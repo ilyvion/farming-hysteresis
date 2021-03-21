@@ -4,15 +4,15 @@
   <FarmingHysteresis.EnableFarmingHysteresis>Enable farming hysteresis</FarmingHysteresis.EnableFarmingHysteresis>
   <FarmingHysteresis.EnableFarmingHysteresisisDesc>Start planting when the configured amount gets lower than the configured lower amount and stop when it gets above the configured upper amount.</FarmingHysteresis.EnableFarmingHysteresisisDesc>
 
-  <FarmingHysteresis.DecrementLowerHysteresis>L: -100</FarmingHysteresis.DecrementLowerHysteresis>
-  <FarmingHysteresis.DecrementLowerHysteresisDesc>Decrement the lower bound by 100</FarmingHysteresis.DecrementLowerHysteresisDesc>
-  <FarmingHysteresis.IncrementLowerHysteresis>L: +100</FarmingHysteresis.IncrementLowerHysteresis>
-  <FarmingHysteresis.IncrementLowerHysteresisDesc>Increment the lower bound by 100</FarmingHysteresis.IncrementLowerHysteresisDesc>
+  <FarmingHysteresis.DecrementLowerHysteresis>L: -{0}</FarmingHysteresis.DecrementLowerHysteresis>
+  <FarmingHysteresis.DecrementLowerHysteresisDesc>Decrement the lower bound by {0}</FarmingHysteresis.DecrementLowerHysteresisDesc>
+  <FarmingHysteresis.IncrementLowerHysteresis>L: +{0}</FarmingHysteresis.IncrementLowerHysteresis>
+  <FarmingHysteresis.IncrementLowerHysteresisDesc>Increment the lower bound by {0}</FarmingHysteresis.IncrementLowerHysteresisDesc>
   
-  <FarmingHysteresis.DecrementUpperHysteresis>U: -100</FarmingHysteresis.DecrementUpperHysteresis>
-  <FarmingHysteresis.DecrementUpperHysteresisDesc>Decrement the upper bound by 100</FarmingHysteresis.DecrementUpperHysteresisDesc>
-  <FarmingHysteresis.IncrementUpperHysteresis>U: +100</FarmingHysteresis.IncrementUpperHysteresis>
-  <FarmingHysteresis.IncrementUpperHysteresisDesc>Increment the upper bound by 100</FarmingHysteresis.IncrementUpperHysteresisDesc>
+  <FarmingHysteresis.DecrementUpperHysteresis>U: -{0}</FarmingHysteresis.DecrementUpperHysteresis>
+  <FarmingHysteresis.DecrementUpperHysteresisDesc>Decrement the upper bound by {0}</FarmingHysteresis.DecrementUpperHysteresisDesc>
+  <FarmingHysteresis.IncrementUpperHysteresis>U: +{0}</FarmingHysteresis.IncrementUpperHysteresis>
+  <FarmingHysteresis.IncrementUpperHysteresisDesc>Increment the upper bound by {0}</FarmingHysteresis.IncrementUpperHysteresisDesc>
 
   <FarmingHysteresis.LowerBound>Start planting {0} when there are fewer than {1} {2} in storage</FarmingHysteresis.LowerBound>
   <FarmingHysteresis.UpperBound>Stop planting {0} when there are more than {1} {2} in storage</FarmingHysteresis.UpperBound>

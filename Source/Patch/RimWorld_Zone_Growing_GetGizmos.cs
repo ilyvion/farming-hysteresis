@@ -60,37 +60,37 @@ namespace FarmingHysteresis.Patch
 				Texture2D uiIcon = harvestedThingDef.uiIcon;
 				var decrementLowerHysteresisCommand = new Command_Decrement
 				{
-					defaultLabel = "FarmingHysteresis.DecrementLowerHysteresis".Translate(),
-					defaultDesc = "FarmingHysteresis.DecrementLowerHysteresisDesc".Translate(),
+					defaultLabel = "FarmingHysteresis.DecrementLowerHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+					defaultDesc = "FarmingHysteresis.DecrementLowerHysteresisDesc".Translate(GenUI.CurrentAdjustmentMultiplier()),
 					icon = uiIcon,
-					action = () => data.LowerBound -= 100
+					action = () => data.LowerBound -= GenUI.CurrentAdjustmentMultiplier()
 				};
 				result.Add(decrementLowerHysteresisCommand);
 
 				var incrementLowerHysteresisCommand = new Command_Increment
 				{
-					defaultLabel = "FarmingHysteresis.IncrementLowerHysteresis".Translate(),
-					defaultDesc = "FarmingHysteresis.IncrementLowerHysteresisDesc".Translate(),
+					defaultLabel = "FarmingHysteresis.IncrementLowerHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+					defaultDesc = "FarmingHysteresis.IncrementLowerHysteresisDesc".Translate(GenUI.CurrentAdjustmentMultiplier()),
 					icon = uiIcon,
-					action = () => data.LowerBound += 100
+					action = () => data.LowerBound += GenUI.CurrentAdjustmentMultiplier()
 				};
 				result.Add(incrementLowerHysteresisCommand);
 
 				var decrementUpperHysteresisCommand = new Command_Decrement
 				{
-					defaultLabel = "FarmingHysteresis.DecrementUpperHysteresis".Translate(),
-					defaultDesc = "FarmingHysteresis.DecrementUpperHysteresisDesc".Translate(),
+					defaultLabel = "FarmingHysteresis.DecrementUpperHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+					defaultDesc = "FarmingHysteresis.DecrementUpperHysteresisDesc".Translate(GenUI.CurrentAdjustmentMultiplier()),
 					icon = uiIcon,
-					action = () => data.UpperBound -= 100
+					action = () => data.UpperBound -= GenUI.CurrentAdjustmentMultiplier()
 				};
 				result.Add(decrementUpperHysteresisCommand);
 
 				var incrementUpperHysteresisCommand = new Command_Increment
 				{
-					defaultLabel = "FarmingHysteresis.IncrementUpperHysteresis".Translate(),
-					defaultDesc = "FarmingHysteresis.IncrementUpperHysteresisDesc".Translate(),
+					defaultLabel = "FarmingHysteresis.IncrementUpperHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+					defaultDesc = "FarmingHysteresis.IncrementUpperHysteresisDesc".Translate(GenUI.CurrentAdjustmentMultiplier()),
 					icon = uiIcon,
-					action = () => data.UpperBound += 100
+					action = () => data.UpperBound += GenUI.CurrentAdjustmentMultiplier()
 				};
 				result.Add(incrementUpperHysteresisCommand);
 			}
