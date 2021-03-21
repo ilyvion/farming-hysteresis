@@ -20,8 +20,18 @@ namespace FarmingHysteresis.Patch
 				defaultLabel = "FarmingHysteresis.EnableFarmingHysteresis".Translate(),
 				defaultDesc = "FarmingHysteresis.EnableFarmingHysteresisisDesc".Translate(),
 				icon = TexCommand.ForbidOff,
-				isActive = () => data.enabled,
-				toggleAction = () => data.enabled = !data.enabled
+				isActive = () => data.Enabled,
+				toggleAction = () =>
+				{
+					if (data.Enabled)
+					{
+						data.Disable(__instance);
+					}
+					else
+					{
+						data.Enable(__instance);
+					}
+				}
 			};
 
 			var result = new List<Gizmo>(__result);
@@ -30,7 +40,7 @@ namespace FarmingHysteresis.Patch
 				result.Add(harvestHysteresisCommand);
 			}
 
-			if (data.enabled)
+			if (data.Enabled)
 			{
 				if (harvestedThingDef == null)
 				{

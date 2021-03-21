@@ -8,7 +8,7 @@ namespace FarmingHysteresis
 {
 	internal class FarmingHysteresisData
 	{
-		public bool enabled;
+		private bool enabled;
 		private int lowerBound;
 		private int upperBound;
 		public LatchMode latchMode;
@@ -59,10 +59,27 @@ namespace FarmingHysteresis
 			}
 		}
 
+		internal bool Enabled
+		{
+			get { return enabled; }
+		}
+
+		internal void Enable(Zone_Growing zone)
+		{
+			enabled = true;
+			UpdateLatchModeAndSowing(zone);
+		}
+
+		internal void Disable(Zone_Growing zone)
+		{
+			enabled = false;
+		}
+
 		internal void UpdateLatchModeAndSowing(Zone_Growing zone)
 		{
 			var (harvestedThingDef, harvestedThingCount) = zone.PlantHarvestInfo();
-			if (harvestedThingDef == null) {
+			if (harvestedThingDef == null)
+			{
 				DisableDueToMissingHarvestedThingDef(zone);
 				return;
 			}

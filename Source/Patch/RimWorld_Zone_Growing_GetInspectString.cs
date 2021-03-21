@@ -13,7 +13,7 @@ namespace FarmingHysteresis.Patch
 		{
 			var data = __instance.GetFarmingHysteresisData();
 			var (harvestedThingDef, harvestedThingCount) = __instance.PlantHarvestInfo();
-			if (data.enabled)
+			if (data.Enabled)
 			{
 				if (harvestedThingDef == null)
 				{

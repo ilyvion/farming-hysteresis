@@ -29,7 +29,7 @@ namespace FarmingHysteresis
 			foreach (var zone in map.zoneManager.AllZones.OfType<Zone_Growing>())
 			{
 				var data = zone.GetFarmingHysteresisData();
-				if (data.enabled)
+				if (data.Enabled)
 				{
 					data.UpdateLatchModeAndSowing(zone);
 				}
