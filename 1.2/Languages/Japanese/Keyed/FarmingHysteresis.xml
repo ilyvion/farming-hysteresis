@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<LanguageData>
+  <FarmingHysteresis.EnableFarmingHysteresis>在庫対応有効</FarmingHysteresis.EnableFarmingHysteresis>
+  <FarmingHysteresis.EnableFarmingHysteresisisDesc>設定された下限値を在庫が下回った場合に種蒔きを開始して,設定された上限値を在庫が超えた場合に種蒔きを停止します.</FarmingHysteresis.EnableFarmingHysteresisisDesc>
+
+  <FarmingHysteresis.DecrementLowerHysteresis>下限：-{0}</FarmingHysteresis.DecrementLowerHysteresis>
+  <FarmingHysteresis.DecrementLowerHysteresisDesc>下限値を{0}下げます.\nCtrlキー押すと+10,\nShiftキーを押すと+100に変更</FarmingHysteresis.DecrementLowerHysteresisDesc>
+  <FarmingHysteresis.IncrementLowerHysteresis>下限：+{0}</FarmingHysteresis.IncrementLowerHysteresis>
+  <FarmingHysteresis.IncrementLowerHysteresisDesc>下限値を{0}上げます.\nCtrlキー押すと+10,\nShiftキーを押すと+100に変更</FarmingHysteresis.IncrementLowerHysteresisDesc>
+
+  <FarmingHysteresis.DecrementUpperHysteresis>上限：-{0}</FarmingHysteresis.DecrementUpperHysteresis>
+  <FarmingHysteresis.DecrementUpperHysteresisDesc>上限値を{0}下げます.\nCtrlキー押すと+10,\nShiftキーを押すと+100に変更</FarmingHysteresis.DecrementUpperHysteresisDesc>
+  <FarmingHysteresis.IncrementUpperHysteresis>上限：+{0}</FarmingHysteresis.IncrementUpperHysteresis>
+  <FarmingHysteresis.IncrementUpperHysteresisDesc>上限値を{0}上げます.\nCtrlキー押すと+10,\nShiftキーを押すと+100に変更</FarmingHysteresis.IncrementUpperHysteresisDesc>
+
+  <FarmingHysteresis.LowerBound>下限:{2}が{1}未満の場合,\n　　 {0}の種蒔きを開始</FarmingHysteresis.LowerBound>
+  <FarmingHysteresis.UpperBound>上限:{2}が{1}以上の場合,\n　　 {0}の種蒔きを停止</FarmingHysteresis.UpperBound>
+  <FarmingHysteresis.InStorage>{0}の在庫量：現在 {1}</FarmingHysteresis.InStorage>
+
+  <FarmingHysteresis.LatchModeDesc>現状:{0}</FarmingHysteresis.LatchModeDesc>
+  <FarmingHysteresis.LatchModeDesc.Unknown>不明.これはバグです.</FarmingHysteresis.LatchModeDesc.Unknown>
+  <FarmingHysteresis.LatchModeDesc.BelowLowerBound>在庫が下限未満.種蒔き可能</FarmingHysteresis.LatchModeDesc.BelowLowerBound>
+  <FarmingHysteresis.LatchModeDesc.AboveLowerBoundEnabled>在庫が下限以上,上限未満.種蒔き可能</FarmingHysteresis.LatchModeDesc.AboveLowerBoundEnabled>
+  <FarmingHysteresis.LatchModeDesc.AboveLowerBoundDisabled>在庫が下限未満,上限未満.種蒔き可能</FarmingHysteresis.LatchModeDesc.AboveLowerBoundDisabled>
+  <FarmingHysteresis.LatchModeDesc.AboveUpperBound>在庫が上限以上.種蒔き無効</FarmingHysteresis.LatchModeDesc.AboveUpperBound>
+  <FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>選択した植物に収穫可能な作物が存在しないので,この栽培ゾーンでは在庫対応が無効になっています</FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>
+
+</LanguageData>
