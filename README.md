@@ -8,10 +8,12 @@ I got tired of keeping track of these numbers myself, so I made a little mod to 
 
 Licensed under either of
 
-* Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
-* MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+* Apache License, Version 2.0, ([LICENSE.Apache-2.0](LICENSE.Apache-2.0) or http://www.apache.org/licenses/LICENSE-2.0)
+* MIT license ([LICENSE.MIT](LICENSE.MIT) or http://opensource.org/licenses/MIT)
 
 at your option.
+
+`SPDX-License-Identifier: Apache-2.0 OR MIT`
 
 ### Contribution
 
