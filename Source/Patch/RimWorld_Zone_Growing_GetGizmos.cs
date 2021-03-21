@@ -13,6 +13,11 @@ namespace FarmingHysteresis.Patch
 	{
 		private static void Postfix(Zone_Growing __instance, ref IEnumerable<Gizmo> __result)
 		{
+			if (Find.Selector.NumSelected != 1)
+			{
+				return;
+			}
+
 			var data = __instance.GetFarmingHysteresisData();
 			var harvestedThingDef = __instance.GetPlantDefToGrow().plant.harvestedThingDef;
 			var harvestHysteresisCommand = new Command_Toggle
