@@ -4,6 +4,10 @@ Farming Hysteresis lets you automate enabling and disabling growing zones based 
 
 I got tired of keeping track of these numbers myself, so I made a little mod to do it for me. Hopefully it can be of use to you too.
 
+## Contributors
+
+* Proxyer: Japanese translation
+
 ## License
 
 Licensed under either of
