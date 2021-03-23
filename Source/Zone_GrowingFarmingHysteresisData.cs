@@ -117,15 +117,17 @@ namespace FarmingHysteresis
 				return;
 			}
 
+			IBoundedValueAccessor values = GetBoundedValueAccessor();
+			
 			// First, check the simple cases
-			if (harvestedThingCount < lowerBound)
+			if (harvestedThingCount < values.LowerBoundValueRaw)
 			{
 				// Below lower bound: Enabled
 				latchMode = LatchMode.BelowLowerBound;
 				zone.allowSow = true;
 				return;
 			}
-			else if (harvestedThingCount > upperBound)
+			else if (harvestedThingCount > values.UpperBoundValueRaw)
 			{
 				// Above upper bound: Disabled
 				latchMode = LatchMode.AboveUpperBound;
@@ -142,7 +144,7 @@ namespace FarmingHysteresis
 				case LatchMode.Unknown:
 					// If we were previously below the lower bound, it's time to enter
 					// the "above lower bound enabled" state.
-					if (harvestedThingCount > lowerBound)
+					if (harvestedThingCount > values.LowerBoundValueRaw)
 					{
 						latchMode = LatchMode.AboveLowerBoundEnabled;
 						zone.allowSow = true;
@@ -152,7 +154,7 @@ namespace FarmingHysteresis
 				case LatchMode.AboveUpperBound:
 					// If we were previously above the upper bound, it's time to enter
 					// the "above lower bound disabled" state.
-					if (harvestedThingCount < upperBound)
+					if (harvestedThingCount < values.UpperBoundValueRaw)
 					{
 						latchMode = LatchMode.AboveLowerBoundDisabled;
 						zone.allowSow = false;
