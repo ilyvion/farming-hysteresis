@@ -5,7 +5,7 @@
   <FarmingHysteresis.EnableFarmingHysteresisisDesc>Start planting when the configured amount gets lower than the configured lower amount and stop when it gets above the configured upper amount.</FarmingHysteresis.EnableFarmingHysteresisisDesc>
 
   <FarmingHysteresis.UseGlobalValues>Use global hysteresis values</FarmingHysteresis.UseGlobalValues>
-  <FarmingHysteresis.UseGlobalValuesDesc>For all zones of the same crop with this setting is enabled, they will share the same bound values.</FarmingHysteresis.UseGlobalValuesDesc>
+  <FarmingHysteresis.UseGlobalValuesDesc>For all zones of the same crop with this setting enabled, they will share the same bound values.</FarmingHysteresis.UseGlobalValuesDesc>
 
   <FarmingHysteresis.DecrementLowerHysteresis>L: -{0}</FarmingHysteresis.DecrementLowerHysteresis>
   <FarmingHysteresis.DecrementLowerHysteresisDesc>Decrement the lower bound by {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.DecrementLowerHysteresisDesc>

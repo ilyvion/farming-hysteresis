@@ -88,7 +88,7 @@ namespace FarmingHysteresis
 
 		internal bool HasBoundsFor(ThingDef harvestedThingDef)
 		{
-			return globalLowerBoundValues.ContainsKey(harvestedThingDef) || globalUpperBoundValues.ContainsKey(harvestedThingDef);
+			return GlobalLowerBoundValues.ContainsKey(harvestedThingDef) || GlobalUpperBoundValues.ContainsKey(harvestedThingDef);
 		}
 
 		public string GetUniqueLoadID()
