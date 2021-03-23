@@ -6,56 +6,89 @@ using Verse;
 
 namespace FarmingHysteresis
 {
-	internal class FarmingHysteresisData
+	internal class FarmingHysteresisData : IBoundedValueAccessor
 	{
+		private System.WeakReference<Zone_Growing> zoneWeakReference;
+
 		private bool enabled;
 		private int lowerBound;
 		private int upperBound;
 		public LatchMode latchMode;
 
-		public FarmingHysteresisData()
+		public bool useGlobalValues;
+
+		public FarmingHysteresisData(System.WeakReference<Zone_Growing> weakReference)
 		{
+			zoneWeakReference = weakReference;
 			enabled = false;
 			lowerBound = Constants.DefaultHysteresisLowerBound;
 			upperBound = Constants.DefaultHysteresisUpperBound;
 			latchMode = LatchMode.Unknown;
 		}
 
-		internal void ExposeData(ref Zone_Growing zone)
+		internal void ExposeData()
 		{
 			Scribe_Values.Look(ref enabled, "farmingHysteresisEnabled", false);
 			Scribe_Values.Look(ref lowerBound, "farmingHysteresisLowerBound", Constants.DefaultHysteresisLowerBound);
 			Scribe_Values.Look(ref upperBound, "farmingHysteresisUpperBound", Constants.DefaultHysteresisUpperBound);
 			Scribe_Values.Look(ref latchMode, "farmingHysteresisLatchMode", LatchMode.Unknown);
+			Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", false);
+		}
+
+		int IBoundedValueAccessor.LowerBoundValueRaw { get => lowerBound; set => lowerBound = value; }
+		int IBoundedValueAccessor.UpperBoundValueRaw { get => upperBound; set => upperBound = value; }
+
+		private IBoundedValueAccessor GetBoundedValueAccessor()
+		{
+			IBoundedValueAccessor values;
+			if (!useGlobalValues)
+			{
+				values = this;
+			}
+			else
+			{
+				if (zoneWeakReference.TryGetTarget(out var zone))
+				{
+					var (harvestedThingDef, _) = zone.PlantHarvestInfo();
+					values = FarmingHysteresisMapComponent.For(Find.CurrentMap).GetGlobalBoundedValueAccessorFor(harvestedThingDef);
+				}
+				else
+				{
+					throw new Exception("This should not happen. Code: FHD-GBVA");
+				}
+			}
+			return values;
 		}
 
 		public int LowerBound
 		{
-			get { return lowerBound; }
+			get => GetBoundedValueAccessor().LowerBoundValueRaw;
 			set
 			{
+				IBoundedValueAccessor values = GetBoundedValueAccessor();
 				if (value < 0)
 				{
 					value = 0;
 				}
-				if (value > upperBound)
+				else if (value > values.UpperBoundValueRaw)
 				{
-					value = upperBound;
+					value = values.UpperBoundValueRaw;
 				}
-				lowerBound = value;
+				values.LowerBoundValueRaw = value;
 			}
 		}
 
 		public int UpperBound
 		{
-			get { return upperBound; }
+			get => GetBoundedValueAccessor().UpperBoundValueRaw;
 			set
 			{
-				if (value < lowerBound)
+				IBoundedValueAccessor values = GetBoundedValueAccessor();
+				if (value < values.LowerBoundValueRaw)
 				{
-					value = lowerBound;
+					value = values.LowerBoundValueRaw;
 				}
-				upperBound = value;
+				values.UpperBoundValueRaw = value;
 			}
 		}
 
@@ -141,7 +174,7 @@ namespace FarmingHysteresis
 
 		internal static FarmingHysteresisData GetFarmingHysteresisData(this Zone_Growing zone)
 		{
-			return dataTable.GetOrCreateValue(zone);
+			return dataTable.GetValue(zone, (z) => new FarmingHysteresisData(new System.WeakReference<Zone_Growing>(z)));
 		}
 	}
 }

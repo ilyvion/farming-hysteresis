@@ -1,7 +1,5 @@
-using FarmingHysteresis.Helpers.Extensions;
 using HarmonyLib;
 using RimWorld;
-using Verse;
 
 namespace FarmingHysteresis.Patch
 {
@@ -10,7 +8,7 @@ namespace FarmingHysteresis.Patch
 	{
 		private static void Postfix(ref Zone_Growing __instance)
 		{
-			__instance.GetFarmingHysteresisData().ExposeData(ref __instance);
+			__instance.GetFarmingHysteresisData().ExposeData();
 		}
 	}
 }

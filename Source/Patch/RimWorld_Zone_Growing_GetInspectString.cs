@@ -1,4 +1,3 @@
-using System.Linq;
 using FarmingHysteresis.Helpers.Extensions;
 using HarmonyLib;
 using RimWorld;
@@ -22,6 +21,7 @@ namespace FarmingHysteresis.Patch
 				}
 
 				var plant = __instance.GetPlantDefToGrow();
+				__result += "\n" + "FarmingHysteresis.UseGlobalBounds".Translate(harvestedThingDef.label, data.useGlobalValues ? "Yes".Translate() : "No".Translate());
 				__result += "\n" + "FarmingHysteresis.LowerBound".Translate(plant.label, data.LowerBound, harvestedThingDef.label);
 				__result += "\n" + "FarmingHysteresis.UpperBound".Translate(plant.label, data.UpperBound, harvestedThingDef.label);
 				__result += "\n" + "FarmingHysteresis.InStorage".Translate(harvestedThingDef.label, harvestedThingCount);

@@ -1,10 +1,8 @@
-using FarmingHysteresis.Helpers.Extensions;
 using System.Collections.Generic;
 using HarmonyLib;
 using RimWorld;
 using Verse;
 using UnityEngine;
-using System.Linq;
 
 namespace FarmingHysteresis.Patch
 {
@@ -56,6 +54,36 @@ namespace FarmingHysteresis.Patch
 				// If hysteresis is enabled, disable the manual sowing enabled button
 				var sowingGizmo = result.Find(g => g is Command_Toggle t && t.defaultLabel == "CommandAllowSow".Translate());
 				result.Remove(sowingGizmo);
+
+				var useGlobalValuesCommand = new Command_Toggle
+				{
+					defaultLabel = "FarmingHysteresis.UseGlobalValues".Translate(),
+					defaultDesc = "FarmingHysteresis.UseGlobalValuesDesc".Translate(),
+					icon = TexCommand.ForbidOff,
+					isActive = () => data.useGlobalValues,
+					toggleAction = () =>
+					{
+						if (data.useGlobalValues || FarmingHysteresisMapComponent.For(Find.CurrentMap).HasBoundsFor(harvestedThingDef))
+						{
+							// We were already using global values OR such global values already exist for this harvest type.
+							// So just flip the value.
+							data.useGlobalValues = !data.useGlobalValues;
+						}
+						else
+						{
+							// This is the first time this harvest type is switching to global values.
+							// Copy the initial global values over from the local values for a better user experience.
+							var currentLowerBound = data.LowerBound;
+							var currentUpperBound = data.UpperBound;
+
+							data.useGlobalValues = true;
+
+							data.LowerBound = currentLowerBound;
+							data.UpperBound = currentUpperBound;
+						}
+					}
+				};
+				result.Add(useGlobalValuesCommand);
 
 				Texture2D uiIcon = harvestedThingDef.uiIcon;
 				var decrementLowerHysteresisCommand = new Command_Decrement
