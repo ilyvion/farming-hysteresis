@@ -4,6 +4,9 @@
   <FarmingHysteresis.EnableFarmingHysteresis>在庫対応有効</FarmingHysteresis.EnableFarmingHysteresis>
   <FarmingHysteresis.EnableFarmingHysteresisisDesc>設定された下限値を在庫が下回った場合に種蒔きを開始して,設定された上限値を在庫が超えた場合に種蒔きを停止します.</FarmingHysteresis.EnableFarmingHysteresisisDesc>
 
+  <FarmingHysteresis.UseGlobalValues>同種在庫 全域対応</FarmingHysteresis.UseGlobalValues>
+  <FarmingHysteresis.UseGlobalValuesDesc>この設定が有効になっている同じ作物に指定されているすべての栽培ゾーンで,同じ境界値(下限値/上限値)が共有されます.</FarmingHysteresis.UseGlobalValuesDesc>
+
   <FarmingHysteresis.DecrementLowerHysteresis>下限：-{0}</FarmingHysteresis.DecrementLowerHysteresis>
   <FarmingHysteresis.DecrementLowerHysteresisDesc>下限値を{0}下げます.\n{1}キーを押すと+10,\n{2}キーを押すと+100に変更</FarmingHysteresis.DecrementLowerHysteresisDesc>
   <FarmingHysteresis.IncrementLowerHysteresis>下限：+{0}</FarmingHysteresis.IncrementLowerHysteresis>
@@ -14,6 +17,7 @@
   <FarmingHysteresis.IncrementUpperHysteresis>上限：+{0}</FarmingHysteresis.IncrementUpperHysteresis>
   <FarmingHysteresis.IncrementUpperHysteresisDesc>上限値を{0}上げます.\n{1}キーを押すと+10,\n{2}キーを押すと+100に変更</FarmingHysteresis.IncrementUpperHysteresisDesc>
 
+  <FarmingHysteresis.UseGlobalBounds>{0}に全域在庫対応を使用：{1}</FarmingHysteresis.UseGlobalBounds>
   <FarmingHysteresis.LowerBound>下限:{2}が{1}未満の場合,\n　　 {0}の種蒔きを開始</FarmingHysteresis.LowerBound>
   <FarmingHysteresis.UpperBound>上限:{2}が{1}以上の場合,\n　　 {0}の種蒔きを停止</FarmingHysteresis.UpperBound>
   <FarmingHysteresis.InStorage>{0}の在庫量：現在 {1}</FarmingHysteresis.InStorage>
