@@ -9,7 +9,7 @@ namespace FarmingHysteresis
 		{
 			GizmoResult result = base.GizmoOnGUI(loc, maxWidth);
 			Rect rect = new Rect(loc.x, loc.y, GetWidth(maxWidth), 75f);
-			Rect position = new Rect(rect.x + rect.width - 24f, rect.y, 24f, 24f);
+			Rect position = new Rect(rect.x + rect.width - GenUI.SmallIconSize, rect.y, GenUI.SmallIconSize, GenUI.SmallIconSize);
 			Texture2D image = ContentFinder<Texture2D>.Get("UI/Overlays/Arrow");
 
 			GUI.DrawTexture(position, image);
