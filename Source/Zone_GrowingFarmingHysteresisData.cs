@@ -32,6 +32,18 @@ namespace FarmingHysteresis
 			Scribe_Values.Look(ref lowerBound, "farmingHysteresisLowerBound", Constants.DefaultHysteresisLowerBound);
 			Scribe_Values.Look(ref upperBound, "farmingHysteresisUpperBound", Constants.DefaultHysteresisUpperBound);
 			Scribe_Values.Look(ref latchMode, "farmingHysteresisLatchMode", LatchMode.Unknown);
+			if (Scribe.mode == LoadSaveMode.LoadingVars)
+			{
+				switch (latchMode)
+				{
+					case LatchMode.AboveLowerBoundDisabled:
+						latchMode = LatchMode.BetweenBoundsDisabled;
+						break;
+					case LatchMode.AboveLowerBoundEnabled:
+						latchMode = LatchMode.BetweenBoundsEnabled;
+						break;
+				}
+			}
 			Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", false);
 		}
 
@@ -118,7 +130,7 @@ namespace FarmingHysteresis
 			}
 
 			IBoundedValueAccessor values = GetBoundedValueAccessor();
-			
+
 			// First, check the simple cases
 			if (harvestedThingCount < values.LowerBoundValueRaw)
 			{
@@ -146,7 +158,7 @@ namespace FarmingHysteresis
 					// the "above lower bound enabled" state.
 					if (harvestedThingCount > values.LowerBoundValueRaw)
 					{
-						latchMode = LatchMode.AboveLowerBoundEnabled;
+						latchMode = LatchMode.BetweenBoundsEnabled;
 						zone.allowSow = true;
 					}
 					return;
@@ -156,7 +168,7 @@ namespace FarmingHysteresis
 					// the "above lower bound disabled" state.
 					if (harvestedThingCount < values.UpperBoundValueRaw)
 					{
-						latchMode = LatchMode.AboveLowerBoundDisabled;
+						latchMode = LatchMode.BetweenBoundsDisabled;
 						zone.allowSow = false;
 					}
 					return;
