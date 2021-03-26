@@ -8,7 +8,7 @@
 		<RootNamespace>FarmingHysteresis</RootNamespace>
 		<AssemblyName>FarmingHysteresis</AssemblyName>
 		<OutputPath>../1.2/Assemblies</OutputPath>
-		<VersionPrefix>0.2</VersionPrefix>
+		<VersionPrefix>0.3</VersionPrefix>
 
 		<!-- do not generate pdb file -->
 		<DebugType>none</DebugType>

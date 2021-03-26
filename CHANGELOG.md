@@ -1,3 +1,12 @@
+## 0.3.0 (March 26, 2021)
+
+### New ✨
+* There is now a Japanese translation of the mod, courtesy of Proxyer.
+* You can now set map-global hysteresis bounds, which lets you make it so that all zones that grow the same product share the same values.
+
+### Improvements 🙌
+* Show main multiplier modifier keys in the increment/decrement button descriptions
+
 ## 0.2.0 (March 21, 2021)
 
 ### New ✨

@@ -4,6 +4,12 @@ Farming Hysteresis lets you automate enabling and disabling growing zones based 
 
 I got tired of keeping track of these numbers myself, so I made a little mod to do it for me. Hopefully it can be of use to you too.
 
+## Operation
+
+The mod adds an "Enable farming hysteresis" to all supported growing zones. Only growing zones that produce a harvestable product are supported. When you enable this setting, the "Enable sowing" button is removed, and sowing is instead controlled by a set of hysteresis bounds.
+
+When the amount of stored product goes below the lower bound, growing is enabled. Growing remains enabled until the amount of stored product goes above the upper bound, at which point growing is disabled. Growing remains disabled until the amount of stored product once again goes below the lower bound.
+
 ## Contributors
 
 * Proxyer: Japanese translation
