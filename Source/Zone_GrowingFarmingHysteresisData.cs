@@ -136,42 +136,54 @@ namespace FarmingHysteresis
 			{
 				// Below lower bound: Enabled
 				latchMode = LatchMode.BelowLowerBound;
-				zone.allowSow = true;
-				return;
 			}
 			else if (harvestedThingCount > values.UpperBoundValueRaw)
 			{
 				// Above upper bound: Disabled
 				latchMode = LatchMode.AboveUpperBound;
-				zone.allowSow = false;
-				return;
 			}
+			else
+			{
+				// We know harvestedThingCount is between lower and upper bound
+				// at this point thanks to the above checks.
 
-			// We know harvestedThingCount is between lower and upper bound
-			// at this point thanks to the above checks.
+				switch (latchMode)
+				{
+					case LatchMode.BelowLowerBound:
+					case LatchMode.Unknown:
+						// If we were previously below the lower bound, it's time to enter
+						// the "above lower bound enabled" state.
+						if (harvestedThingCount > values.LowerBoundValueRaw)
+						{
+							latchMode = LatchMode.BetweenBoundsEnabled;
+						}
+						break;
+
+					case LatchMode.AboveUpperBound:
+						// If we were previously above the upper bound, it's time to enter
+						// the "above lower bound disabled" state.
+						if (harvestedThingCount < values.UpperBoundValueRaw)
+						{
+							latchMode = LatchMode.BetweenBoundsDisabled;
+						}
+						break;
+				}
+			}
 
 			switch (latchMode)
 			{
-				case LatchMode.BelowLowerBound:
-				case LatchMode.Unknown:
-					// If we were previously below the lower bound, it's time to enter
-					// the "above lower bound enabled" state.
-					if (harvestedThingCount > values.LowerBoundValueRaw)
-					{
-						latchMode = LatchMode.BetweenBoundsEnabled;
-						zone.allowSow = true;
-					}
-					return;
-
 				case LatchMode.AboveUpperBound:
-					// If we were previously above the upper bound, it's time to enter
-					// the "above lower bound disabled" state.
-					if (harvestedThingCount < values.UpperBoundValueRaw)
-					{
-						latchMode = LatchMode.BetweenBoundsDisabled;
-						zone.allowSow = false;
-					}
-					return;
+				case LatchMode.BetweenBoundsDisabled:
+					zone.allowSow = false;
+					break;
+
+				case LatchMode.BelowLowerBound:
+				case LatchMode.BetweenBoundsEnabled:
+					zone.allowSow = true;
+					break;
+
+				default:
+					throw new Exception($"We should never be in this state. This is a bug! State was {latchMode}.");
 			}
 		}
 
