@@ -7,10 +7,14 @@ namespace FarmingHysteresis
 		// Below lower bound - enabled
 		BelowLowerBound,
 		// Lower bound met, but not upper bound - enabled
-		AboveLowerBoundEnabled,
+		BetweenBoundsEnabled,
 		// Upper bound met, but not yet below lower bound - disabled
-		AboveLowerBoundDisabled,
+		BetweenBoundsDisabled,
 		// Above upper bound - disabled
 		AboveUpperBound,
+
+		// We need to keep these around to avoid breaking saves; they get converted to the correct values on load
+		AboveLowerBoundEnabled,
+		AboveLowerBoundDisabled,
 	}
 }

@@ -25,8 +25,8 @@
   <FarmingHysteresis.LatchModeDesc>Current state: {0}</FarmingHysteresis.LatchModeDesc>
   <FarmingHysteresis.LatchModeDesc.Unknown>Unknown. This is a bug.</FarmingHysteresis.LatchModeDesc.Unknown>
   <FarmingHysteresis.LatchModeDesc.BelowLowerBound>Lower than the lower bound. Sowing enabled.</FarmingHysteresis.LatchModeDesc.BelowLowerBound>
-  <FarmingHysteresis.LatchModeDesc.AboveLowerBoundEnabled>Higher than the lower bound, but has not reached the upper bound. Sowing still enabled.</FarmingHysteresis.LatchModeDesc.AboveLowerBoundEnabled>
-  <FarmingHysteresis.LatchModeDesc.AboveLowerBoundDisabled>Lower than the upper bound, but has not reached the lower bound. Sowing still disabled.</FarmingHysteresis.LatchModeDesc.AboveLowerBoundDisabled>
+  <FarmingHysteresis.LatchModeDesc.BetweenBoundsEnabled>Higher than the lower bound, but has not reached the upper bound. Sowing still enabled.</FarmingHysteresis.LatchModeDesc.BetweenBoundsEnabled>
+  <FarmingHysteresis.LatchModeDesc.BetweenBoundsDisabled>Lower than the upper bound, but has not reached the lower bound. Sowing still disabled.</FarmingHysteresis.LatchModeDesc.BetweenBoundsDisabled>
   <FarmingHysteresis.LatchModeDesc.AboveUpperBound>Higher than the upper bound. Sowing disabled.</FarmingHysteresis.LatchModeDesc.AboveUpperBound>
   <FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>Farming hysteresis is disabled for this growing zone due to the selected plant not having a harvestable product.</FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>
 </LanguageData>

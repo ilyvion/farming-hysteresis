@@ -116,8 +116,8 @@ namespace FarmingHysteresis
 		{
 			base.MapComponentTick();
 
-			// No need to make these checks every single tick; once every in-game hour should suffice.
-			if (Find.TickManager.TicksGame % 2500 != 0) return;
+			// No need to make these checks every single tick; once every 6 in-game minutes (4.16 seconds real time) should be enough.
+			if (Find.TickManager.TicksGame % 250 != 0) return;
 
 			foreach (var zone in map.zoneManager.AllZones.OfType<Zone_Growing>())
 			{

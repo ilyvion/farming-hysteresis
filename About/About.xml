@@ -7,7 +7,21 @@
 
 I got tired of keeping track of these numbers myself, so I made a little mod to do it for me. Hopefully it can be of use to you too.
 
-Current version: 0.2</description>
+&lt;size=24&gt;Operation&lt;/size&gt;
+
+The mod adds an "Enable farming hysteresis" to all supported growing zones. Only growing zones that produce a harvestable product are supported. When you enable this setting, the "Enable sowing" button is removed, and sowing is instead controlled by a set of hysteresis bounds.
+
+When the amount of stored product goes below the lower bound, growing is enabled. Growing remains enabled until the amount of stored product goes above the upper bound, at which point growing is disabled. Growing remains disabled until the amount of stored product once again goes below the lower bound.
+
+&lt;size=24&gt;Contributors&lt;/size&gt;
+
+* Proxyer: Japanese translation
+
+&lt;size=24&gt;Version&lt;/size&gt;
+
+This is version 0.3.1 for RimWorld 1.2
+
+</description>
 	<supportedVersions>
 		<li>1.2</li>
 	</supportedVersions>

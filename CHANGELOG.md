@@ -1,3 +1,21 @@
+## 0.3.1 (April 3, 2021)
+
+### Improvements 🙌
+* Manifest.xml for use with ModManager now included.
+* 'Growing' changed to 'sowing' in description of what the mod does.
+
+### Bug Fixes 🐛
+* Whether or not to allow sowing only got updated on a latch mode change, which meant that if the zone was set to not allow sowing manually, and then was set to use hysteresis, sowing would not be enabled until there was a change in hysteresis state.
+
+## 0.3.0 (March 26, 2021)
+
+### New ✨
+* There is now a Japanese translation of the mod, courtesy of Proxyer.
+* You can now set map-global hysteresis bounds, which lets you make it so that all zones that grow the same product share the same values.
+
+### Improvements 🙌
+* Show main multiplier modifier keys in the increment/decrement button descriptions
+
 ## 0.2.0 (March 21, 2021)
 
 ### New ✨
