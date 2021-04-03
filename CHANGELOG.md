@@ -1,3 +1,12 @@
+## 0.3.1 (April 3, 2021)
+
+### Improvements 🙌
+* Manifest.xml for use with ModManager now included.
+* 'Growing' changed to 'sowing' in description of what the mod does.
+
+### Bug Fixes 🐛
+* Whether or not to allow sowing only got updated on a latch mode change, which meant that if the zone was set to not allow sowing manually, and then was set to use hysteresis, sowing would not be enabled until there was a change in hysteresis state.
+
 ## 0.3.0 (March 26, 2021)
 
 ### New ✨
