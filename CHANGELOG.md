@@ -5,11 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Mod settings to let the default hysteresis values be configurable by the player.
 
 ## [0.3.2] - 2021-07-23
 ### Changed
-- Declare support for 1.3
-- Changelog file modified to adhere to the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) pattern
+- Declare support for 1.3.
+- Changelog file modified to adhere to the [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) pattern.
 - Modified build files so the project folder must be outside the RimWorld folder, and files are copied in instead.
 
 ## [0.3.1] - 2021-04-03
