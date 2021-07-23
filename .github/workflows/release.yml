@@ -51,7 +51,8 @@ jobs:
       run: |
         echo "MOD_PATH=$HOME/FarmingHysteresis" >> $GITHUB_ENV
         echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_ENV
-    
+        echo "NO_PREFIX_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
     - name: Create Mod Folder
       run: mkdir -p ${{ env.MOD_PATH }}
 
@@ -60,10 +61,22 @@ jobs:
       with:
         name: FarmingHysteresis-Release
         path: ${{ env.MOD_PATH }}
+
     - name: Zip Mod
       run: | 
         cd $HOME
         zip -r ./FarmingHysteresis.zip ./FarmingHysteresis/*
+
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Get Changelog Entry
+      id: changelog_reader
+      uses: mindsers/changelog-reader-action@v2
+      with:
+        version: ${{ env.NO_PREFIX_VERSION }}
+        path: ./CHANGELOG.md
+
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -72,8 +85,10 @@ jobs:
       with:
         tag_name: ${{ env.VERSION }}
         release_name: Release ${{ env.VERSION }}
+        body: ${{ steps.changelog_reader.outputs.changes }}
         draft: false
         prerelease: false
+
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
