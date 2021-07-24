@@ -20,15 +20,16 @@ namespace FarmingHysteresis
         public FarmingHysteresisData(System.WeakReference<Zone_Growing> weakReference)
         {
             zoneWeakReference = weakReference;
-            enabled = false;
+            enabled = Settings.EnabledByDefault;
             lowerBound = Settings.DefaultHysteresisLowerBound;
             upperBound = Settings.DefaultHysteresisUpperBound;
+            useGlobalValues = Settings.UseGlobalValuesByDefault;
             latchMode = LatchMode.Unknown;
         }
 
         internal void ExposeData()
         {
-            Scribe_Values.Look(ref enabled, "farmingHysteresisEnabled", false);
+            Scribe_Values.Look(ref enabled, "farmingHysteresisEnabled", Settings.EnabledByDefault);
             Scribe_Values.Look(ref lowerBound, "farmingHysteresisLowerBound", Settings.DefaultHysteresisLowerBound);
             Scribe_Values.Look(ref upperBound, "farmingHysteresisUpperBound", Settings.DefaultHysteresisUpperBound);
             Scribe_Values.Look(ref latchMode, "farmingHysteresisLatchMode", LatchMode.Unknown);
@@ -44,7 +45,7 @@ namespace FarmingHysteresis
                         break;
                 }
             }
-            Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", false);
+            Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", Settings.UseGlobalValuesByDefault);
         }
 
         int IBoundedValueAccessor.LowerBoundValueRaw { get => lowerBound; set => lowerBound = value; }
@@ -190,7 +191,7 @@ namespace FarmingHysteresis
         internal void DisableDueToMissingHarvestedThingDef(Zone_Growing zone)
         {
             enabled = false;
-            Log.Message($"Zone {zone.ID} has a plant type without a harvestable product. Disabling farming hysteresis.");
+            Log.Warning($"Zone {zone.ID} has a plant type without a harvestable product. Disabling farming hysteresis.");
         }
     }
 

@@ -9,6 +9,8 @@
 
   <FarmingHysteresis.DefaultLowerBound>Default lower bound</FarmingHysteresis.DefaultLowerBound>
   <FarmingHysteresis.DefaultUpperBound>Default upper bound</FarmingHysteresis.DefaultUpperBound>
+  <FarmingHysteresis.EnabledByDefault>Growing zones enable hysteresis upon placement</FarmingHysteresis.EnabledByDefault>
+  <FarmingHysteresis.UseGlobalValuesByDefault>Use global hysteresis values by default</FarmingHysteresis.UseGlobalValuesByDefault>
 
   <FarmingHysteresis.DecrementLowerHysteresis>L: -{0}</FarmingHysteresis.DecrementLowerHysteresis>
   <FarmingHysteresis.DecrementLowerHysteresisDesc>Decrement the lower bound by {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.DecrementLowerHysteresisDesc>

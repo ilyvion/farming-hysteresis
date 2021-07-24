@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Mod settings to let the default hysteresis values be configurable by the player.
+- Mod settings for enabling hysteresis by default and for using global hysteresis values by default.
+### Changed
+- Using hysteresis is now enabled by default.
+- Using global hysteresis values is now enabled by default.
 
 ## [0.3.2] - 2021-07-23
 ### Changed

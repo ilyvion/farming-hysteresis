@@ -21,17 +21,7 @@ namespace FarmingHysteresis
         public override void DoSettingsWindowContents(Rect inRect)
         {
             base.DoSettingsWindowContents(inRect);
-
-            Listing_Standard listingStandard = new Listing_Standard();
-            listingStandard.Begin(inRect);
-
-            listingStandard.Label("FarmingHysteresis.DefaultLowerBound".Translate());
-            listingStandard.IntEntry(ref Settings._defaultHysteresisLowerBound, ref Settings.DefaultHysteresisLowerBoundBuffer);
-
-            listingStandard.Label("FarmingHysteresis.DefaultUpperBound".Translate());
-            listingStandard.IntEntry(ref Settings._defaultHysteresisUpperBound, ref Settings.DefaultHysteresisUpperBoundBuffer);
-
-            listingStandard.End();
+            Settings.DoSettingsWindowContents(inRect);
         }
 
         public override string SettingsCategory()
