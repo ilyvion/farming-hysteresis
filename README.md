@@ -1,4 +1,4 @@
-[![RimWorld 1.2+](https://img.shields.io/badge/RimWorld-1.2%2B-brightgreen.svg)](http://rimworldgame.com/) [![Build](https://github.com/alexschrod/farming-hysteresis/actions/workflows/build.yml/badge.svg)](https://github.com/alexschrod/farming-hysteresis/actions/workflows/build.yml)
+[![RimWorld 1.3](https://img.shields.io/badge/RimWorld-1.3-brightgreen.svg)](http://rimworldgame.com/) [![Build](https://github.com/alexschrod/farming-hysteresis/actions/workflows/build.yml/badge.svg)](https://github.com/alexschrod/farming-hysteresis/actions/workflows/build.yml)
 
 Farming Hysteresis lets you automate enabling and disabling growing zones based on the amount of product already in storage.
 
