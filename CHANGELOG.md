@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2022-10-24
+### Fixed
+- Only support for 1.4. Fixes bug when selecting growing zones.
+
 ## [0.4.0] - 2022-10-23
 ### Added
 - Mod settings to let the default hysteresis values be configurable by the player.
@@ -52,7 +56,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - First implementation of the mod.
 
-[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/olivierlacan/keep-a-changelog/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/alexschrod/farming-hysteresis/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/alexschrod/farming-hysteresis/compare/v0.3.2...v0.4.0
 [0.3.2]: https://github.com/alexschrod/farming-hysteresis/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/alexschrod/farming-hysteresis/compare/v0.3.0...v0.3.1

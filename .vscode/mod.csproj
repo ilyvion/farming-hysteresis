@@ -6,8 +6,8 @@
 
 		<RootNamespace>FarmingHysteresis</RootNamespace>
 		<AssemblyName>FarmingHysteresis</AssemblyName>
-    	<OutputPath>../1.3/Assemblies</OutputPath>
-		<VersionPrefix>0.3.2</VersionPrefix>
+    	<OutputPath>../1.4/Assemblies</OutputPath>
+		<VersionPrefix>0.4.1</VersionPrefix>
 
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.3.3069" />
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.4.3525" />
 		<PackageReference Include="Lib.Harmony" Version="2.0.0.7" />
 	</ItemGroup>
 </Project>
