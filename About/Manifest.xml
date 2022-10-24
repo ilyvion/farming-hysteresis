@@ -6,5 +6,5 @@
         <li>brrainz.harmony</li>
     </dependencies>
     <manifestUri>https://raw.githubusercontent.com/alexschrod/farming-hysteresis/main/About/Manifest.xml</manifestUri>
-    <downloadUri>https://github.com/FluffierThanThou/ModManager/releases/latest</downloadUri>
+    <downloadUri>https://github.com/alexschrod/farming-hysteresis/releases/latest</downloadUri>
 </Manifest>
