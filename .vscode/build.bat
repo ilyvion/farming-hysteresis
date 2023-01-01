@@ -12,16 +12,26 @@ RMDIR /S /Q %TARGET%
 
 REM make mod folders
 MKDIR %TARGET%\1.4\Assemblies
+
 MKDIR %TARGET%\1.4\Languages\English\Keyed
+
 MKDIR %TARGET%\1.4\Languages\Japanese\Keyed
+
+MKDIR %TARGET%\1.4\Languages\Norwegian\Keyed
+
 MKDIR %TARGET%\1.4\Patches
 MKDIR %TARGET%\About
 
 REM copy mod files
 COPY 1.4\Assemblies\FarmingHysteresis.dll %TARGET%\1.4\Assemblies
+
 COPY 1.4\Languages\English\Data.xml %TARGET%\1.4\Languages\English
 COPY 1.4\Languages\English\Keyed\FarmingHysteresis.xml %TARGET%\1.4\Languages\English\Keyed
+
 COPY 1.4\Languages\Japanese\Keyed\FarmingHysteresis.xml %TARGET%\1.4\Languages\Japanese\Keyed
+
+COPY 1.4\Languages\Norwegian\Keyed\FarmingHysteresis.xml %TARGET%\1.4\Languages\Norwegian\Keyed
+
 COPY 1.4\Patches\Patches.xml %TARGET%\1.4\Patches
 COPY About\About.xml %TARGET%\About
 COPY About\Manifest.xml %TARGET%\About

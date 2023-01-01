@@ -28,7 +28,8 @@
   <FarmingHysteresis.InStorage>Current amount of {0} in storage: {1}</FarmingHysteresis.InStorage>
 
   <FarmingHysteresis.LatchModeDesc>Current state: {0}</FarmingHysteresis.LatchModeDesc>
-  <FarmingHysteresis.LatchModeDesc.Unknown>Unknown. This is a bug.</FarmingHysteresis.LatchModeDesc.Unknown>
+  <FarmingHysteresis.LatchModeDesc.Unknown>Unknown. This is a bug unless the zone was just
+    created or hysteresis was just enabled.</FarmingHysteresis.LatchModeDesc.Unknown>
   <FarmingHysteresis.LatchModeDesc.BelowLowerBound>Lower than the lower bound. Sowing enabled.</FarmingHysteresis.LatchModeDesc.BelowLowerBound>
   <FarmingHysteresis.LatchModeDesc.BetweenBoundsEnabled>Higher than the lower bound, but has not reached the upper bound. Sowing still enabled.</FarmingHysteresis.LatchModeDesc.BetweenBoundsEnabled>
   <FarmingHysteresis.LatchModeDesc.BetweenBoundsDisabled>Lower than the upper bound, but has not reached the lower bound. Sowing still disabled.</FarmingHysteresis.LatchModeDesc.BetweenBoundsDisabled>
