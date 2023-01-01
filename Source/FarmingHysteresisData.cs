@@ -6,9 +6,21 @@ using Verse;
 
 namespace FarmingHysteresis
 {
+    internal class BoundValues : IExposable
+    {
+        public int Upper;
+        public int Lower;
+
+        public void ExposeData()
+        {
+            Scribe_Values.Look(ref Upper, "upper", Settings.DefaultHysteresisUpperBound);
+            Scribe_Values.Look(ref Lower, "lower", Settings.DefaultHysteresisLowerBound);
+        }
+    }
+
     internal class FarmingHysteresisData : IBoundedValueAccessor
     {
-        private System.WeakReference<Zone_Growing> zoneWeakReference;
+        private System.WeakReference<IPlantToGrowSettable> zoneWeakReference;
 
         private bool enabled;
         private BoundValues bounds;
@@ -16,11 +28,11 @@ namespace FarmingHysteresis
 
         public bool useGlobalValues;
 
-        public FarmingHysteresisData(System.WeakReference<Zone_Growing> weakReference)
+        public FarmingHysteresisData(System.WeakReference<IPlantToGrowSettable> weakReference)
         {
             zoneWeakReference = weakReference;
             enabled = Settings.EnabledByDefault;
-            bounds = new()
+            bounds = new BoundValues
             {
                 Upper = Settings.DefaultHysteresisUpperBound,
                 Lower = Settings.DefaultHysteresisLowerBound
@@ -31,22 +43,29 @@ namespace FarmingHysteresis
 
         internal void ExposeData()
         {
-            Scribe_Values.Look(ref enabled, "farmingHysteresisEnabled", Settings.EnabledByDefault);
-            Scribe_Values.Look(ref bounds, "farmingHysteresisBounds", new()
+            Scribe_Values.Look(ref enabled, "farmingHysteresisEnabled", Settings.EnabledByDefault, true);
+            Scribe_Deep.Look(
+                ref bounds,
+                "farmingHysteresisBounds"
+            );
+            if (bounds == null)
             {
-                Upper = Settings.DefaultHysteresisUpperBound,
-                Lower = Settings.DefaultHysteresisLowerBound
-            });
+                bounds = new BoundValues
+                {
+                    Upper = Settings.DefaultHysteresisUpperBound,
+                    Lower = Settings.DefaultHysteresisLowerBound
+                };
+            }
             if (Scribe.mode == LoadSaveMode.LoadingVars)
             {
                 TransferOldBounds();
             }
 
-            Scribe_Values.Look(ref latchMode, "farmingHysteresisLatchMode", LatchMode.Unknown);
+            Scribe_Values.Look(ref latchMode, "farmingHysteresisLatchMode", LatchMode.Unknown, true);
             if (Scribe.mode == LoadSaveMode.LoadingVars)
             {
                 // Ignore obsolete warning (612) since we're explicitly
-                // transferring from the obsolete state to the new
+                // transferring from the obsolete states to the new
                 // state here.
 #pragma warning disable 612
                 switch (latchMode)
@@ -60,7 +79,7 @@ namespace FarmingHysteresis
                 }
 #pragma warning restore 612
             }
-            Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", Settings.UseGlobalValuesByDefault);
+            Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", Settings.UseGlobalValuesByDefault, true);
 
             void TransferOldBounds()
             {
@@ -147,23 +166,25 @@ namespace FarmingHysteresis
             get { return enabled; }
         }
 
-        internal void Enable(Zone_Growing zone)
+        internal void Enable(IPlantToGrowSettable plantToGrowSettable)
         {
             enabled = true;
-            UpdateLatchModeAndSowing(zone);
+            UpdateLatchModeAndSowing(plantToGrowSettable);
         }
 
-        internal void Disable(Zone_Growing zone)
+        internal void Disable(IPlantToGrowSettable plantToGrowSettable)
         {
             enabled = false;
         }
 
-        internal void UpdateLatchModeAndSowing(Zone_Growing zone)
+        internal void UpdateLatchModeAndSowing(IPlantToGrowSettable plantToGrowSettable)
         {
-            var (harvestedThingDef, harvestedThingCount) = zone.PlantHarvestInfo();
+            Log.Warning("Floob {plantToGrowSettable}");
+
+            var (harvestedThingDef, harvestedThingCount) = plantToGrowSettable.PlantHarvestInfo();
             if (harvestedThingDef == null)
             {
-                DisableDueToMissingHarvestedThingDef(zone);
+                DisableDueToMissingHarvestedThingDef(plantToGrowSettable);
                 return;
             }
 
@@ -212,12 +233,12 @@ namespace FarmingHysteresis
             {
                 case LatchMode.AboveUpperBound:
                 case LatchMode.BetweenBoundsDisabled:
-                    zone.allowSow = false;
+                    plantToGrowSettable.SetAllow(false);
                     break;
 
                 case LatchMode.BelowLowerBound:
                 case LatchMode.BetweenBoundsEnabled:
-                    zone.allowSow = true;
+                    plantToGrowSettable.SetAllow(true);
                     break;
 
                 default:
@@ -225,20 +246,32 @@ namespace FarmingHysteresis
             }
         }
 
-        internal void DisableDueToMissingHarvestedThingDef(Zone_Growing zone)
+        internal void DisableDueToMissingHarvestedThingDef(IPlantToGrowSettable plantToGrowSettable)
         {
             enabled = false;
-            Log.Warning($"Zone {zone.ID} has a plant type without a harvestable product. Disabling farming hysteresis.");
+            if (plantToGrowSettable is ILoadReferenceable loadReferenceable)
+            {
+                Log.Warning($"{loadReferenceable.GetUniqueLoadID()} has a plant type without a harvestable product. Disabling farming hysteresis.");
+            }
+            else
+            {
+                Log.Warning($"Something has a plant type without a harvestable product. Disabling farming hysteresis.");
+            }
         }
     }
 
     internal static class FarmingHysteresisDataExtensions
     {
-        private static readonly ConditionalWeakTable<Zone_Growing, FarmingHysteresisData> dataTable = new ConditionalWeakTable<Zone_Growing, FarmingHysteresisData>();
+        private static readonly ConditionalWeakTable<IPlantToGrowSettable, FarmingHysteresisData> dataTable = new();
 
         internal static FarmingHysteresisData GetFarmingHysteresisData(this Zone_Growing zone)
         {
-            return dataTable.GetValue(zone, (z) => new FarmingHysteresisData(new System.WeakReference<Zone_Growing>(z)));
+            return dataTable.GetValue(zone, (z) => new FarmingHysteresisData(new System.WeakReference<IPlantToGrowSettable>(z)));
+        }
+
+        internal static FarmingHysteresisData GetFarmingHysteresisData(this Building_PlantGrower plantGrower)
+        {
+            return dataTable.GetValue(plantGrower, (p) => new FarmingHysteresisData(new System.WeakReference<IPlantToGrowSettable>(p)));
         }
     }
 }

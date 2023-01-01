@@ -5,12 +5,6 @@ using Verse;
 
 namespace FarmingHysteresis
 {
-    internal class BoundValues
-    {
-        public int Upper;
-        public int Lower;
-    }
-
     internal class GlobalThingDefBoundValueAccessor : IBoundedValueAccessor
     {
         private FarmingHysteresisMapComponent mapComponent;
@@ -35,7 +29,7 @@ namespace FarmingHysteresis
                     var boundValues = new BoundValues
                     {
                         Upper = Settings.DefaultHysteresisUpperBound,
-                        Lower = Settings.DefaultHysteresisLowerBound,
+                        Lower = Settings.DefaultHysteresisLowerBound
                     };
                     mapComponent.GlobalBoundValues.Add(thingDef, boundValues);
                     return boundValues;
@@ -109,13 +103,22 @@ namespace FarmingHysteresis
                     data.UpdateLatchModeAndSowing(zone);
                 }
             }
+
+            foreach (var buildingPlantGrower in map.listerBuildings.AllBuildingsColonistOfClass<Building_PlantGrower>())
+            {
+                var data = buildingPlantGrower.GetFarmingHysteresisData();
+                if (data.Enabled)
+                {
+                    data.UpdateLatchModeAndSowing(buildingPlantGrower);
+                }
+            }
         }
 
         public override void ExposeData()
         {
             base.ExposeData();
             Scribe_Values.Look(ref id, "id", -1, true);
-            Scribe_Collections.Look(ref globalBoundValues, "globalBoundValues", LookMode.Def, LookMode.Value);
+            Scribe_Collections.Look(ref globalBoundValues, "globalBoundValues", LookMode.Def, LookMode.Deep);
             if (globalBoundValues == null || globalBoundValues.Count == 0)
             {
                 if (Scribe.mode == LoadSaveMode.LoadingVars)
@@ -136,9 +139,8 @@ namespace FarmingHysteresis
                     var boundValues = new BoundValues
                     {
                         Upper = Settings.DefaultHysteresisUpperBound,
-                        Lower = Settings.DefaultHysteresisLowerBound,
+                        Lower = Settings.DefaultHysteresisLowerBound
                     };
-
                     {
                         if (globalLowerBoundValues.TryGetValue(thingDef, out var value))
                         {

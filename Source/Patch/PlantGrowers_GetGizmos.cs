@@ -3,6 +3,7 @@ using HarmonyLib;
 using RimWorld;
 using Verse;
 using UnityEngine;
+using System;
 
 namespace FarmingHysteresis.Patch
 {
@@ -11,13 +12,46 @@ namespace FarmingHysteresis.Patch
     {
         private static void Postfix(Zone_Growing __instance, ref IEnumerable<Gizmo> __result)
         {
+            GetGizmosPatcher.Patch(
+                __instance,
+                ref __result,
+                (i) => i.GetFarmingHysteresisData(),
+                (r) => r.Find(g => g is Command_Toggle t && t.defaultLabel == "CommandAllowSow".Translate())
+            );
+        }
+    }
+
+
+    [HarmonyPatch(typeof(Building_PlantGrower), nameof(Building_PlantGrower.GetGizmos))]
+    internal static class RimWorld_Building_PlantGrower_GetGizmos
+    {
+        private static void Postfix(Building_PlantGrower __instance, ref IEnumerable<Gizmo> __result)
+        {
+            GetGizmosPatcher.Patch(
+                __instance,
+                ref __result,
+                (i) => i.GetFarmingHysteresisData(),
+                (r) => r.Find(g => g is Command_Toggle t && t.defaultLabel == "CommandAllow".TranslateWithBackup("DesignatorUnforbid"))
+            );
+        }
+    }
+
+    internal class GetGizmosPatcher
+    {
+        internal static void Patch<T>(
+            T plantToGrowSettable,
+            ref IEnumerable<Gizmo> __result,
+            Func<T, FarmingHysteresisData> getHysteresisData,
+            Func<List<Gizmo>, Gizmo> findAllowGizmo)
+            where T : IPlantToGrowSettable
+        {
             if (Find.Selector.NumSelected != 1)
             {
                 return;
             }
 
-            var data = __instance.GetFarmingHysteresisData();
-            var harvestedThingDef = __instance.GetPlantDefToGrow().plant.harvestedThingDef;
+            var data = getHysteresisData(plantToGrowSettable);
+            var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow().plant.harvestedThingDef;
             var harvestHysteresisCommand = new Command_Toggle
             {
                 defaultLabel = "FarmingHysteresis.EnableFarmingHysteresis".Translate(),
@@ -28,11 +62,11 @@ namespace FarmingHysteresis.Patch
                 {
                     if (data.Enabled)
                     {
-                        data.Disable(__instance);
+                        data.Disable(plantToGrowSettable);
                     }
                     else
                     {
-                        data.Enable(__instance);
+                        data.Enable(plantToGrowSettable);
                     }
                 }
             };
@@ -47,13 +81,13 @@ namespace FarmingHysteresis.Patch
             {
                 if (harvestedThingDef == null)
                 {
-                    data.DisableDueToMissingHarvestedThingDef(__instance);
+                    data.DisableDueToMissingHarvestedThingDef(plantToGrowSettable);
                     return;
                 }
 
-                // If hysteresis is enabled, disable the manual sowing enabled button
-                var sowingGizmo = result.Find(g => g is Command_Toggle t && t.defaultLabel == "CommandAllowSow".Translate());
-                result.Remove(sowingGizmo);
+                // If hysteresis is enabled, disable the manual allow button
+                var allowGizmo = findAllowGizmo(result);
+                result.Remove(allowGizmo);
 
                 var useGlobalValuesCommand = new Command_Toggle
                 {
