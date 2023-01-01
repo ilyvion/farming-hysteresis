@@ -12,25 +12,32 @@ RMDIR /S /Q %TARGET%
 
 REM make mod folders
 MKDIR %TARGET%\1.4\Assemblies
+MKDIR %TARGET%\1.4\Defs
+MKDIR %TARGET%\1.4\Defs\MainTabDefs
 
 MKDIR %TARGET%\1.4\Languages\English\Keyed
+MKDIR %TARGET%\1.4\Languages\English\DefInjected\MainButtonDef
 
 MKDIR %TARGET%\1.4\Languages\Japanese\Keyed
 
 MKDIR %TARGET%\1.4\Languages\Norwegian\Keyed
+MKDIR %TARGET%\1.4\Languages\Norwegian\DefInjected\MainButtonDef
 
 MKDIR %TARGET%\1.4\Patches
 MKDIR %TARGET%\About
 
 REM copy mod files
 COPY 1.4\Assemblies\FarmingHysteresis.dll %TARGET%\1.4\Assemblies
+COPY 1.4\Defs\MainTabDefs\MainTabWindow_Hysteresis.xml %TARGET%\1.4\Defs\MainTabDefs
 
 COPY 1.4\Languages\English\Data.xml %TARGET%\1.4\Languages\English
 COPY 1.4\Languages\English\Keyed\FarmingHysteresis.xml %TARGET%\1.4\Languages\English\Keyed
+COPY 1.4\Languages\English\DefInjected\MainButtonDef\MainButtons.xml %TARGET%\1.4\Languages\English\DefInjected\MainButtonDef
 
 COPY 1.4\Languages\Japanese\Keyed\FarmingHysteresis.xml %TARGET%\1.4\Languages\Japanese\Keyed
 
 COPY 1.4\Languages\Norwegian\Keyed\FarmingHysteresis.xml %TARGET%\1.4\Languages\Norwegian\Keyed
+COPY 1.4\Languages\Norwegian\DefInjected\MainButtonDef\MainButtons.xml %TARGET%\1.4\Languages\Norwegian\DefInjected\MainButtonDef
 
 COPY 1.4\Patches\Patches.xml %TARGET%\1.4\Patches
 COPY About\About.xml %TARGET%\About

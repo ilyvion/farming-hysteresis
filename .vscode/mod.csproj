@@ -3,6 +3,7 @@
 		<OutputType>Library</OutputType>
 		<TargetFramework>net472</TargetFramework>
 		<PlatformTarget>x64</PlatformTarget>
+        <LangVersion>9.0</LangVersion>
 
 		<RootNamespace>FarmingHysteresis</RootNamespace>
 		<AssemblyName>FarmingHysteresis</AssemblyName>

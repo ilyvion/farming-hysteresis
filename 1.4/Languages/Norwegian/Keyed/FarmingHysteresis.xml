@@ -46,4 +46,9 @@
     <FarmingHysteresis.LatchModeDesc.AboveUpperBound>Høyere enn den øvre grensa. Såing deaktivert.</FarmingHysteresis.LatchModeDesc.AboveUpperBound>
     <FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>Jordbrukshysterese er deaktivert for
         denne jordbrukssonen da den valgte planten ikke har et produkt som kan høstes.</FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>
+
+    <FarmingHysteresis.LowerBoundLabel>Nedre grense</FarmingHysteresis.LowerBoundLabel>
+    <FarmingHysteresis.UpperBoundLabel>Øvre grense</FarmingHysteresis.UpperBoundLabel>
+
+    <FarmingHysteresis.GlobalHysteresisBounds>Globale hysteresegrenser</FarmingHysteresis.GlobalHysteresisBounds>
 </LanguageData>

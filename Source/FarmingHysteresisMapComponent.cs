@@ -5,6 +5,12 @@ using Verse;
 
 namespace FarmingHysteresis
 {
+    internal class BoundValues
+    {
+        public int Upper;
+        public int Lower;
+    }
+
     internal class GlobalThingDefBoundValueAccessor : IBoundedValueAccessor
     {
         private FarmingHysteresisMapComponent mapComponent;
@@ -16,35 +22,24 @@ namespace FarmingHysteresis
             this.thingDef = thingDef;
         }
 
-        public int LowerBoundValueRaw
+        public BoundValues BoundValueRaw
         {
             get
             {
-                if (mapComponent.GlobalLowerBoundValues.TryGetValue(thingDef, out var value))
+                if (mapComponent.GlobalBoundValues.TryGetValue(thingDef, out var value))
                 {
                     return value;
                 }
-                return Settings.DefaultHysteresisLowerBound;
-            }
-            set
-            {
-                mapComponent.GlobalLowerBoundValues[thingDef] = value;
-            }
-        }
-
-        public int UpperBoundValueRaw
-        {
-            get
-            {
-                if (mapComponent.GlobalUpperBoundValues.TryGetValue(thingDef, out var value))
+                else
                 {
-                    return value;
+                    var boundValues = new BoundValues
+                    {
+                        Upper = Settings.DefaultHysteresisUpperBound,
+                        Lower = Settings.DefaultHysteresisLowerBound,
+                    };
+                    mapComponent.GlobalBoundValues.Add(thingDef, boundValues);
+                    return boundValues;
                 }
-                return Settings.DefaultHysteresisUpperBound;
-            }
-            set
-            {
-                mapComponent.GlobalUpperBoundValues[thingDef] = value;
             }
         }
     }
@@ -53,30 +48,17 @@ namespace FarmingHysteresis
     {
         private int id = -1;
 
-        private Dictionary<ThingDef, int> globalLowerBoundValues;
-        private Dictionary<ThingDef, int> globalUpperBoundValues;
+        private Dictionary<ThingDef, BoundValues> globalBoundValues;
 
-        internal Dictionary<ThingDef, int> GlobalLowerBoundValues
+        internal Dictionary<ThingDef, BoundValues> GlobalBoundValues
         {
             get
             {
-                if (globalLowerBoundValues == null)
+                if (globalBoundValues == null)
                 {
-                    globalLowerBoundValues = new Dictionary<ThingDef, int>();
+                    globalBoundValues = new Dictionary<ThingDef, BoundValues>();
                 }
-                return globalLowerBoundValues;
-            }
-        }
-
-        internal Dictionary<ThingDef, int> GlobalUpperBoundValues
-        {
-            get
-            {
-                if (globalUpperBoundValues == null)
-                {
-                    globalUpperBoundValues = new Dictionary<ThingDef, int>();
-                }
-                return globalUpperBoundValues;
+                return globalBoundValues;
             }
         }
 
@@ -88,7 +70,7 @@ namespace FarmingHysteresis
 
         internal bool HasBoundsFor(ThingDef harvestedThingDef)
         {
-            return GlobalLowerBoundValues.ContainsKey(harvestedThingDef) || GlobalUpperBoundValues.ContainsKey(harvestedThingDef);
+            return globalBoundValues.ContainsKey(harvestedThingDef);
         }
 
         public string GetUniqueLoadID()
@@ -133,8 +115,45 @@ namespace FarmingHysteresis
         {
             base.ExposeData();
             Scribe_Values.Look(ref id, "id", -1, true);
-            Scribe_Collections.Look(ref globalLowerBoundValues, "globalLowerBoundValues", LookMode.Def, LookMode.Value);
-            Scribe_Collections.Look(ref globalUpperBoundValues, "globalUpperBoundValues", LookMode.Def, LookMode.Value);
+            Scribe_Collections.Look(ref globalBoundValues, "globalBoundValues", LookMode.Def, LookMode.Value);
+            if (globalBoundValues == null || globalBoundValues.Count == 0)
+            {
+                if (Scribe.mode == LoadSaveMode.LoadingVars)
+                {
+                    TransferOldBounds();
+                }
+            }
+
+            void TransferOldBounds()
+            {
+                Dictionary<ThingDef, int> globalLowerBoundValues = new();
+                Dictionary<ThingDef, int> globalUpperBoundValues = new();
+                Scribe_Collections.Look(ref globalLowerBoundValues, "globalLowerBoundValues", LookMode.Def, LookMode.Value);
+                Scribe_Collections.Look(ref globalUpperBoundValues, "globalUpperBoundValues", LookMode.Def, LookMode.Value);
+
+                foreach (var thingDef in globalLowerBoundValues.Keys.Union(globalUpperBoundValues.Keys))
+                {
+                    var boundValues = new BoundValues
+                    {
+                        Upper = Settings.DefaultHysteresisUpperBound,
+                        Lower = Settings.DefaultHysteresisLowerBound,
+                    };
+
+                    {
+                        if (globalLowerBoundValues.TryGetValue(thingDef, out var value))
+                        {
+                            boundValues.Lower = value;
+                        }
+                    }
+                    {
+                        if (globalUpperBoundValues.TryGetValue(thingDef, out var value))
+                        {
+                            boundValues.Upper = value;
+                        }
+                    }
+                    GlobalBoundValues.Add(thingDef, boundValues);
+                }
+            }
         }
     }
 }

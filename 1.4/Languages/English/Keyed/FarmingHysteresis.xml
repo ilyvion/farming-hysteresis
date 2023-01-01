@@ -35,4 +35,9 @@
   <FarmingHysteresis.LatchModeDesc.BetweenBoundsDisabled>Lower than the upper bound, but has not reached the lower bound. Sowing still disabled.</FarmingHysteresis.LatchModeDesc.BetweenBoundsDisabled>
   <FarmingHysteresis.LatchModeDesc.AboveUpperBound>Higher than the upper bound. Sowing disabled.</FarmingHysteresis.LatchModeDesc.AboveUpperBound>
   <FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>Farming hysteresis is disabled for this growing zone due to the selected plant not having a harvestable product.</FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>
+
+  <FarmingHysteresis.LowerBoundLabel>Lower bound</FarmingHysteresis.LowerBoundLabel>
+  <FarmingHysteresis.UpperBoundLabel>Upper bound</FarmingHysteresis.UpperBoundLabel>
+
+  <FarmingHysteresis.GlobalHysteresisBounds>Global Hysteresis Bounds</FarmingHysteresis.GlobalHysteresisBounds>
 </LanguageData>
