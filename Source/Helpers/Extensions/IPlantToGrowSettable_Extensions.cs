@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using RimWorld;
 using Verse;
@@ -13,7 +12,7 @@ namespace FarmingHysteresis.Helpers.Extensions
             public bool allowSow;
         }
 
-        internal static (ThingDef, int) PlantHarvestInfo(this IPlantToGrowSettable plantToGrowSettable)
+        internal static (ThingDef?, int) PlantHarvestInfo(this IPlantToGrowSettable plantToGrowSettable)
         {
             var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow().plant.harvestedThingDef;
             if (harvestedThingDef != null)

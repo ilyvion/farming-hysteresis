@@ -112,11 +112,15 @@ namespace FarmingHysteresis
                 if (zoneWeakReference.TryGetTarget(out var zone))
                 {
                     var (harvestedThingDef, _) = zone.PlantHarvestInfo();
+                    if (harvestedThingDef == null)
+                    {
+                        throw new Exception("This should not happen. Code: FHD-GBVA-PI");
+                    }
                     values = FarmingHysteresisMapComponent.For(Find.CurrentMap).GetGlobalBoundedValueAccessorFor(harvestedThingDef);
                 }
                 else
                 {
-                    throw new Exception("This should not happen. Code: FHD-GBVA");
+                    throw new Exception("This should not happen. Code: FHD-GBVA-ZWR");
                 }
             }
             return values;

@@ -21,8 +21,8 @@ namespace FarmingHysteresis
 
         private Dictionary<ThingDef, IBoundedValueAccessor> globalBoundAccessors = new Dictionary<ThingDef, IBoundedValueAccessor>();
         private Dictionary<ThingDef, BoundValues> globalBounds = new();
-        private Dictionary<ThingDef, String> globalBoundLowerBuffers = new Dictionary<ThingDef, String>();
-        private Dictionary<ThingDef, String> globalBoundUpperBuffers = new Dictionary<ThingDef, String>();
+        private Dictionary<ThingDef, string?> globalBoundLowerBuffers = new();
+        private Dictionary<ThingDef, string?> globalBoundUpperBuffers = new();
 
         public override void PreOpen()
         {

@@ -42,7 +42,7 @@ namespace FarmingHysteresis
     {
         private int id = -1;
 
-        private Dictionary<ThingDef, BoundValues> globalBoundValues;
+        private Dictionary<ThingDef, BoundValues>? globalBoundValues;
 
         internal Dictionary<ThingDef, BoundValues> GlobalBoundValues
         {
@@ -64,6 +64,10 @@ namespace FarmingHysteresis
 
         internal bool HasBoundsFor(ThingDef harvestedThingDef)
         {
+            if (globalBoundValues == null)
+            {
+                return false;
+            }
             return globalBoundValues.ContainsKey(harvestedThingDef);
         }
 

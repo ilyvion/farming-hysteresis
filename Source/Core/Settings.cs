@@ -5,8 +5,8 @@ namespace FarmingHysteresis
 {
     public class Settings : ModSettings
     {
-        private static string _defaultHysteresisLowerBoundBuffer;
-        private static string _defaultHysteresisUpperBoundBuffer;
+        private static string? _defaultHysteresisLowerBoundBuffer;
+        private static string? _defaultHysteresisUpperBoundBuffer;
 
         private static int _defaultHysteresisLowerBound = Constants.DefaultHysteresisLowerBound;
         private static int _defaultHysteresisUpperBound = Constants.DefaultHysteresisUpperBound;

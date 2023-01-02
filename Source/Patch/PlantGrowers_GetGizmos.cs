@@ -42,7 +42,7 @@ namespace FarmingHysteresis.Patch
             T plantToGrowSettable,
             ref IEnumerable<Gizmo> __result,
             Func<T, FarmingHysteresisData> getHysteresisData,
-            Func<List<Gizmo>, Gizmo> findAllowGizmo)
+            Func<List<Gizmo>, Gizmo?> findAllowGizmo)
             where T : IPlantToGrowSettable
         {
             if (Find.Selector.NumSelected != 1)
