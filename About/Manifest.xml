@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Manifest>
     <identifier>ilyvion.FarmingHysteresis</identifier>
-    <version>0.4.1</version>
+    <version>0.5.0</version>
     <dependencies>
         <li>brrainz.harmony</li>
     </dependencies>
-    <manifestUri>https://raw.githubusercontent.com/alexschrod/farming-hysteresis/main/About/Manifest.xml</manifestUri>
+    <manifestUri>
+        https://raw.githubusercontent.com/alexschrod/farming-hysteresis/main/About/Manifest.xml</manifestUri>
     <downloadUri>https://github.com/alexschrod/farming-hysteresis/releases/latest</downloadUri>
 </Manifest>

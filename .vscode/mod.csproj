@@ -1,38 +1,38 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<OutputType>Library</OutputType>
-		<TargetFramework>net472</TargetFramework>
-		<PlatformTarget>x64</PlatformTarget>
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net472</TargetFramework>
+        <PlatformTarget>x64</PlatformTarget>
         <LangVersion>9.0</LangVersion>
         <Nullable>enable</Nullable>
 
-		<RootNamespace>FarmingHysteresis</RootNamespace>
-		<AssemblyName>FarmingHysteresis</AssemblyName>
-    	<OutputPath>../1.4/Assemblies</OutputPath>
-		<VersionPrefix>0.4.1</VersionPrefix>
+        <RootNamespace>FarmingHysteresis</RootNamespace>
+        <AssemblyName>FarmingHysteresis</AssemblyName>
+        <OutputPath>../1.4/Assemblies</OutputPath>
+        <VersionPrefix>0.5.0</VersionPrefix>
 
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-	</PropertyGroup>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'RELEASE'">
-    	<DebugType>none</DebugType>
-		<DebugSymbols>false</DebugSymbols>
-    	<Optimize>true</Optimize>
-  	</PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'RELEASE'">
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+        <Optimize>true</Optimize>
+    </PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'DEBUG'">
-    	<DebugType>full</DebugType>
-    	<Optimize>false</Optimize>
-		<DebugSymbols>true</DebugSymbols>
-  	</PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)' == 'DEBUG'">
+        <DebugType>full</DebugType>
+        <Optimize>false</Optimize>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
 
- 	<ItemGroup>
-	 	<!-- Mod -->
-	 	<Compile Include="../Source/**" />
-	</ItemGroup>
+    <ItemGroup>
+        <!-- Mod -->
+        <Compile Include="../Source/**" />
+    </ItemGroup>
 
-	<ItemGroup>
+    <ItemGroup>
         <PackageReference Include="Krafs.Rimworld.Ref" Version="1.4.3580" />
         <PackageReference Include="Lib.Harmony" Version="2.2.2" />
-	</ItemGroup>
+    </ItemGroup>
 </Project>
