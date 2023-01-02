@@ -13,10 +13,10 @@ jobs:
         runs-on: windows-latest
         steps:
             - name: Checkout Repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
             - name: Setup Dotnet
-              uses: actions/setup-dotnet@v1
+              uses: actions/setup-dotnet@v3
               with:
                   dotnet-version: 6.0.x
 
@@ -27,7 +27,7 @@ jobs:
               run: dotnet build .vscode --configuration Release --no-restore
 
             - name: Upload Mod Artifacts
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v3
               with:
                   name: FarmingHysteresis-Release
                   path: |
@@ -57,7 +57,7 @@ jobs:
               run: mkdir -p ${{ env.MOD_PATH }}
 
             - name: Download Mod Artifacts from Build Step
-              uses: actions/download-artifact@v2
+              uses: actions/download-artifact@v3
               with:
                   name: FarmingHysteresis-Release
                   path: ${{ env.MOD_PATH }}
@@ -68,7 +68,7 @@ jobs:
                   zip -r ./FarmingHysteresis.zip ./FarmingHysteresis/*
 
             - name: Checkout Repository
-              uses: actions/checkout@v2
+              uses: actions/checkout@v3
 
             - name: Get Changelog Entry
               id: changelog_reader
