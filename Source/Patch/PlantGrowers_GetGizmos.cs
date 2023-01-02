@@ -31,7 +31,7 @@ namespace FarmingHysteresis.Patch
                 __instance,
                 ref __result,
                 (i) => i.GetFarmingHysteresisData(),
-                (r) => r.Find(g => g is Command_Toggle t && t.defaultLabel == "CommandAllow".TranslateWithBackup("DesignatorUnforbid"))
+                (r) => null
             );
         }
     }
@@ -87,7 +87,10 @@ namespace FarmingHysteresis.Patch
 
                 // If hysteresis is enabled, disable the manual allow button
                 var allowGizmo = findAllowGizmo(result);
-                result.Remove(allowGizmo);
+                if (allowGizmo != null)
+                {
+                    result.Remove(allowGizmo);
+                }
 
                 var useGlobalValuesCommand = new Command_Toggle
                 {

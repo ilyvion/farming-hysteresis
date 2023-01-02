@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using RimWorld;
 using Verse;
 
@@ -6,6 +8,11 @@ namespace FarmingHysteresis.Helpers.Extensions
 {
     internal static class IPlantToGrowSettableExtensions
     {
+        private class Building_PlantGrowerCustomFields
+        {
+            public bool allowSow;
+        }
+
         internal static (ThingDef, int) PlantHarvestInfo(this IPlantToGrowSettable plantToGrowSettable)
         {
             var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow().plant.harvestedThingDef;
@@ -19,7 +26,8 @@ namespace FarmingHysteresis.Helpers.Extensions
             }
         }
 
-        internal static void SetAllow(this IPlantToGrowSettable plantToGrowSettable, bool allow)
+        private static readonly ConditionalWeakTable<Building_PlantGrower, Building_PlantGrowerCustomFields> plantGrowerCustomFieldsTable = new();
+        internal static void SetAllowSow(this IPlantToGrowSettable plantToGrowSettable, bool allow)
         {
             if (plantToGrowSettable is Zone_Growing zoneGrowing)
             {
@@ -27,11 +35,31 @@ namespace FarmingHysteresis.Helpers.Extensions
             }
             else if (plantToGrowSettable is Building_PlantGrower buildingPlantGrower)
             {
-                ForbidUtility.SetForbidden(buildingPlantGrower, !allow);
+                var buildingPlantGrowerCustomFields = plantGrowerCustomFieldsTable.GetValue(buildingPlantGrower, (b) => new());
+                buildingPlantGrowerCustomFields.allowSow = allow;
             }
             else
             {
-                Log.Error("Called SetAllow on an unknown Thing.");
+                Log.Error($"Called SetAllowSow on an unknown IPlantToGrowSettable: {plantToGrowSettable.GetType().FullName}.");
+            }
+        }
+        internal static bool GetAllowSow(this IPlantToGrowSettable plantToGrowSettable)
+        {
+            if (plantToGrowSettable is Zone_Growing zoneGrowing)
+            {
+                return zoneGrowing.allowSow;
+            }
+            else if (plantToGrowSettable is Building_PlantGrower buildingPlantGrower)
+            {
+                if (plantGrowerCustomFieldsTable.TryGetValue(buildingPlantGrower, out var buildingPlantGrowerCustomFields))
+                {
+                    return buildingPlantGrowerCustomFields.allowSow;
+                }
+                return true;
+            }
+            else
+            {
+                throw new Exception($"Called GetAllowSow on an unknown IPlantToGrowSettable: {plantToGrowSettable.GetType().FullName}.");
             }
         }
     }

@@ -233,12 +233,12 @@ namespace FarmingHysteresis
             {
                 case LatchMode.AboveUpperBound:
                 case LatchMode.BetweenBoundsDisabled:
-                    plantToGrowSettable.SetAllow(false);
+                    plantToGrowSettable.SetAllowSow(false);
                     break;
 
                 case LatchMode.BelowLowerBound:
                 case LatchMode.BetweenBoundsEnabled:
-                    plantToGrowSettable.SetAllow(true);
+                    plantToGrowSettable.SetAllowSow(true);
                     break;
 
                 default:
