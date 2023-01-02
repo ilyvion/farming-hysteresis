@@ -8,12 +8,12 @@
         høyere enn den konfigurerte øvre hysteresegrensa.</FarmingHysteresis.EnableFarmingHysteresisisDesc>
 
     <FarmingHysteresis.UseGlobalValues>Bruk globale hysteresegrenser</FarmingHysteresis.UseGlobalValues>
-    <FarmingHysteresis.UseGlobalValuesDesc>Alle soner med samme innhøstingsprodukt som har denne
+    <FarmingHysteresis.UseGlobalValuesDesc>Alle soner og hydroponiske bed med samme innhøstingsprodukt som har denne
         innstillingen på vil dele grenseverdier.</FarmingHysteresis.UseGlobalValuesDesc>
 
     <FarmingHysteresis.DefaultLowerBound>Standard nedre grensenivå</FarmingHysteresis.DefaultLowerBound>
     <FarmingHysteresis.DefaultUpperBound>Standard øvre grensenivå</FarmingHysteresis.DefaultUpperBound>
-    <FarmingHysteresis.EnabledByDefault>Jordbrukssoner har hysterese aktivert når de blir plassert</FarmingHysteresis.EnabledByDefault>
+    <FarmingHysteresis.EnabledByDefault>Jordbrukssoner og hydroponiske bed har hysterese aktivert når de blir plassert</FarmingHysteresis.EnabledByDefault>
     <FarmingHysteresis.UseGlobalValuesByDefault>Bruk globale hysteresegrenser som standard</FarmingHysteresis.UseGlobalValuesByDefault>
 
     <FarmingHysteresis.DecrementLowerHysteresis>N: -{0}</FarmingHysteresis.DecrementLowerHysteresis>
