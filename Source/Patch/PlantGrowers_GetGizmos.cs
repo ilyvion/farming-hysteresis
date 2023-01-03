@@ -4,6 +4,7 @@ using RimWorld;
 using Verse;
 using UnityEngine;
 using System;
+using System.Linq;
 
 namespace FarmingHysteresis.Patch
 {
@@ -16,7 +17,10 @@ namespace FarmingHysteresis.Patch
                 __instance,
                 ref __result,
                 (i) => i.GetFarmingHysteresisData(),
-                (r) => r.Find(g => g is Command_Toggle t && t.defaultLabel == "CommandAllowSow".Translate())
+                (r) => r.Where(g =>
+                    g is Command_Toggle t &&
+                    (t.defaultLabel == "CommandAllowSow".Translate() ||
+                    t.defaultLabel == "CommandAllowCut".Translate())).ToList()
             );
         }
     }
@@ -31,7 +35,7 @@ namespace FarmingHysteresis.Patch
                 __instance,
                 ref __result,
                 (i) => i.GetFarmingHysteresisData(),
-                (r) => null
+                (r) => new()
             );
         }
     }
@@ -42,7 +46,7 @@ namespace FarmingHysteresis.Patch
             T plantToGrowSettable,
             ref IEnumerable<Gizmo> __result,
             Func<T, FarmingHysteresisData> getHysteresisData,
-            Func<List<Gizmo>, Gizmo?> findAllowGizmo)
+            Func<List<Gizmo>, List<Gizmo>> findAllowGizmos)
             where T : IPlantToGrowSettable
         {
             if (Find.Selector.NumSelected != 1)
@@ -52,10 +56,11 @@ namespace FarmingHysteresis.Patch
 
             var data = getHysteresisData(plantToGrowSettable);
             var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow().plant.harvestedThingDef;
+
             var harvestHysteresisCommand = new Command_Toggle
             {
                 defaultLabel = "FarmingHysteresis.EnableFarmingHysteresis".Translate(),
-                defaultDesc = "FarmingHysteresis.EnableFarmingHysteresisisDesc".Translate(),
+                defaultDesc = "FarmingHysteresis.EnableFarmingHysteresisisDesc".Translate(Settings.HysteresisMode.AsString()),
                 icon = TexCommand.ForbidOff,
                 isActive = () => data.Enabled,
                 toggleAction = () =>
@@ -85,9 +90,9 @@ namespace FarmingHysteresis.Patch
                     return;
                 }
 
-                // If hysteresis is enabled, disable the manual allow button
-                var allowGizmo = findAllowGizmo(result);
-                if (allowGizmo != null)
+                // If hysteresis is enabled, disable the manual allow buttons
+                var allowGizmos = findAllowGizmos(result);
+                foreach (var allowGizmo in allowGizmos)
                 {
                     result.Remove(allowGizmo);
                 }

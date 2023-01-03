@@ -14,7 +14,7 @@ namespace FarmingHysteresis.Patch
                 return;
             }
 
-            if (__result)
+            if (__result && Settings.ControlSowing)
             {
                 // We check that __result was true first so we don't mess up the game's
                 // other reasons for disallowing sowing. But if sowing normally is

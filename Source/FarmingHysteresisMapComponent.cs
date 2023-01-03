@@ -104,7 +104,7 @@ namespace FarmingHysteresis
                 var data = zone.GetFarmingHysteresisData();
                 if (data.Enabled)
                 {
-                    data.UpdateLatchModeAndSowing(zone);
+                    data.UpdateLatchModeAndHandling(zone);
                 }
             }
 
@@ -113,7 +113,7 @@ namespace FarmingHysteresis
                 var data = buildingPlantGrower.GetFarmingHysteresisData();
                 if (data.Enabled)
                 {
-                    data.UpdateLatchModeAndSowing(buildingPlantGrower);
+                    data.UpdateLatchModeAndHandling(buildingPlantGrower);
                 }
             }
         }

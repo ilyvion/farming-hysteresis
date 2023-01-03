@@ -173,7 +173,7 @@ namespace FarmingHysteresis
         internal void Enable(IPlantToGrowSettable plantToGrowSettable)
         {
             enabled = true;
-            UpdateLatchModeAndSowing(plantToGrowSettable);
+            UpdateLatchModeAndHandling(plantToGrowSettable);
         }
 
         internal void Disable(IPlantToGrowSettable plantToGrowSettable)
@@ -181,10 +181,8 @@ namespace FarmingHysteresis
             enabled = false;
         }
 
-        internal void UpdateLatchModeAndSowing(IPlantToGrowSettable plantToGrowSettable)
+        internal void UpdateLatchModeAndHandling(IPlantToGrowSettable plantToGrowSettable)
         {
-            Log.Warning("Floob {plantToGrowSettable}");
-
             var (harvestedThingDef, harvestedThingCount) = plantToGrowSettable.PlantHarvestInfo();
             if (harvestedThingDef == null)
             {
@@ -237,12 +235,12 @@ namespace FarmingHysteresis
             {
                 case LatchMode.AboveUpperBound:
                 case LatchMode.BetweenBoundsDisabled:
-                    plantToGrowSettable.SetAllowSow(false);
+                    plantToGrowSettable.SetHysteresisControlState(false);
                     break;
 
                 case LatchMode.BelowLowerBound:
                 case LatchMode.BetweenBoundsEnabled:
-                    plantToGrowSettable.SetAllowSow(true);
+                    plantToGrowSettable.SetHysteresisControlState(true);
                     break;
 
                 default:

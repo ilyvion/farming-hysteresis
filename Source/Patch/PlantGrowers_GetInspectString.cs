@@ -58,7 +58,7 @@ namespace FarmingHysteresis.Patch
                 __result += "\n" + "FarmingHysteresis.LowerBound".Translate(plant.label, data.LowerBound, harvestedThingDef.label);
                 __result += "\n" + "FarmingHysteresis.UpperBound".Translate(plant.label, data.UpperBound, harvestedThingDef.label);
                 __result += "\n" + "FarmingHysteresis.InStorage".Translate(harvestedThingDef.label, harvestedThingCount);
-                __result += "\n" + "FarmingHysteresis.LatchModeDesc".Translate(("FarmingHysteresis.LatchModeDesc." + data.latchMode.ToString()).Translate());
+                __result += "\n" + "FarmingHysteresis.LatchModeDesc".Translate(("FarmingHysteresis.LatchModeDesc." + data.latchMode.ToString()).Translate(Settings.HysteresisMode.AsString()));
             }
             else if (harvestedThingDef == null)
             {
