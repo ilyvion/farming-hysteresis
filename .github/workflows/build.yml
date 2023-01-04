@@ -1,54 +1,54 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'README.md'
-      - 'CHANGELOG.md'
-      - '.gitignore'
-    tags-ignore:
-      # This will ignore release versions tagged with a version identifier. We'll 
-      # use a separate workflow for them.
-      - 'v*'
-  pull_request:
-    paths-ignore: 
-      - README.md
-      - 'CHANGELOG.md'
-      - '.gitignore'
+    push:
+        branches:
+            - main
+        paths-ignore:
+            - "README.md"
+            - "CHANGELOG.md"
+            - ".gitignore"
+        tags-ignore:
+            # This will ignore release versions tagged with a version identifier. We'll
+            # use a separate workflow for them.
+            - "v*"
+    pull_request:
+        paths-ignore:
+            - README.md
+            - "CHANGELOG.md"
+            - ".gitignore"
 
 jobs:
-  build:
-    name: Build
-    runs-on: windows-latest
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-      
-    - name: Setup Dotnet
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.x
-      
-    - name: Install Mod Dependencies
-      run: dotnet restore .vscode
+    build:
+        name: Build
+        runs-on: windows-latest
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
 
-    - name: Build Mod
-      run: dotnet build .vscode --configuration Release --no-restore
-      
-    - name: Upload Mod Artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: FarmingHysteresis-${{ github.sha }}
-        path: |
-          About/
-          1.2/
-          LICENSE
-          LICENSE.Apache-2.0
-          LICENSE.MIT
-          README.md
-          CHANGELOG.md
-          !**/.*
-          !About/Preview.pdn
-          !1.2/Assemblies/0Harmony.dll
+            - name: Setup Dotnet
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: 6.0.x
+
+            - name: Install Mod Dependencies
+              run: dotnet restore .vscode
+
+            - name: Build Mod
+              run: dotnet build .vscode --configuration Release --no-restore
+
+            - name: Upload Mod Artifacts
+              uses: actions/upload-artifact@v3
+              with:
+                  name: FarmingHysteresis-${{ github.sha }}
+                  path: |
+                      About/
+                      1.4/
+                      LICENSE
+                      LICENSE.Apache-2.0
+                      LICENSE.MIT
+                      README.md
+                      CHANGELOG.md
+                      !**/.*
+                      !About/Preview.pdn
+                      !1.4/Assemblies/0Harmony.dll

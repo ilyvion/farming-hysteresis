@@ -5,136 +5,161 @@ using Verse;
 
 namespace FarmingHysteresis
 {
-	internal class GlobalThingDefBoundValueAccessor : IBoundedValueAccessor
-	{
-		private FarmingHysteresisMapComponent mapComponent;
-		private ThingDef thingDef;
+    internal class GlobalThingDefBoundValueAccessor : IBoundedValueAccessor
+    {
+        private FarmingHysteresisMapComponent mapComponent;
+        private ThingDef thingDef;
 
-		public GlobalThingDefBoundValueAccessor(FarmingHysteresisMapComponent mapComponent, ThingDef thingDef)
-		{
-			this.mapComponent = mapComponent;
-			this.thingDef = thingDef;
-		}
+        public GlobalThingDefBoundValueAccessor(FarmingHysteresisMapComponent mapComponent, ThingDef thingDef)
+        {
+            this.mapComponent = mapComponent;
+            this.thingDef = thingDef;
+        }
 
-		public int LowerBoundValueRaw
-		{
-			get
-			{
-				if (mapComponent.GlobalLowerBoundValues.TryGetValue(thingDef, out var value))
-				{
-					return value;
-				}
-				return Constants.DefaultHysteresisLowerBound;
-			}
-			set
-			{
-				mapComponent.GlobalLowerBoundValues[thingDef] = value;
-			}
-		}
+        public BoundValues BoundValueRaw
+        {
+            get
+            {
+                if (mapComponent.GlobalBoundValues.TryGetValue(thingDef, out var value))
+                {
+                    return value;
+                }
+                else
+                {
+                    var boundValues = new BoundValues
+                    {
+                        Upper = Settings.DefaultHysteresisUpperBound,
+                        Lower = Settings.DefaultHysteresisLowerBound
+                    };
+                    mapComponent.GlobalBoundValues.Add(thingDef, boundValues);
+                    return boundValues;
+                }
+            }
+        }
+    }
 
-		public int UpperBoundValueRaw
-		{
-			get
-			{
-				if (mapComponent.GlobalUpperBoundValues.TryGetValue(thingDef, out var value))
-				{
-					return value;
-				}
-				return Constants.DefaultHysteresisUpperBound;
-			}
-			set
-			{
-				mapComponent.GlobalUpperBoundValues[thingDef] = value;
-			}
-		}
-	}
+    public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
+    {
+        private int id = -1;
 
-	public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
-	{
-		private int id = -1;
+        private Dictionary<ThingDef, BoundValues>? globalBoundValues;
 
-		private Dictionary<ThingDef, int> globalLowerBoundValues;
-		private Dictionary<ThingDef, int> globalUpperBoundValues;
+        internal Dictionary<ThingDef, BoundValues> GlobalBoundValues
+        {
+            get
+            {
+                if (globalBoundValues == null)
+                {
+                    globalBoundValues = new Dictionary<ThingDef, BoundValues>();
+                }
+                return globalBoundValues;
+            }
+        }
 
-		internal Dictionary<ThingDef, int> GlobalLowerBoundValues
-		{
-			get
-			{
-				if (globalLowerBoundValues == null)
-				{
-					globalLowerBoundValues = new Dictionary<ThingDef, int>();
-				}
-				return globalLowerBoundValues;
-			}
-		}
+        public FarmingHysteresisMapComponent(Map map) : base(map)
+        {
+            // if not created in SavingLoading, give yourself the ID of the map you were constructed on.
+            if (Scribe.mode == Verse.LoadSaveMode.Inactive) id = map.uniqueID;
+        }
 
-		internal Dictionary<ThingDef, int> GlobalUpperBoundValues
-		{
-			get
-			{
-				if (globalUpperBoundValues == null)
-				{
-					globalUpperBoundValues = new Dictionary<ThingDef, int>();
-				}
-				return globalUpperBoundValues;
-			}
-		}
+        internal bool HasBoundsFor(ThingDef harvestedThingDef)
+        {
+            if (globalBoundValues == null)
+            {
+                return false;
+            }
+            return globalBoundValues.ContainsKey(harvestedThingDef);
+        }
 
-		public FarmingHysteresisMapComponent(Map map) : base(map)
-		{
-			// if not created in SavingLoading, give yourself the ID of the map you were constructed on.
-			if (Scribe.mode == Verse.LoadSaveMode.Inactive) id = map.uniqueID;
-		}
+        public string GetUniqueLoadID()
+        {
+            return "FarmingHysteresisMapComponent_" + id;
+        }
 
-		internal bool HasBoundsFor(ThingDef harvestedThingDef)
-		{
-			return GlobalLowerBoundValues.ContainsKey(harvestedThingDef) || GlobalUpperBoundValues.ContainsKey(harvestedThingDef);
-		}
+        public static FarmingHysteresisMapComponent For(Map map)
+        {
+            var instance = map.GetComponent<FarmingHysteresisMapComponent>();
+            if (instance != null)
+                return instance;
 
-		public string GetUniqueLoadID()
-		{
-			return "FarmingHysteresisMapComponent_" + id;
-		}
+            instance = new FarmingHysteresisMapComponent(map);
+            map.components.Add(instance);
+            return instance;
+        }
 
-		public static FarmingHysteresisMapComponent For(Map map)
-		{
-			var instance = map.GetComponent<FarmingHysteresisMapComponent>();
-			if (instance != null)
-				return instance;
+        internal IBoundedValueAccessor GetGlobalBoundedValueAccessorFor(ThingDef thingDef)
+        {
+            return new GlobalThingDefBoundValueAccessor(this, thingDef);
+        }
 
-			instance = new FarmingHysteresisMapComponent(map);
-			map.components.Add(instance);
-			return instance;
-		}
+        public override void MapComponentTick()
+        {
+            base.MapComponentTick();
 
-		internal IBoundedValueAccessor GetGlobalBoundedValueAccessorFor(ThingDef thingDef)
-		{
-			return new GlobalThingDefBoundValueAccessor(this, thingDef);
-		}
+            // No need to make these checks every single tick; once every 6 in-game minutes (4.16 seconds real time) should be enough.
+            if (Find.TickManager.TicksGame % 250 != 0) return;
 
-		public override void MapComponentTick()
-		{
-			base.MapComponentTick();
+            foreach (var zone in map.zoneManager.AllZones.OfType<Zone_Growing>())
+            {
+                var data = zone.GetFarmingHysteresisData();
+                if (data.Enabled)
+                {
+                    data.UpdateLatchModeAndHandling(zone);
+                }
+            }
 
-			// No need to make these checks every single tick; once every 6 in-game minutes (4.16 seconds real time) should be enough.
-			if (Find.TickManager.TicksGame % 250 != 0) return;
+            foreach (var buildingPlantGrower in map.listerBuildings.AllBuildingsColonistOfClass<Building_PlantGrower>())
+            {
+                var data = buildingPlantGrower.GetFarmingHysteresisData();
+                if (data.Enabled)
+                {
+                    data.UpdateLatchModeAndHandling(buildingPlantGrower);
+                }
+            }
+        }
 
-			foreach (var zone in map.zoneManager.AllZones.OfType<Zone_Growing>())
-			{
-				var data = zone.GetFarmingHysteresisData();
-				if (data.Enabled)
-				{
-					data.UpdateLatchModeAndSowing(zone);
-				}
-			}
-		}
+        public override void ExposeData()
+        {
+            base.ExposeData();
+            Scribe_Values.Look(ref id, "id", -1, true);
+            Scribe_Collections.Look(ref globalBoundValues, "globalBoundValues", LookMode.Def, LookMode.Deep);
+            if (globalBoundValues == null || globalBoundValues.Count == 0)
+            {
+                if (Scribe.mode == LoadSaveMode.LoadingVars)
+                {
+                    TransferOldBounds();
+                }
+            }
 
-		public override void ExposeData()
-		{
-			base.ExposeData();
-			Scribe_Values.Look(ref id, "id", -1, true);
-			Scribe_Collections.Look(ref globalLowerBoundValues, "globalLowerBoundValues", LookMode.Def, LookMode.Value);
-			Scribe_Collections.Look(ref globalUpperBoundValues, "globalUpperBoundValues", LookMode.Def, LookMode.Value);
-		}
-	}
+            void TransferOldBounds()
+            {
+                Dictionary<ThingDef, int> globalLowerBoundValues = new();
+                Dictionary<ThingDef, int> globalUpperBoundValues = new();
+                Scribe_Collections.Look(ref globalLowerBoundValues, "globalLowerBoundValues", LookMode.Def, LookMode.Value);
+                Scribe_Collections.Look(ref globalUpperBoundValues, "globalUpperBoundValues", LookMode.Def, LookMode.Value);
+
+                foreach (var thingDef in globalLowerBoundValues.Keys.Union(globalUpperBoundValues.Keys))
+                {
+                    var boundValues = new BoundValues
+                    {
+                        Upper = Settings.DefaultHysteresisUpperBound,
+                        Lower = Settings.DefaultHysteresisLowerBound
+                    };
+                    {
+                        if (globalLowerBoundValues.TryGetValue(thingDef, out var value))
+                        {
+                            boundValues.Lower = value;
+                        }
+                    }
+                    {
+                        if (globalUpperBoundValues.TryGetValue(thingDef, out var value))
+                        {
+                            boundValues.Upper = value;
+                        }
+                    }
+                    GlobalBoundValues.Add(thingDef, boundValues);
+                }
+            }
+        }
+    }
 }

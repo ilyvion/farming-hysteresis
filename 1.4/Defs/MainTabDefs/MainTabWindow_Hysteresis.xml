@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+    <MainButtonDef>
+        <defName>FarmingHysteresis_MainTabWindow_Hysteresis</defName>
+        <label>hysteresis.label</label>
+        <description>hysteresis.description</description>
+        <tabWindowClass>FarmingHysteresis.MainTabWindow_Hysteresis</tabWindowClass>
+        <order>20</order>
+    </MainButtonDef>
+
+</Defs>
