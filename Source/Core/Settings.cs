@@ -41,7 +41,7 @@ namespace FarmingHysteresis
             Listing_Standard listingStandard = new Listing_Standard();
             listingStandard.Begin(inRect);
 
-            listingStandard.CheckboxLabeled("FarmingHysteresis.EnabledByDefault".Translate(), ref _useGlobalValuesByDefault);
+            listingStandard.CheckboxLabeled("FarmingHysteresis.EnabledByDefault".Translate(), ref _enabledByDefault);
             listingStandard.CheckboxLabeled("FarmingHysteresis.UseGlobalValuesByDefault".Translate(), ref _useGlobalValuesByDefault);
 
             if (listingStandard.ButtonTextLabeledPct(
