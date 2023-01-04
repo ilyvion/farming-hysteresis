@@ -49,11 +49,6 @@ namespace FarmingHysteresis.Patch
             Func<List<Gizmo>, List<Gizmo>> findAllowGizmos)
             where T : IPlantToGrowSettable
         {
-            if (Find.Selector.NumSelected != 1)
-            {
-                return;
-            }
-
             var data = getHysteresisData(plantToGrowSettable);
             var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow().plant.harvestedThingDef;
 
@@ -98,20 +93,24 @@ namespace FarmingHysteresis.Patch
                 }
 
                 Texture2D uiIcon = harvestedThingDef.uiIcon;
-                var configureHysteresisCommand = new Command_Action
-                {
-                    defaultLabel = "FarmingHysteresis.ConfigureHysteresis".Translate(),
-                    defaultDesc = "FarmingHysteresis.ConfigureHysteresisDesc".Translate(),
-                    icon = uiIcon,
-                    action = () =>
-                    {
-                        Dialog_HysteresisParameters dialog = new(data);
-                        Find.WindowStack.Add(dialog);
-                    }
-                };
-                result.Add(configureHysteresisCommand);
 
-                if (Settings.ShowOldCommands)
+                if (Find.Selector.NumSelected == 1)
+                {
+                    var configureHysteresisCommand = new Command_Action
+                    {
+                        defaultLabel = "FarmingHysteresis.ConfigureHysteresis".Translate(),
+                        defaultDesc = "FarmingHysteresis.ConfigureHysteresisDesc".Translate(),
+                        icon = uiIcon,
+                        action = () =>
+                        {
+                            Dialog_HysteresisParameters dialog = new(data);
+                            Find.WindowStack.Add(dialog);
+                        }
+                    };
+                    result.Add(configureHysteresisCommand);
+                }
+
+                if (Settings.ShowOldCommands && Find.Selector.NumSelected == 1)
                 {
                     var useGlobalValuesCommand = new Command_Toggle
                     {
