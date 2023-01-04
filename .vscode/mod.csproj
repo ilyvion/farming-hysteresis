@@ -28,7 +28,7 @@
 
     <ItemGroup>
         <!-- Mod -->
-        <Compile Include="../Source/**" />
+        <Compile Include="../Source/FarmingHysteresis/**" />
     </ItemGroup>
 
     <ItemGroup>
