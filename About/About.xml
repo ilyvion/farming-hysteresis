@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ModMetaData>
-	<packageId>ilyvion.FarmingHysteresis</packageId>
-	<name>Farming Hysteresis</name>
-	<author>ilyvion</author>
-	<description>Farming Hysteresis lets you automate enabling and disabling growing zones based on the amount of product already in storage.
+    <packageId>ilyvion.FarmingHysteresis</packageId>
+    <name>Farming Hysteresis</name>
+    <author>ilyvion</author>
+    <description>Farming Hysteresis lets you automate enabling and disabling growing zones based on the amount of product already in storage.
 
 I got tired of keeping track of these numbers myself, so I made a little mod to do it for me. Hopefully it can be of use to you too.
 
 &lt;size=24&gt;Operation&lt;/size&gt;
 
-The mod adds an "Enable farming hysteresis" to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported.When you enable this setting, the "Enable sowing" button is removed, and sowing is instead controlled by a set of hysteresis bounds. Hydroponics basins typically don't have this setting, but with this mod and hysteresis enabled, sowing also stops on those when appropriate.
+The mod adds an "Enable farming hysteresis" to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported. When you enable this setting, the "Allow sowing" and "Allow cutting" buttons are removed, and these are instead controlled by a set of hysteresis bounds. Hydroponics basins typically don't have these settings, but with this mod and hysteresis enabled, sowing and/or cutting also stops on those when appropriate.
 
-When the amount of stored product goes below the lower bound, sowing is enabled. Sowing remains enabled until the amount of stored product goes above the upper bound, at which point sowing is disabled. Sowing remains disabled until the amount of stored product once again goes below the lower bound.
+When the amount of stored product goes below the lower bound, sowing and/or cutting is enabled. This remains enabled until the amount of stored product goes above the upper bound, at which point sowing and/or cutting is disabled. This then remains disabled until the amount of stored product once again goes below the lower bound.
 
 &lt;size=24&gt;Contributors&lt;/size&gt;
 
@@ -19,21 +19,21 @@ When the amount of stored product goes below the lower bound, sowing is enabled.
 
 &lt;size=24&gt;Version&lt;/size&gt;
 
-This is version 0.5.1 for RimWorld 1.4
+This is version 0.6.0 for RimWorld 1.4
 
-</description>
-	<supportedVersions>
-		<li>1.4</li>
-	</supportedVersions>
-	<modDependencies>
-		<li>
-			<packageId>brrainz.harmony</packageId>
-			<displayName>Harmony</displayName>
-			<downloadUrl>https://steamcommunity.com/workshop/filedetails/?id=2009463077</downloadUrl>
-			<steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
-		</li>
-	</modDependencies>
-	<loadAfter>
-		<li>brrainz.harmony</li>
-	</loadAfter>
+    </description>
+    <supportedVersions>
+        <li>1.4</li>
+    </supportedVersions>
+    <modDependencies>
+        <li>
+            <packageId>brrainz.harmony</packageId>
+            <displayName>Harmony</displayName>
+            <downloadUrl>https://steamcommunity.com/workshop/filedetails/?id=2009463077</downloadUrl>
+            <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+        </li>
+    </modDependencies>
+    <loadAfter>
+        <li>brrainz.harmony</li>
+    </loadAfter>
 </ModMetaData>
