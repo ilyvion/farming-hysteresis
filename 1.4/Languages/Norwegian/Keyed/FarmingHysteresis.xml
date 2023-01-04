@@ -12,6 +12,11 @@
     <FarmingHysteresis.EnabledByDefault>Jordbrukssoner og hydroponiske bed har hysterese aktivert når de blir plassert</FarmingHysteresis.EnabledByDefault>
     <FarmingHysteresis.UseGlobalValuesByDefault>Bruk globale hysteresegrenser som standard</FarmingHysteresis.UseGlobalValuesByDefault>
     <FarmingHysteresis.HysteresisMode>Hysteresemodus</FarmingHysteresis.HysteresisMode>
+    <FarmingHysteresis.ShowOldCommands>Vis gamle kommandoknapper</FarmingHysteresis.ShowOldCommands>
+    <FarmingHysteresis.ShowOldCommandsTooltip>I versjon 0.6 gikk moden fra å bruke kommandoknapper til å bruke en dialog for å stille inn hystereseparametere. Skru på dette valget for å også vise de gamle kommandoknappene.</FarmingHysteresis.ShowOldCommandsTooltip>
+
+    <FarmingHysteresis.ConfigureHysteresis>Konfigurer hystereseparametere</FarmingHysteresis.ConfigureHysteresis>
+    <FarmingHysteresis.ConfigureHysteresisDesc>Konfigurer hystereseparametere som f.eks. øvre og nedre grensenivå.</FarmingHysteresis.ConfigureHysteresisDesc>
 
     <FarmingHysteresis.DecrementLowerHysteresis>N: -{0}</FarmingHysteresis.DecrementLowerHysteresis>
     <FarmingHysteresis.DecrementLowerHysteresisDesc>Reduser den nedre grensa med {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.DecrementLowerHysteresisDesc>
@@ -36,6 +41,7 @@
     <FarmingHysteresis.LatchModeDesc.AboveUpperBound>Høyere enn den øvre grensa. Deaktiverer {0}.</FarmingHysteresis.LatchModeDesc.AboveUpperBound>
     <FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>Jordbrukshysterese er deaktivert for denne jordbrukssonen da den valgte planten ikke har et produkt som kan høstes.</FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>
 
+    <FarmingHysteresis.UseGlobalBoundsLabel>Bruk globale grenseverdier</FarmingHysteresis.UseGlobalBoundsLabel>
     <FarmingHysteresis.LowerBoundLabel>Nedre grense</FarmingHysteresis.LowerBoundLabel>
     <FarmingHysteresis.UpperBoundLabel>Øvre grense</FarmingHysteresis.UpperBoundLabel>
 

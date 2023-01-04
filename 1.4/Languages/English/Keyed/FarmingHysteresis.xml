@@ -12,6 +12,11 @@
     <FarmingHysteresis.EnabledByDefault>Growing zones and hydroponic basins enable hysteresis upon placement</FarmingHysteresis.EnabledByDefault>
     <FarmingHysteresis.UseGlobalValuesByDefault>Use global hysteresis values by default</FarmingHysteresis.UseGlobalValuesByDefault>
     <FarmingHysteresis.HysteresisMode>Hysteresis mode</FarmingHysteresis.HysteresisMode>
+    <FarmingHysteresis.ShowOldCommands>Show old command buttons</FarmingHysteresis.ShowOldCommands>
+    <FarmingHysteresis.ShowOldCommandsTooltip>In version 0.6, the mod switched from using command buttons to a dialog for configuring hysteresis parameters. Enable this setting to also show the old command buttons.</FarmingHysteresis.ShowOldCommandsTooltip>
+
+    <FarmingHysteresis.ConfigureHysteresis>Configure hysteresis parameters</FarmingHysteresis.ConfigureHysteresis>
+    <FarmingHysteresis.ConfigureHysteresisDesc>Configure hysteresis parameters such as the upper and lower bounds.</FarmingHysteresis.ConfigureHysteresisDesc>
 
     <FarmingHysteresis.DecrementLowerHysteresis>L: -{0}</FarmingHysteresis.DecrementLowerHysteresis>
     <FarmingHysteresis.DecrementLowerHysteresisDesc>Decrement the lower bound by {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.DecrementLowerHysteresisDesc>
@@ -36,6 +41,7 @@
     <FarmingHysteresis.LatchModeDesc.AboveUpperBound>Higher than the upper bound. Disallowing {0}.</FarmingHysteresis.LatchModeDesc.AboveUpperBound>
     <FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>Farming hysteresis is disabled for this growing zone due to the selected plant not having a harvestable product.</FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>
 
+    <FarmingHysteresis.UseGlobalBoundsLabel>Use global bounds</FarmingHysteresis.UseGlobalBoundsLabel>
     <FarmingHysteresis.LowerBoundLabel>Lower bound</FarmingHysteresis.LowerBoundLabel>
     <FarmingHysteresis.UpperBoundLabel>Upper bound</FarmingHysteresis.UpperBoundLabel>
 

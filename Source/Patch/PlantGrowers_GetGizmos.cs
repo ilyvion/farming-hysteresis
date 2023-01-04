@@ -97,88 +97,104 @@ namespace FarmingHysteresis.Patch
                     result.Remove(allowGizmo);
                 }
 
-                var useGlobalValuesCommand = new Command_Toggle
+                Texture2D uiIcon = harvestedThingDef.uiIcon;
+                var configureHysteresisCommand = new Command_Action
                 {
-                    defaultLabel = "FarmingHysteresis.UseGlobalValues".Translate(),
-                    defaultDesc = "FarmingHysteresis.UseGlobalValuesDesc".Translate(),
-                    icon = TexCommand.ForbidOff,
-                    isActive = () => data.useGlobalValues,
-                    toggleAction = () =>
+                    defaultLabel = "FarmingHysteresis.ConfigureHysteresis".Translate(),
+                    defaultDesc = "FarmingHysteresis.ConfigureHysteresisDesc".Translate(),
+                    icon = uiIcon,
+                    action = () =>
                     {
-                        if (data.useGlobalValues || FarmingHysteresisMapComponent.For(Find.CurrentMap).HasBoundsFor(harvestedThingDef))
-                        {
-                            // We were already using global values OR such global values already exist for this harvest type.
-                            // So just flip the flag.
-                            data.useGlobalValues = !data.useGlobalValues;
-                        }
-                        else
-                        {
-                            // This is the first time this harvest type is switching to global values.
-                            // Copy the initial global values over from the local values for a better user experience.
-                            var currentLowerBound = data.LowerBound;
-                            var currentUpperBound = data.UpperBound;
-
-                            data.useGlobalValues = true;
-
-                            data.LowerBound = currentLowerBound;
-                            data.UpperBound = currentUpperBound;
-                        }
+                        Dialog_HysteresisParameters dialog = new(data);
+                        Find.WindowStack.Add(dialog);
                     }
                 };
-                result.Add(useGlobalValuesCommand);
+                result.Add(configureHysteresisCommand);
 
-                Texture2D uiIcon = harvestedThingDef.uiIcon;
-                var decrementLowerHysteresisCommand = new Command_Decrement
+                if (Settings.ShowOldCommands)
                 {
-                    defaultLabel = "FarmingHysteresis.DecrementLowerHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
-                    defaultDesc = "FarmingHysteresis.DecrementLowerHysteresisDesc".Translate(
-                        GenUI.CurrentAdjustmentMultiplier(),
-                        KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
-                        KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
-                    ),
-                    icon = uiIcon,
-                    action = () => data.LowerBound -= GenUI.CurrentAdjustmentMultiplier()
-                };
-                result.Add(decrementLowerHysteresisCommand);
+                    var useGlobalValuesCommand = new Command_Toggle
+                    {
+                        defaultLabel = "FarmingHysteresis.UseGlobalValues".Translate(),
+                        defaultDesc = "FarmingHysteresis.UseGlobalValuesDesc".Translate(),
+                        icon = TexCommand.ForbidOff,
+                        isActive = () => data.useGlobalValues,
+                        toggleAction = () =>
+                        {
+                            if (data.useGlobalValues || FarmingHysteresisMapComponent.For(Find.CurrentMap).HasBoundsFor(harvestedThingDef))
+                            {
+                                // We were already using global values OR such global values already exist for this harvest type.
+                                // So just flip the flag.
+                                data.useGlobalValues = !data.useGlobalValues;
+                            }
+                            else
+                            {
+                                // This is the first time this harvest type is switching to global values.
+                                // Copy the initial global values over from the local values for a better user experience.
+                                var currentLowerBound = data.LowerBound;
+                                var currentUpperBound = data.UpperBound;
 
-                var incrementLowerHysteresisCommand = new Command_Increment
-                {
-                    defaultLabel = "FarmingHysteresis.IncrementLowerHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
-                    defaultDesc = "FarmingHysteresis.IncrementLowerHysteresisDesc".Translate(
-                        GenUI.CurrentAdjustmentMultiplier(),
-                        KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
-                        KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
-                    ),
-                    icon = uiIcon,
-                    action = () => data.LowerBound += GenUI.CurrentAdjustmentMultiplier()
-                };
-                result.Add(incrementLowerHysteresisCommand);
+                                data.useGlobalValues = true;
 
-                var decrementUpperHysteresisCommand = new Command_Decrement
-                {
-                    defaultLabel = "FarmingHysteresis.DecrementUpperHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
-                    defaultDesc = "FarmingHysteresis.DecrementUpperHysteresisDesc".Translate(
-                        GenUI.CurrentAdjustmentMultiplier(),
-                        KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
-                        KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
-                    ),
-                    icon = uiIcon,
-                    action = () => data.UpperBound -= GenUI.CurrentAdjustmentMultiplier()
-                };
-                result.Add(decrementUpperHysteresisCommand);
+                                data.LowerBound = currentLowerBound;
+                                data.UpperBound = currentUpperBound;
+                            }
+                        }
+                    };
+                    result.Add(useGlobalValuesCommand);
 
-                var incrementUpperHysteresisCommand = new Command_Increment
-                {
-                    defaultLabel = "FarmingHysteresis.IncrementUpperHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
-                    defaultDesc = "FarmingHysteresis.IncrementUpperHysteresisDesc".Translate(
-                        GenUI.CurrentAdjustmentMultiplier(),
-                        KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
-                        KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
-                    ),
-                    icon = uiIcon,
-                    action = () => data.UpperBound += GenUI.CurrentAdjustmentMultiplier()
-                };
-                result.Add(incrementUpperHysteresisCommand);
+                    var decrementLowerHysteresisCommand = new Command_Decrement
+                    {
+                        defaultLabel = "FarmingHysteresis.DecrementLowerHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+                        defaultDesc = "FarmingHysteresis.DecrementLowerHysteresisDesc".Translate(
+                            GenUI.CurrentAdjustmentMultiplier(),
+                            KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
+                            KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
+                        ),
+                        icon = uiIcon,
+                        action = () => data.LowerBound -= GenUI.CurrentAdjustmentMultiplier()
+                    };
+                    result.Add(decrementLowerHysteresisCommand);
+
+                    var incrementLowerHysteresisCommand = new Command_Increment
+                    {
+                        defaultLabel = "FarmingHysteresis.IncrementLowerHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+                        defaultDesc = "FarmingHysteresis.IncrementLowerHysteresisDesc".Translate(
+                            GenUI.CurrentAdjustmentMultiplier(),
+                            KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
+                            KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
+                        ),
+                        icon = uiIcon,
+                        action = () => data.LowerBound += GenUI.CurrentAdjustmentMultiplier()
+                    };
+                    result.Add(incrementLowerHysteresisCommand);
+
+                    var decrementUpperHysteresisCommand = new Command_Decrement
+                    {
+                        defaultLabel = "FarmingHysteresis.DecrementUpperHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+                        defaultDesc = "FarmingHysteresis.DecrementUpperHysteresisDesc".Translate(
+                            GenUI.CurrentAdjustmentMultiplier(),
+                            KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
+                            KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
+                        ),
+                        icon = uiIcon,
+                        action = () => data.UpperBound -= GenUI.CurrentAdjustmentMultiplier()
+                    };
+                    result.Add(decrementUpperHysteresisCommand);
+
+                    var incrementUpperHysteresisCommand = new Command_Increment
+                    {
+                        defaultLabel = "FarmingHysteresis.IncrementUpperHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+                        defaultDesc = "FarmingHysteresis.IncrementUpperHysteresisDesc".Translate(
+                            GenUI.CurrentAdjustmentMultiplier(),
+                            KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
+                            KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
+                        ),
+                        icon = uiIcon,
+                        action = () => data.UpperBound += GenUI.CurrentAdjustmentMultiplier()
+                    };
+                    result.Add(incrementUpperHysteresisCommand);
+                }
             }
             __result = result;
         }

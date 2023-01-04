@@ -15,12 +15,14 @@ namespace FarmingHysteresis
         private static bool _enabledByDefault = true;
         private static bool _useGlobalValuesByDefault = true;
         private static HysteresisMode _hysteresisMode = HysteresisMode.Sowing;
+        private static bool _showOldCommands = false;
 
         internal static int DefaultHysteresisLowerBound { get => _defaultHysteresisLowerBound; set => _defaultHysteresisLowerBound = value; }
         internal static int DefaultHysteresisUpperBound { get => _defaultHysteresisUpperBound; set => _defaultHysteresisUpperBound = value; }
         internal static bool EnabledByDefault { get => _enabledByDefault; set => _enabledByDefault = value; }
         internal static bool UseGlobalValuesByDefault { get => _useGlobalValuesByDefault; set => _useGlobalValuesByDefault = value; }
         internal static HysteresisMode HysteresisMode { get => _hysteresisMode; set => _hysteresisMode = value; }
+        internal static bool ShowOldCommands { get => _showOldCommands; set => _showOldCommands = value; }
 
         internal static bool ControlSowing => _hysteresisMode == HysteresisMode.Sowing || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
         internal static bool ControlHarvesting => _hysteresisMode == HysteresisMode.Harvesting || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
@@ -34,6 +36,7 @@ namespace FarmingHysteresis
             Scribe_Values.Look(ref _enabledByDefault, "enabledByDefault", true);
             Scribe_Values.Look(ref _useGlobalValuesByDefault, "useGlobalValuesByDefault", true);
             Scribe_Values.Look(ref _hysteresisMode, "hysteresisMode", HysteresisMode.Sowing);
+            Scribe_Values.Look(ref _showOldCommands, "showOldCommands", false);
         }
 
         public static void DoSettingsWindowContents(Rect inRect)
@@ -43,6 +46,10 @@ namespace FarmingHysteresis
 
             listingStandard.CheckboxLabeled("FarmingHysteresis.EnabledByDefault".Translate(), ref _enabledByDefault);
             listingStandard.CheckboxLabeled("FarmingHysteresis.UseGlobalValuesByDefault".Translate(), ref _useGlobalValuesByDefault);
+            listingStandard.CheckboxLabeled(
+                "FarmingHysteresis.ShowOldCommands".Translate(),
+                ref _showOldCommands,
+                "FarmingHysteresis.ShowOldCommandsTooltip".Translate());
 
             if (listingStandard.ButtonTextLabeledPct(
                 "FarmingHysteresis.HysteresisMode".Translate(),
