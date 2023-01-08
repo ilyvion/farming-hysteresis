@@ -19,8 +19,7 @@ namespace FarmingHysteresis.Patch
                 (i) => i.GetFarmingHysteresisData(),
                 (r) => r.Where(g =>
                     g is Command_Toggle t &&
-                    (t.defaultLabel == "CommandAllowSow".Translate() ||
-                    t.defaultLabel == "CommandAllowCut".Translate())).ToList()
+                    (t.defaultLabel == "CommandAllowSow".Translate())).ToList()
             );
         }
     }

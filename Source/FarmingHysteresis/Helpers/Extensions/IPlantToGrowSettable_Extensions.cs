@@ -7,10 +7,10 @@ namespace FarmingHysteresis.Helpers.Extensions
 {
     internal static class IPlantToGrowSettableExtensions
     {
-        private class Building_PlantGrowerCustomFields
+        private class IPlantToGrowSettableCustomFields
         {
             public bool allowSow;
-            public bool allowCut;
+            public bool allowHarvest;
         }
 
         internal static (ThingDef?, int) PlantHarvestInfo(this IPlantToGrowSettable plantToGrowSettable)
@@ -26,19 +26,20 @@ namespace FarmingHysteresis.Helpers.Extensions
             }
         }
 
-        private static readonly ConditionalWeakTable<Building_PlantGrower, Building_PlantGrowerCustomFields> plantGrowerCustomFieldsTable = new();
+        private static readonly ConditionalWeakTable<IPlantToGrowSettable, IPlantToGrowSettableCustomFields> plantGrowerCustomFieldsTable = new();
         internal static void SetHysteresisControlState(this IPlantToGrowSettable plantToGrowSettable, bool state)
         {
             if (plantToGrowSettable is Zone_Growing zoneGrowing)
             {
+                var buildingPlantGrowerCustomFields = plantGrowerCustomFieldsTable.GetValue(zoneGrowing, (z) => new());
                 zoneGrowing.allowSow = Settings.ControlSowing ? state : true;
-                zoneGrowing.allowCut = Settings.ControlHarvesting ? state : true;
+                buildingPlantGrowerCustomFields.allowHarvest = Settings.ControlHarvesting ? state : true;
             }
             else if (plantToGrowSettable is Building_PlantGrower buildingPlantGrower)
             {
                 var buildingPlantGrowerCustomFields = plantGrowerCustomFieldsTable.GetValue(buildingPlantGrower, (b) => new());
                 buildingPlantGrowerCustomFields.allowSow = Settings.ControlSowing ? state : true;
-                buildingPlantGrowerCustomFields.allowCut = Settings.ControlHarvesting ? state : true;
+                buildingPlantGrowerCustomFields.allowHarvest = Settings.ControlHarvesting ? state : true;
             }
             else
             {
@@ -70,13 +71,17 @@ namespace FarmingHysteresis.Helpers.Extensions
         {
             if (plantToGrowSettable is Zone_Growing zoneGrowing)
             {
-                return zoneGrowing.allowCut;
+                if (plantGrowerCustomFieldsTable.TryGetValue(zoneGrowing, out var zoneGrowingCustomFields))
+                {
+                    return zoneGrowingCustomFields.allowHarvest;
+                }
+                return true;
             }
             else if (plantToGrowSettable is Building_PlantGrower buildingPlantGrower)
             {
                 if (plantGrowerCustomFieldsTable.TryGetValue(buildingPlantGrower, out var buildingPlantGrowerCustomFields))
                 {
-                    return buildingPlantGrowerCustomFields.allowCut;
+                    return buildingPlantGrowerCustomFields.allowHarvest;
                 }
                 return true;
             }

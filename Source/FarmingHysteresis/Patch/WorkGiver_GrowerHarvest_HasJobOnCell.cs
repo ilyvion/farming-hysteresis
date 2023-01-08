@@ -19,6 +19,10 @@ namespace FarmingHysteresis.Patch
                 {
                     __result = buildingPlantGrower.GetAllowHarvest();
                 }
+                else if (c.GetZone(pawn.Map) is Zone_Growing zoneGrowing)
+                {
+                    __result = zoneGrowing.GetAllowHarvest();
+                }
             }
         }
     }
