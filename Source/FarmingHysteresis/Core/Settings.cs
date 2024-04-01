@@ -51,12 +51,19 @@ namespace FarmingHysteresis
                 ref _showOldCommands,
                 "FarmingHysteresis.ShowOldCommandsTooltip".Translate());
 
+#if v1_3
+            if (listingStandard.ButtonTextLabeled(
+                "FarmingHysteresis.HysteresisMode".Translate(),
+                "FarmingHysteresis.Control".Translate(_hysteresisMode.AsString())))
+            {
+#else
             if (listingStandard.ButtonTextLabeledPct(
                 "FarmingHysteresis.HysteresisMode".Translate(),
                 "FarmingHysteresis.Control".Translate(_hysteresisMode.AsString()),
                 0.6f,
                 TextAnchor.MiddleLeft))
             {
+#endif
                 List<FloatMenuOption> list = new();
                 list.Add(new FloatMenuOption(
                     "FarmingHysteresis.Control".Translate("FarmingHysteresis.Sowing".Translate()),
