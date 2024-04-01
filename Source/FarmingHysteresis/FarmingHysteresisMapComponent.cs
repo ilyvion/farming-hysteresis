@@ -138,6 +138,12 @@ namespace FarmingHysteresis
                 Scribe_Collections.Look(ref globalLowerBoundValues, "globalLowerBoundValues", LookMode.Def, LookMode.Value);
                 Scribe_Collections.Look(ref globalUpperBoundValues, "globalUpperBoundValues", LookMode.Def, LookMode.Value);
 
+                if (globalLowerBoundValues == null || globalUpperBoundValues == null)
+                {
+                    Log.Warning("globalLowerBoundValues or globalUpperBoundValues was null; expected a value. No bounds transferred from old game.");
+                    return;
+                }
+
                 foreach (var thingDef in globalLowerBoundValues.Keys.Union(globalUpperBoundValues.Keys))
                 {
                     var boundValues = new BoundValues
