@@ -20,11 +20,20 @@ jobs:
               with:
                   dotnet-version: 6.0.x
 
-            - name: Install Mod Dependencies
-              run: dotnet restore .vscode
+            - name: Build Mod for 1.3
+              env:
+                  RimWorldVersion: 1.3
+              run: dotnet build .vscode --configuration Release
 
-            - name: Build Mod
-              run: dotnet build .vscode --configuration Release --no-restore
+            - name: Build Mod for 1.4
+              env:
+                  RimWorldVersion: 1.4
+              run: dotnet build .vscode --configuration Release
+
+            - name: Build Mod for 1.5
+              env:
+                  RimWorldVersion: 1.5
+              run: dotnet build .vscode --configuration Release
 
             - name: Upload Mod Artifacts
               uses: actions/upload-artifact@v3
@@ -32,7 +41,10 @@ jobs:
                   name: FarmingHysteresis-Release
                   path: |
                       About/
+                      1.3/
                       1.4/
+                      1.5/
+                      Common/
                       LICENSE
                       LICENSE.Apache-2.0
                       LICENSE.MIT
@@ -40,7 +52,6 @@ jobs:
                       CHANGELOG.md
                       !**/.*
                       !About/Preview.pdn
-                      !1.4/Assemblies/0Harmony.dll
 
     package:
         name: Release
