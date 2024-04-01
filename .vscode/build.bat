@@ -12,34 +12,34 @@ RMDIR /S /Q %TARGET%
 
 REM make mod folders
 MKDIR %TARGET%\1.4\Assemblies
-MKDIR %TARGET%\1.4\Defs
-MKDIR %TARGET%\1.4\Defs\MainTabDefs
+MKDIR %TARGET%\Common\Defs
+MKDIR %TARGET%\Common\Defs\MainTabDefs
 
-MKDIR %TARGET%\1.4\Languages\English\Keyed
-MKDIR %TARGET%\1.4\Languages\English\DefInjected\MainButtonDef
+MKDIR %TARGET%\Common\Languages\English\Keyed
+MKDIR %TARGET%\Common\Languages\English\DefInjected\MainButtonDef
 
-MKDIR %TARGET%\1.4\Languages\Japanese\Keyed
+MKDIR %TARGET%\Common\Languages\Japanese\Keyed
 
-MKDIR %TARGET%\1.4\Languages\Norwegian\Keyed
-MKDIR %TARGET%\1.4\Languages\Norwegian\DefInjected\MainButtonDef
+MKDIR %TARGET%\Common\Languages\Norwegian\Keyed
+MKDIR %TARGET%\Common\Languages\Norwegian\DefInjected\MainButtonDef
 
-MKDIR %TARGET%\1.4\Patches
+MKDIR %TARGET%\Common\Patches
 MKDIR %TARGET%\About
 
 REM copy mod files
 COPY 1.4\Assemblies\FarmingHysteresis.dll %TARGET%\1.4\Assemblies
-COPY 1.4\Defs\MainTabDefs\MainTabWindow_Hysteresis.xml %TARGET%\1.4\Defs\MainTabDefs
+COPY Common\Defs\MainTabDefs\MainTabWindow_Hysteresis.xml %TARGET%\Common\Defs\MainTabDefs
 
-COPY 1.4\Languages\English\Data.xml %TARGET%\1.4\Languages\English
-COPY 1.4\Languages\English\Keyed\FarmingHysteresis.xml %TARGET%\1.4\Languages\English\Keyed
-COPY 1.4\Languages\English\DefInjected\MainButtonDef\MainButtons.xml %TARGET%\1.4\Languages\English\DefInjected\MainButtonDef
+COPY Common\Languages\English\Data.xml %TARGET%\Common\Languages\English
+COPY Common\Languages\English\Keyed\FarmingHysteresis.xml %TARGET%\Common\Languages\English\Keyed
+COPY Common\Languages\English\DefInjected\MainButtonDef\MainButtons.xml %TARGET%\Common\Languages\English\DefInjected\MainButtonDef
 
-COPY 1.4\Languages\Japanese\Keyed\FarmingHysteresis.xml %TARGET%\1.4\Languages\Japanese\Keyed
+COPY Common\Languages\Japanese\Keyed\FarmingHysteresis.xml %TARGET%\Common\Languages\Japanese\Keyed
 
-COPY 1.4\Languages\Norwegian\Keyed\FarmingHysteresis.xml %TARGET%\1.4\Languages\Norwegian\Keyed
-COPY 1.4\Languages\Norwegian\DefInjected\MainButtonDef\MainButtons.xml %TARGET%\1.4\Languages\Norwegian\DefInjected\MainButtonDef
+COPY Common\Languages\Norwegian\Keyed\FarmingHysteresis.xml %TARGET%\Common\Languages\Norwegian\Keyed
+COPY Common\Languages\Norwegian\DefInjected\MainButtonDef\MainButtons.xml %TARGET%\Common\Languages\Norwegian\DefInjected\MainButtonDef
 
-COPY 1.4\Patches\Patches.xml %TARGET%\1.4\Patches
+COPY Common\Patches\Patches.xml %TARGET%\Common\Patches
 COPY About\About.xml %TARGET%\About
 COPY About\Manifest.xml %TARGET%\About
 COPY About\Preview.png %TARGET%\About
