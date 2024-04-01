@@ -83,7 +83,7 @@ namespace FarmingHysteresis
             Widgets.BeginScrollView(rect2, ref messagesScrollPos, viewRect);
 
             float num = 0f;
-            foreach (ThingDef harvestedThingDef in globalBoundAccessors.Keys) // DefDatabase<ThingDef>.AllDefs.Where((ThingDef def) => def.category == ThingCategory.Plant))
+            foreach (ThingDef harvestedThingDef in globalBoundAccessors.Keys)
             {
                 var value = globalBounds[harvestedThingDef].Lower;
                 var buffer = globalBoundLowerBuffers[harvestedThingDef];
