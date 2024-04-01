@@ -43,7 +43,7 @@ namespace FarmingHysteresis.Helpers.Extensions
             }
             else
             {
-                Log.Error($"Called {nameof(SetHysteresisControlState)} on an unknown IPlantToGrowSettable: {plantToGrowSettable.GetType().FullName}.");
+                FarmingHysteresisMod.Error($"Called {nameof(SetHysteresisControlState)} on an unknown IPlantToGrowSettable: {plantToGrowSettable.GetType().FullName}.");
             }
         }
 

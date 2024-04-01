@@ -253,11 +253,11 @@ namespace FarmingHysteresis
             enabled = false;
             if (plantToGrowSettable is ILoadReferenceable loadReferenceable)
             {
-                Log.Warning($"{loadReferenceable.GetUniqueLoadID()} has a plant type without a harvestable product. Disabling farming hysteresis.");
+                FarmingHysteresisMod.Warning($"{loadReferenceable.GetUniqueLoadID()} has a plant type without a harvestable product. Disabling farming hysteresis.");
             }
             else
             {
-                Log.Warning($"Something has a plant type without a harvestable product. Disabling farming hysteresis.");
+                FarmingHysteresisMod.Warning($"Something has a plant type without a harvestable product. Disabling farming hysteresis.");
             }
         }
     }

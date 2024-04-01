@@ -2,6 +2,7 @@
 using Verse;
 using System.Reflection;
 using UnityEngine;
+using System;
 
 namespace FarmingHysteresis
 {
@@ -27,6 +28,30 @@ namespace FarmingHysteresis
         public override string SettingsCategory()
         {
             return content.Name;
+        }
+
+        public static void Message(string msg)
+        {
+            Log.Message("[Farming Hysteresis] " + msg);
+        }
+
+        public static void Warning(string msg)
+        {
+            Log.Warning("[Farming Hysteresis] " + msg);
+        }
+
+        public static void Error(string msg)
+        {
+            Log.Error("[Farming Hysteresis] " + msg);
+        }
+
+        public static void Exception(string msg, Exception? e = null)
+        {
+            Message(msg);
+            if (e != null)
+            {
+                Log.Error(e.ToString());
+            }
         }
     }
 }

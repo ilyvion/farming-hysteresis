@@ -140,7 +140,7 @@ namespace FarmingHysteresis
 
                 if (globalLowerBoundValues == null || globalUpperBoundValues == null)
                 {
-                    Log.Warning("globalLowerBoundValues or globalUpperBoundValues was null; expected a value. No bounds transferred from old game.");
+                    FarmingHysteresisMod.Warning("globalLowerBoundValues or globalUpperBoundValues was null; expected a value. No bounds transferred from old game.");
                     return;
                 }
 
