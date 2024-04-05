@@ -9,7 +9,7 @@ I got tired of keeping track of these numbers myself, so I made a little mod to 
 
 &lt;size=24&gt;Operation&lt;/size&gt;
 
-The mod adds an "Enable farming hysteresis" to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported. When you enable this setting, the "Allow sowing" and "Allow cutting" buttons are removed, and these are instead controlled by a set of hysteresis bounds. Hydroponics basins typically don't have these settings, but with this mod and hysteresis enabled, sowing and/or cutting also stops on those when appropriate.
+The mod adds an "Enable farming hysteresis" to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported. When you enable this setting, the "Allow sowing" button is removed, and sowing and harvesting are instead controlled by a set of hysteresis bounds. Hydroponics basins typically don't have these settings, but with this mod and hysteresis enabled, sowing and/or cutting also stops on those when appropriate.
 
 When the amount of stored product goes below the lower bound, sowing and/or cutting is enabled. This remains enabled until the amount of stored product goes above the upper bound, at which point sowing and/or cutting is disabled. This then remains disabled until the amount of stored product once again goes below the lower bound.
 
