@@ -1,14 +1,25 @@
+$ErrorActionPreference = 'Stop'
+
 $Target = "C:\Program Files (x86)\Steam\steamapps\common\RimWorld\Mods\FarmingHysteresis"
 
 # build dlls
 $env:RimWorldVersion = "1.3"
 dotnet build .vscode
+if ($LASTEXITCODE -gt 0) {
+    throw "Build failed"
+}
 Start-Sleep -Seconds 0.5
 $env:RimWorldVersion = "1.4"
 dotnet build .vscode
+if ($LASTEXITCODE -gt 0) {
+    throw "Build failed"
+}
 Start-Sleep -Seconds 0.5
 $env:RimWorldVersion = "1.5"
 dotnet build .vscode
+if ($LASTEXITCODE -gt 0) {
+    throw "Build failed"
+}
 
 # remove mod folder
 Remove-Item -Path $Target -Recurse
