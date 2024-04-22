@@ -11,6 +11,9 @@
         <VersionPrefix>0.6.1</VersionPrefix>
 
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+        <!-- Intellisense doesn't work without specifying this -->
+        <!-- <RimWorldVersion>1.4</RimWorldVersion> -->
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
