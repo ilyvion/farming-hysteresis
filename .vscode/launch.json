@@ -9,7 +9,10 @@
             "type": "clr",
             "request": "launch",
             "preLaunchTask": "build dll",
-            "args": [],
+            "args": [
+                "-savedatafolder=${workspaceFolder}\\.savedatafolder",
+                //"-quicktest",
+            ],
             "program": "C:/Program Files (x86)/Steam/steamapps/common/RimWorld/RimWorldWin64.exe",
             "cwd": "${workspaceFolder}",
             "console": "internalConsole",

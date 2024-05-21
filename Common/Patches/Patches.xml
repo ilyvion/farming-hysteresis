@@ -1,3 +1,16 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <Patch>
+    <!-- Add Hysteresis inspector tab to Building_PlantGrower buildings -->
+    <Operation Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[thingClass='Building_PlantGrower'][not(inspectorTabs)]</xpath>
+        <value>
+            <inspectorTabs />
+        </value>
+    </Operation>
+    <Operation Class="PatchOperationAdd">
+        <xpath>Defs/ThingDef[thingClass='Building_PlantGrower']/inspectorTabs</xpath>
+        <value>
+            <li>FarmingHysteresis.ITabs.ITab_Hysteresis</li>
+        </value>
+    </Operation>
 </Patch>

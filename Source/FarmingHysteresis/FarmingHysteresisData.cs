@@ -186,7 +186,7 @@ namespace FarmingHysteresis
             var (harvestedThingDef, harvestedThingCount) = plantToGrowSettable.PlantHarvestInfo();
             if (harvestedThingDef == null)
             {
-                DisableDueToMissingHarvestedThingDef(plantToGrowSettable);
+                DisableDueToMissingHarvestedThingDef(plantToGrowSettable, plantToGrowSettable.GetPlantDefToGrow());
                 return;
             }
 
@@ -248,16 +248,31 @@ namespace FarmingHysteresis
             }
         }
 
-        internal void DisableDueToMissingHarvestedThingDef(IPlantToGrowSettable plantToGrowSettable)
+        internal void DisableDueToMissingHarvestedThingDef(IPlantToGrowSettable plantToGrowSettable, ThingDef plantDef)
         {
             enabled = false;
-            if (plantToGrowSettable is ILoadReferenceable loadReferenceable)
+            if (plantToGrowSettable is Zone zone)
             {
-                FarmingHysteresisMod.Warning($"{loadReferenceable.GetUniqueLoadID()} has a plant type without a harvestable product. Disabling farming hysteresis.");
+                FarmingHysteresisMod.Warning($"Zone '{zone.label}' has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            }
+            else if (plantToGrowSettable is Building building)
+            {
+                // Let's not cause unnecessary spam from flower pots and similar
+                string? sowTag = building.def.building?.sowTag;
+                if (sowTag == "Decorative" || sowTag == "DecorativeTree")
+                {
+                    return;
+                }
+
+                FarmingHysteresisMod.Warning($"Building named '{building.Label}' @ {building.InteractionCell.ToIntVec2} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            }
+            else if (plantToGrowSettable is ILoadReferenceable loadReferenceable)
+            {
+                FarmingHysteresisMod.Warning($"{loadReferenceable.GetUniqueLoadID()} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
             }
             else
             {
-                FarmingHysteresisMod.Warning($"Something has a plant type without a harvestable product. Disabling farming hysteresis.");
+                FarmingHysteresisMod.Warning($"Unknown type {plantToGrowSettable.GetType().FullName} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
             }
         }
     }

@@ -8,6 +8,9 @@ using System.Linq;
 
 namespace FarmingHysteresis.Patch
 {
+    /// <summary>
+    /// Add Farming Hysteresis gizmos to the growing zone
+    /// </summary>
     [HarmonyPatch(typeof(Zone_Growing), nameof(Zone_Growing.GetGizmos))]
     internal static class RimWorld_Zone_Growing_GetGizmos
     {
@@ -24,7 +27,9 @@ namespace FarmingHysteresis.Patch
         }
     }
 
-
+    /// <summary>
+    /// Add Farming Hysteresis gizmos to any Building_PlantGrower
+    /// </summary>
     [HarmonyPatch(typeof(Building_PlantGrower), nameof(Building_PlantGrower.GetGizmos))]
     internal static class RimWorld_Building_PlantGrower_GetGizmos
     {
@@ -80,7 +85,7 @@ namespace FarmingHysteresis.Patch
             {
                 if (harvestedThingDef == null)
                 {
-                    data.DisableDueToMissingHarvestedThingDef(plantToGrowSettable);
+                    data.DisableDueToMissingHarvestedThingDef(plantToGrowSettable, plantToGrowSettable.GetPlantDefToGrow());
                     return;
                 }
 
@@ -91,26 +96,10 @@ namespace FarmingHysteresis.Patch
                     result.Remove(allowGizmo);
                 }
 
-                Texture2D uiIcon = harvestedThingDef.uiIcon;
-
-                if (Find.Selector.NumSelected == 1)
-                {
-                    var configureHysteresisCommand = new Command_Action
-                    {
-                        defaultLabel = "FarmingHysteresis.ConfigureHysteresis".Translate(),
-                        defaultDesc = "FarmingHysteresis.ConfigureHysteresisDesc".Translate(),
-                        icon = uiIcon,
-                        action = () =>
-                        {
-                            Dialog_HysteresisParameters dialog = new(data);
-                            Find.WindowStack.Add(dialog);
-                        }
-                    };
-                    result.Add(configureHysteresisCommand);
-                }
-
                 if (Settings.ShowOldCommands && Find.Selector.NumSelected == 1)
                 {
+                    Texture2D uiIcon = harvestedThingDef.uiIcon;
+
                     var useGlobalValuesCommand = new Command_Toggle
                     {
                         defaultLabel = "FarmingHysteresis.UseGlobalValues".Translate(),

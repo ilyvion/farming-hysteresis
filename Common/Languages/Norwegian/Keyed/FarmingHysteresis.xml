@@ -29,8 +29,8 @@
     <FarmingHysteresis.IncrementUpperHysteresisDesc>Øk den nedre grensa med {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.IncrementUpperHysteresisDesc>
 
     <FarmingHysteresis.UseGlobalBounds>Bruk globale grenser for {0}: {1}</FarmingHysteresis.UseGlobalBounds>
-    <FarmingHysteresis.LowerBound>Start såing av {0} dersom det er færre enn {1} {2} på lager</FarmingHysteresis.LowerBound>
-    <FarmingHysteresis.UpperBound>Avslutt såing av {0} dersom det er flere enn {1} {2} på lager</FarmingHysteresis.UpperBound>
+    <FarmingHysteresis.LowerBound>Start {3} av {0} dersom det er færre enn {1} {2} på lager</FarmingHysteresis.LowerBound>
+    <FarmingHysteresis.UpperBound>Avslutt {3} av {0} dersom det er flere enn {1} {2} på lager</FarmingHysteresis.UpperBound>
     <FarmingHysteresis.InStorage>Nåværende mengde {0} på lager: {1}</FarmingHysteresis.InStorage>
 
     <FarmingHysteresis.LatchModeDesc>Nåværende tilstand: {0}</FarmingHysteresis.LatchModeDesc>
@@ -51,4 +51,7 @@
     <FarmingHysteresis.Harvesting>innhøsting</FarmingHysteresis.Harvesting>
     <FarmingHysteresis.SowingAndHarvesting>såing og innhøsting</FarmingHysteresis.SowingAndHarvesting>
     <FarmingHysteresis.Control>Styr {0}</FarmingHysteresis.Control>
+
+    <FarmingHysteresis.TabHysteresis>Hysterese</FarmingHysteresis.TabHysteresis>
+    <FarmingHysteresis.ProductLabel>Hystereseprodukt:</FarmingHysteresis.ProductLabel>
 </LanguageData>

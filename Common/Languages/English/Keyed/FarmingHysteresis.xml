@@ -29,8 +29,8 @@
     <FarmingHysteresis.IncrementUpperHysteresisDesc>Increment the upper bound by {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.IncrementUpperHysteresisDesc>
 
     <FarmingHysteresis.UseGlobalBounds>Use global bounds for {0}: {1}</FarmingHysteresis.UseGlobalBounds>
-    <FarmingHysteresis.LowerBound>Start planting {0} when there are fewer than {1} {2} in storage</FarmingHysteresis.LowerBound>
-    <FarmingHysteresis.UpperBound>Stop planting {0} when there are more than {1} {2} in storage</FarmingHysteresis.UpperBound>
+    <FarmingHysteresis.LowerBound>Start {3} {0} when there are fewer than {1} {2} in storage</FarmingHysteresis.LowerBound>
+    <FarmingHysteresis.UpperBound>Stop {3} {0} when there are more than {1} {2} in storage</FarmingHysteresis.UpperBound>
     <FarmingHysteresis.InStorage>Current amount of {0} in storage: {1}</FarmingHysteresis.InStorage>
 
     <FarmingHysteresis.LatchModeDesc>Current state: {0}</FarmingHysteresis.LatchModeDesc>
@@ -51,4 +51,7 @@
     <FarmingHysteresis.Harvesting>harvesting</FarmingHysteresis.Harvesting>
     <FarmingHysteresis.SowingAndHarvesting>sowing and harvesting</FarmingHysteresis.SowingAndHarvesting>
     <FarmingHysteresis.Control>Control {0}</FarmingHysteresis.Control>
+
+    <FarmingHysteresis.TabHysteresis>Hysteresis</FarmingHysteresis.TabHysteresis>
+    <FarmingHysteresis.ProductLabel>Hysteresis product:</FarmingHysteresis.ProductLabel>
 </LanguageData>
