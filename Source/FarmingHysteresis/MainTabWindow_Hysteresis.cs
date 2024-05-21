@@ -7,6 +7,11 @@ using Verse;
 
 namespace FarmingHysteresis
 {
+    public class MainButtonWorker_Hysteresis : MainButtonWorker_ToggleTab
+    {
+        public override bool Visible => Settings.ShowHysteresisMainTab;
+    }
+
     public class MainTabWindow_Hysteresis : MainTabWindow
     {
         private enum HysteresisTab : byte

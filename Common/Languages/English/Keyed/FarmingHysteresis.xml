@@ -14,6 +14,8 @@
     <FarmingHysteresis.HysteresisMode>Hysteresis mode</FarmingHysteresis.HysteresisMode>
     <FarmingHysteresis.ShowOldCommands>Show old command buttons</FarmingHysteresis.ShowOldCommands>
     <FarmingHysteresis.ShowOldCommandsTooltip>In version 0.6, the mod switched from using command buttons to a dialog for configuring hysteresis parameters. Enable this setting to also show the old command buttons.</FarmingHysteresis.ShowOldCommandsTooltip>
+    <FarmingHysteresis.ShowHysteresisMainTab>Show hysteresis tab</FarmingHysteresis.ShowHysteresisMainTab>
+    <FarmingHysteresis.ShowHysteresisMainTabTooltip>Disabling this setting hides the Hysteresis tab from the game.\n\nWhile it is currently only used as a convenient location to configure global hysteresis values in one place, there are plans to add more features to this tab later. Hiding it will thus prevent access to these features and is generally not recommended.</FarmingHysteresis.ShowHysteresisMainTabTooltip>
 
     <FarmingHysteresis.ConfigureHysteresis>Configure hysteresis parameters</FarmingHysteresis.ConfigureHysteresis>
     <FarmingHysteresis.ConfigureHysteresisDesc>Configure hysteresis parameters such as the upper and lower bounds.</FarmingHysteresis.ConfigureHysteresisDesc>

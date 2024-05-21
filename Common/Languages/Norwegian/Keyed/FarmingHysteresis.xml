@@ -14,6 +14,8 @@
     <FarmingHysteresis.HysteresisMode>Hysteresemodus</FarmingHysteresis.HysteresisMode>
     <FarmingHysteresis.ShowOldCommands>Vis gamle kommandoknapper</FarmingHysteresis.ShowOldCommands>
     <FarmingHysteresis.ShowOldCommandsTooltip>I versjon 0.6 gikk moden fra å bruke kommandoknapper til å bruke en dialog for å stille inn hystereseparametere. Skru på dette valget for å også vise de gamle kommandoknappene.</FarmingHysteresis.ShowOldCommandsTooltip>
+    <FarmingHysteresis.ShowHysteresisMainTab>Vis hysterese-fane</FarmingHysteresis.ShowHysteresisMainTab>
+    <FarmingHysteresis.ShowHysteresisMainTabTooltip>Hysterese-fanen skjules fra spillet dersom dette valget skrus av.\n\nSelv om denne fanen kun brukes til å konfigurere globale hysteresegrenser nå, er det planer om å legge til flere funksjoner til denne fanen over tid. Det å skjule den vil derfor kunne hindre tilgang til disse funksjonene og er generelt ikke å anbefale.</FarmingHysteresis.ShowHysteresisMainTabTooltip>
 
     <FarmingHysteresis.ConfigureHysteresis>Konfigurer hystereseparametere</FarmingHysteresis.ConfigureHysteresis>
     <FarmingHysteresis.ConfigureHysteresisDesc>Konfigurer hystereseparametere som f.eks. øvre og nedre grensenivå.</FarmingHysteresis.ConfigureHysteresisDesc>

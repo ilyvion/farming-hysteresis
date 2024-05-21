@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+-   Added a setting to hide the Hysteresis tab from the game.
+
 ### Changed
 
 -   Removed farming hysteresis text from inspect strings as well as the "configure hysteresis" gizmo and related dialog. Both concepts were unified into an inspect tab that is now added instead.

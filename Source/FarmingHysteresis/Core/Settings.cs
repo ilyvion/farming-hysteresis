@@ -16,6 +16,7 @@ namespace FarmingHysteresis
         private static bool _useGlobalValuesByDefault = true;
         private static HysteresisMode _hysteresisMode = HysteresisMode.Sowing;
         private static bool _showOldCommands = false;
+        private static bool _showHysteresisMainTab = true;
 
         internal static int DefaultHysteresisLowerBound { get => _defaultHysteresisLowerBound; set => _defaultHysteresisLowerBound = value; }
         internal static int DefaultHysteresisUpperBound { get => _defaultHysteresisUpperBound; set => _defaultHysteresisUpperBound = value; }
@@ -23,6 +24,7 @@ namespace FarmingHysteresis
         internal static bool UseGlobalValuesByDefault { get => _useGlobalValuesByDefault; set => _useGlobalValuesByDefault = value; }
         internal static HysteresisMode HysteresisMode { get => _hysteresisMode; set => _hysteresisMode = value; }
         internal static bool ShowOldCommands { get => _showOldCommands; set => _showOldCommands = value; }
+        internal static bool ShowHysteresisMainTab { get => _showHysteresisMainTab; set => _showHysteresisMainTab = value; }
 
         internal static bool ControlSowing => _hysteresisMode == HysteresisMode.Sowing || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
         internal static bool ControlHarvesting => _hysteresisMode == HysteresisMode.Harvesting || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
@@ -37,6 +39,7 @@ namespace FarmingHysteresis
             Scribe_Values.Look(ref _useGlobalValuesByDefault, "useGlobalValuesByDefault", true);
             Scribe_Values.Look(ref _hysteresisMode, "hysteresisMode", HysteresisMode.Sowing);
             Scribe_Values.Look(ref _showOldCommands, "showOldCommands", false);
+            Scribe_Values.Look(ref _showHysteresisMainTab, "showHysteresisMainTab", true);
         }
 
         public static void DoSettingsWindowContents(Rect inRect)
@@ -50,6 +53,10 @@ namespace FarmingHysteresis
                 "FarmingHysteresis.ShowOldCommands".Translate(),
                 ref _showOldCommands,
                 "FarmingHysteresis.ShowOldCommandsTooltip".Translate());
+            listingStandard.CheckboxLabeled(
+                "FarmingHysteresis.ShowHysteresisMainTab".Translate(),
+                ref _showHysteresisMainTab,
+                "FarmingHysteresis.ShowHysteresisMainTabTooltip".Translate());
 
 #if v1_3
             if (listingStandard.ButtonTextLabeled(
@@ -64,16 +71,18 @@ namespace FarmingHysteresis
                 TextAnchor.MiddleLeft))
             {
 #endif
-                List<FloatMenuOption> list = new();
-                list.Add(new FloatMenuOption(
-                    "FarmingHysteresis.Control".Translate("FarmingHysteresis.Sowing".Translate()),
-                    () => _hysteresisMode = HysteresisMode.Sowing));
-                list.Add(new FloatMenuOption(
-                    "FarmingHysteresis.Control".Translate("FarmingHysteresis.Harvesting".Translate()),
-                    () => _hysteresisMode = HysteresisMode.Harvesting));
-                list.Add(new FloatMenuOption(
-                    "FarmingHysteresis.Control".Translate("FarmingHysteresis.SowingAndHarvesting".Translate()),
-                    () => _hysteresisMode = HysteresisMode.SowingAndHarvesting));
+                List<FloatMenuOption> list = new()
+                {
+                    new FloatMenuOption(
+                        "FarmingHysteresis.Control".Translate("FarmingHysteresis.Sowing".Translate()),
+                        () => _hysteresisMode = HysteresisMode.Sowing),
+                    new FloatMenuOption(
+                        "FarmingHysteresis.Control".Translate("FarmingHysteresis.Harvesting".Translate()),
+                        () => _hysteresisMode = HysteresisMode.Harvesting),
+                    new FloatMenuOption(
+                        "FarmingHysteresis.Control".Translate("FarmingHysteresis.SowingAndHarvesting".Translate()),
+                        () => _hysteresisMode = HysteresisMode.SowingAndHarvesting)
+                };
                 Find.WindowStack.Add(new FloatMenu(list));
             }
 

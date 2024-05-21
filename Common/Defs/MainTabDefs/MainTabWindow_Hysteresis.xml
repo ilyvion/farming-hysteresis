@@ -7,6 +7,7 @@
         <description>hysteresis.description</description>
         <tabWindowClass>FarmingHysteresis.MainTabWindow_Hysteresis</tabWindowClass>
         <order>20</order>
+        <workerClass>FarmingHysteresis.MainButtonWorker_Hysteresis</workerClass>
     </MainButtonDef>
 
 </Defs>
