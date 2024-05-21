@@ -1,22 +1,11 @@
 name: Build
 
 on:
-    push:
-        branches:
-            - main
-        paths-ignore:
-            - "README.md"
-            - "CHANGELOG.md"
-            - ".gitignore"
-        tags-ignore:
-            # This will ignore release versions tagged with a version identifier. We'll
-            # use a separate workflow for them.
-            - "v*"
-    pull_request:
-        paths-ignore:
-            - README.md
-            - "CHANGELOG.md"
-            - ".gitignore"
+    workflow_call:
+        inputs:
+            artifact-suffix:
+                required: true
+                type: string
 
 jobs:
     build:
@@ -52,7 +41,7 @@ jobs:
             - name: Upload Mod Artifacts
               uses: actions/upload-artifact@v3
               with:
-                  name: FarmingHysteresis-${{ github.sha }}
+                  name: FarmingHysteresis-${{ inputs.artifact-suffix }}
                   path: |
                       About/
                       1.3/
