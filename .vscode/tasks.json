@@ -9,7 +9,23 @@
                 "isDefault": true
             },
             "command": ".vscode/build.ps1",
+            "args": [
+                "${input:rimWorldVersion}"
+            ],
             "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "rimWorldVersion",
+            "type": "pickString",
+            "description": "Rimworld version to build?",
+            "options": [
+                "1.5",
+                "1.4",
+                "1.3",
+            ],
+            "default": "1.5"
         }
     ]
 }
