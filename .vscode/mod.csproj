@@ -8,7 +8,7 @@
 
         <RootNamespace>FarmingHysteresis</RootNamespace>
         <AssemblyName>FarmingHysteresis</AssemblyName>
-        <VersionPrefix>0.6.1</VersionPrefix>
+        <VersionPrefix>0.7.0</VersionPrefix>
 
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
