@@ -1,62 +1,108 @@
-<?xml version="1.0" encoding="utf-8"?>
-
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <LanguageData>
+    <!-- EN: Enable hysteresis -->
     <FarmingHysteresis.EnableFarmingHysteresis>Aktiver hysterese</FarmingHysteresis.EnableFarmingHysteresis>
+    <!-- EN: Allow {0} when the amount gets lower than the configured lower amount and disallow {0} when it gets above the configured upper amount. -->
     <FarmingHysteresis.EnableFarmingHysteresisisDesc>Tillat {0} av planter så lenge mengden innhøstingsprodukt er lavere enn den konfigurerte nedre hysteresegrensa og forby {0} i det mengden blir høyere enn den konfigurerte øvre hysteresegrensa.</FarmingHysteresis.EnableFarmingHysteresisisDesc>
 
+    <!-- EN: Use global hysteresis values -->
     <FarmingHysteresis.UseGlobalValues>Bruk globale hysteresegrenser</FarmingHysteresis.UseGlobalValues>
+    <!-- EN: For all zones and hydroponics basins of the same crop with this setting enabled, they will share the same bound values. -->
     <FarmingHysteresis.UseGlobalValuesDesc>Alle soner og hydroponiske bed med samme innhøstingsprodukt som har denne innstillingen på vil dele grenseverdier.</FarmingHysteresis.UseGlobalValuesDesc>
 
+    <!-- EN: Default lower bound -->
     <FarmingHysteresis.DefaultLowerBound>Standard nedre grensenivå</FarmingHysteresis.DefaultLowerBound>
+    <!-- EN: Default upper bound -->
     <FarmingHysteresis.DefaultUpperBound>Standard øvre grensenivå</FarmingHysteresis.DefaultUpperBound>
+    <!-- EN: Growing zones and hydroponic basins enable hysteresis upon placement -->
     <FarmingHysteresis.EnabledByDefault>Jordbrukssoner og hydroponiske bed har hysterese aktivert når de blir plassert</FarmingHysteresis.EnabledByDefault>
+    <!-- EN: Use global hysteresis values by default -->
     <FarmingHysteresis.UseGlobalValuesByDefault>Bruk globale hysteresegrenser som standard</FarmingHysteresis.UseGlobalValuesByDefault>
+    <!-- EN: Count all harvest products on map -->
     <FarmingHysteresis.CountAllOnMap>Tell alle innhøstbare produkter på banen</FarmingHysteresis.CountAllOnMap>
+    <!-- EN: If enabled, plant growers count all unforbidden, unhidden items on the map when deciding on the hysteresis state. If disabled, they only count those in stockpiles and storage buildings. -->
     <FarmingHysteresis.CountAllOnMapTooltip>Hvis dette valget er skrudd på telles alle produkter på banen når hysteresestatus skal avgjøres. Hvis det er skrudd av telles kun produkter som befinner seg i lagringsområder og -bygninger.</FarmingHysteresis.CountAllOnMapTooltip>
+    <!-- EN: Enabling this setting may have an adverse effect on performance, especially on large maps or maps with many items. -->
     <FarmingHysteresis.Expensive.Tooltip>Å skru på dette valget kan ha en negativ effekt på ytelsen, spesielt på store baner eller baner med mange gjenstander.</FarmingHysteresis.Expensive.Tooltip>
+    <!-- EN: Hysteresis mode -->
     <FarmingHysteresis.HysteresisMode>Hysteresemodus</FarmingHysteresis.HysteresisMode>
+    <!-- EN: Show old command buttons -->
     <FarmingHysteresis.ShowOldCommands>Vis gamle kommandoknapper</FarmingHysteresis.ShowOldCommands>
+    <!-- EN: In version 0.6, the mod switched from using command buttons to a dialog for configuring hysteresis parameters. Enable this setting to also show the old command buttons. -->
     <FarmingHysteresis.ShowOldCommandsTooltip>I versjon 0.6 gikk moden fra å bruke kommandoknapper til å bruke en dialog for å stille inn hystereseparametere. Skru på dette valget for å også vise de gamle kommandoknappene.</FarmingHysteresis.ShowOldCommandsTooltip>
+    <!-- EN: Show hysteresis tab -->
     <FarmingHysteresis.ShowHysteresisMainTab>Vis hysterese-fane</FarmingHysteresis.ShowHysteresisMainTab>
+    <!-- EN: Disabling this setting hides the Hysteresis tab from the game.\n\nWhile it is currently only used as a convenient location to configure global hysteresis values in one place, there are plans to add more features to this tab later. Hiding it will thus prevent access to these features and is generally not recommended. -->
     <FarmingHysteresis.ShowHysteresisMainTabTooltip>Hysterese-fanen skjules fra spillet dersom dette valget skrus av.\n\nSelv om denne fanen kun brukes til å konfigurere globale hysteresegrenser nå, er det planer om å legge til flere funksjoner til denne fanen over tid. Det å skjule den vil derfor kunne hindre tilgang til disse funksjonene og er generelt ikke å anbefale.</FarmingHysteresis.ShowHysteresisMainTabTooltip>
 
+    <!-- EN: Configure hysteresis parameters -->
     <FarmingHysteresis.ConfigureHysteresis>Konfigurer hystereseparametere</FarmingHysteresis.ConfigureHysteresis>
+    <!-- EN: Configure hysteresis parameters such as the upper and lower bounds. -->
     <FarmingHysteresis.ConfigureHysteresisDesc>Konfigurer hystereseparametere som f.eks. øvre og nedre grensenivå.</FarmingHysteresis.ConfigureHysteresisDesc>
 
+    <!-- EN: L: -{0} -->
     <FarmingHysteresis.DecrementLowerHysteresis>N: -{0}</FarmingHysteresis.DecrementLowerHysteresis>
+    <!-- EN: Decrement the lower bound by {0} (Hold {1} for x10, {2} for x100) -->
     <FarmingHysteresis.DecrementLowerHysteresisDesc>Reduser den nedre grensa med {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.DecrementLowerHysteresisDesc>
+    <!-- EN: L: +{0} -->
     <FarmingHysteresis.IncrementLowerHysteresis>N: +{0}</FarmingHysteresis.IncrementLowerHysteresis>
+    <!-- EN: Increment the lower bound by {0} (Hold {1} for x10, {2} for x100) -->
     <FarmingHysteresis.IncrementLowerHysteresisDesc>Øk den nedre grensa med {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.IncrementLowerHysteresisDesc>
 
+    <!-- EN: U: -{0} -->
     <FarmingHysteresis.DecrementUpperHysteresis>Ø: -{0}</FarmingHysteresis.DecrementUpperHysteresis>
+    <!-- EN: Decrement the upper bound by {0} (Hold {1} for x10, {2} for x100) -->
     <FarmingHysteresis.DecrementUpperHysteresisDesc>Reduser den øvre grensa med {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.DecrementUpperHysteresisDesc>
+    <!-- EN: U: +{0} -->
     <FarmingHysteresis.IncrementUpperHysteresis>Ø: +{0}</FarmingHysteresis.IncrementUpperHysteresis>
+    <!-- EN: Increment the upper bound by {0} (Hold {1} for x10, {2} for x100) -->
     <FarmingHysteresis.IncrementUpperHysteresisDesc>Øk den nedre grensa med {0} (Hold {1} for x10, {2} for x100)</FarmingHysteresis.IncrementUpperHysteresisDesc>
 
+    <!-- EN: Use global bounds for {0}: {1} -->
     <FarmingHysteresis.UseGlobalBounds>Bruk globale grenser for {0}: {1}</FarmingHysteresis.UseGlobalBounds>
+    <!-- EN: Start {3} {0} when there are fewer than {1} {2} in storage -->
     <FarmingHysteresis.LowerBound>Start {3} av {0} dersom det er færre enn {1} {2} på lager</FarmingHysteresis.LowerBound>
+    <!-- EN: Stop {3} {0} when there are more than {1} {2} in storage -->
     <FarmingHysteresis.UpperBound>Avslutt {3} av {0} dersom det er flere enn {1} {2} på lager</FarmingHysteresis.UpperBound>
+    <!-- EN: Current amount of {0} in storage: {1} -->
     <FarmingHysteresis.InStorage>Nåværende mengde {0} på lager: {1}</FarmingHysteresis.InStorage>
 
+    <!-- EN: Current state: {0} -->
     <FarmingHysteresis.LatchModeDesc>Nåværende tilstand: {0}</FarmingHysteresis.LatchModeDesc>
+    <!-- EN: Unknown. This is a bug unless the zone was just created or hysteresis was just enabled. -->
     <FarmingHysteresis.LatchModeDesc.Unknown>Ukjent. Dette er en feiltilstand med mindre sonen nettopp ble opprettet eller hysterese nettopp ble aktivert.</FarmingHysteresis.LatchModeDesc.Unknown>
+    <!-- EN: Lower than the lower bound. Allowing {0}. -->
     <FarmingHysteresis.LatchModeDesc.BelowLowerBound>Lavere enn den nedre grensa. Aktiverer {0}.</FarmingHysteresis.LatchModeDesc.BelowLowerBound>
+    <!-- EN: Higher than the lower bound, but has not reached the upper bound. Still allowing {0}. -->
     <FarmingHysteresis.LatchModeDesc.BetweenBoundsEnabled>Høyere enn den nedre grensa, men har ikke nådd den øvre grensa. Fortsetter å la {0} være aktivert.</FarmingHysteresis.LatchModeDesc.BetweenBoundsEnabled>
+    <!-- EN: Lower than the upper bound, but has not reached the lower bound. Still disallowing {0}. -->
     <FarmingHysteresis.LatchModeDesc.BetweenBoundsDisabled>Lavere enn den øvre grensa, men har ikke nådd den nedre grensa. Fortsetter å la {0} være deaktivert.</FarmingHysteresis.LatchModeDesc.BetweenBoundsDisabled>
+    <!-- EN: Higher than the upper bound. Disallowing {0}. -->
     <FarmingHysteresis.LatchModeDesc.AboveUpperBound>Høyere enn den øvre grensa. Deaktiverer {0}.</FarmingHysteresis.LatchModeDesc.AboveUpperBound>
+    <!-- EN: Farming hysteresis is disabled for this growing zone due to the selected plant not having a harvestable product. -->
     <FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>Jordbrukshysterese er deaktivert for denne jordbrukssonen da den valgte planten ikke har et produkt som kan høstes.</FarmingHysteresis.DisabledDueToMissingHarvestedThingDef>
 
+    <!-- EN: Use global bounds -->
     <FarmingHysteresis.UseGlobalBoundsLabel>Bruk globale grenseverdier</FarmingHysteresis.UseGlobalBoundsLabel>
+    <!-- EN: Lower bound -->
     <FarmingHysteresis.LowerBoundLabel>Nedre grense</FarmingHysteresis.LowerBoundLabel>
+    <!-- EN: Upper bound -->
     <FarmingHysteresis.UpperBoundLabel>Øvre grense</FarmingHysteresis.UpperBoundLabel>
 
+    <!-- EN: Global Hysteresis Bounds -->
     <FarmingHysteresis.GlobalHysteresisBounds>Globale hysteresegrenser</FarmingHysteresis.GlobalHysteresisBounds>
 
+    <!-- EN: sowing -->
     <FarmingHysteresis.Sowing>såing</FarmingHysteresis.Sowing>
+    <!-- EN: harvesting -->
     <FarmingHysteresis.Harvesting>innhøsting</FarmingHysteresis.Harvesting>
+    <!-- EN: sowing and harvesting -->
     <FarmingHysteresis.SowingAndHarvesting>såing og innhøsting</FarmingHysteresis.SowingAndHarvesting>
+    <!-- EN: Control {0} -->
     <FarmingHysteresis.Control>Styr {0}</FarmingHysteresis.Control>
 
+    <!-- EN: Hysteresis -->
     <FarmingHysteresis.TabHysteresis>Hysterese</FarmingHysteresis.TabHysteresis>
+    <!-- EN: Hysteresis product: -->
     <FarmingHysteresis.ProductLabel>Hystereseprodukt:</FarmingHysteresis.ProductLabel>
 </LanguageData>
