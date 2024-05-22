@@ -11,6 +11,9 @@
     <FarmingHysteresis.DefaultUpperBound>Default upper bound</FarmingHysteresis.DefaultUpperBound>
     <FarmingHysteresis.EnabledByDefault>Growing zones and hydroponic basins enable hysteresis upon placement</FarmingHysteresis.EnabledByDefault>
     <FarmingHysteresis.UseGlobalValuesByDefault>Use global hysteresis values by default</FarmingHysteresis.UseGlobalValuesByDefault>
+    <FarmingHysteresis.CountAllOnMap>Count all harvest products on map</FarmingHysteresis.CountAllOnMap>
+    <FarmingHysteresis.CountAllOnMapTooltip>If enabled, plant growers count all unforbidden, unhidden items on the map when deciding on the hysteresis state. If disabled, they only count those in stockpiles and storage buildings.</FarmingHysteresis.CountAllOnMapTooltip>
+    <FarmingHysteresis.Expensive.Tooltip>Enabling this setting may have an adverse effect on performance, especially on large maps or maps with many items.</FarmingHysteresis.Expensive.Tooltip>
     <FarmingHysteresis.HysteresisMode>Hysteresis mode</FarmingHysteresis.HysteresisMode>
     <FarmingHysteresis.ShowOldCommands>Show old command buttons</FarmingHysteresis.ShowOldCommands>
     <FarmingHysteresis.ShowOldCommandsTooltip>In version 0.6, the mod switched from using command buttons to a dialog for configuring hysteresis parameters. Enable this setting to also show the old command buttons.</FarmingHysteresis.ShowOldCommandsTooltip>

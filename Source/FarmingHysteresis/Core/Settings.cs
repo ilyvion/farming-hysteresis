@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HarmonyLib;
 using UnityEngine;
 using Verse;
 
@@ -14,6 +15,7 @@ namespace FarmingHysteresis
         private static int _defaultHysteresisUpperBound = Constants.DefaultHysteresisUpperBound;
         private static bool _enabledByDefault = true;
         private static bool _useGlobalValuesByDefault = true;
+        private static bool _countAllOnMap = false;
         private static HysteresisMode _hysteresisMode = HysteresisMode.Sowing;
         private static bool _showOldCommands = false;
         private static bool _showHysteresisMainTab = true;
@@ -22,6 +24,7 @@ namespace FarmingHysteresis
         internal static int DefaultHysteresisUpperBound { get => _defaultHysteresisUpperBound; set => _defaultHysteresisUpperBound = value; }
         internal static bool EnabledByDefault { get => _enabledByDefault; set => _enabledByDefault = value; }
         internal static bool UseGlobalValuesByDefault { get => _useGlobalValuesByDefault; set => _useGlobalValuesByDefault = value; }
+        internal static bool CountAllOnMap { get => _countAllOnMap; set => _countAllOnMap = value; }
         internal static HysteresisMode HysteresisMode { get => _hysteresisMode; set => _hysteresisMode = value; }
         internal static bool ShowOldCommands { get => _showOldCommands; set => _showOldCommands = value; }
         internal static bool ShowHysteresisMainTab { get => _showHysteresisMainTab; set => _showHysteresisMainTab = value; }
@@ -37,6 +40,7 @@ namespace FarmingHysteresis
             Scribe_Values.Look(ref _defaultHysteresisUpperBound, "defaultHysteresisUpperBound", Constants.DefaultHysteresisUpperBound);
             Scribe_Values.Look(ref _enabledByDefault, "enabledByDefault", true);
             Scribe_Values.Look(ref _useGlobalValuesByDefault, "useGlobalValuesByDefault", true);
+            Scribe_Values.Look(ref _countAllOnMap, "countAllOnMap", false);
             Scribe_Values.Look(ref _hysteresisMode, "hysteresisMode", HysteresisMode.Sowing);
             Scribe_Values.Look(ref _showOldCommands, "showOldCommands", false);
             Scribe_Values.Look(ref _showHysteresisMainTab, "showHysteresisMainTab", true);
@@ -49,6 +53,25 @@ namespace FarmingHysteresis
 
             listingStandard.CheckboxLabeled("FarmingHysteresis.EnabledByDefault".Translate(), ref _enabledByDefault);
             listingStandard.CheckboxLabeled("FarmingHysteresis.UseGlobalValuesByDefault".Translate(), ref _useGlobalValuesByDefault);
+
+            // Calculate where the CountAllOnMap checkbox will go
+            var textHeight = Text.CalcHeight("FarmingHysteresis.CountAllOnMap".Translate(), listingStandard.ColumnWidth);
+            Rect textRect = new Rect(
+                Traverse.Create(listingStandard).Field<float>("curX").Value,
+                Traverse.Create(listingStandard).Field<float>("curY").Value,
+                listingStandard.ColumnWidth,
+                textHeight);
+
+            listingStandard.CheckboxLabeled("FarmingHysteresis.CountAllOnMap".Translate(), ref _countAllOnMap, "FarmingHysteresis.CountAllOnMapTooltip".Translate());
+
+            // Render expensive icon inline in CountAllOnMap checkbox row
+            Rect iconRect = new Rect(inRect.xMax - 16f - 32f, 0f, 16f, 16f)
+                .CenteredOnYIn(textRect);
+            TooltipHandler.TipRegion(iconRect, "FarmingHysteresis.Expensive.Tooltip".Translate());
+            GUI.color = _countAllOnMap ? Resources.Orange : Color.grey;
+            GUI.DrawTexture(iconRect, Resources.Stopwatch);
+            GUI.color = Color.white;
+
             listingStandard.CheckboxLabeled(
                 "FarmingHysteresis.ShowOldCommands".Translate(),
                 ref _showOldCommands,
