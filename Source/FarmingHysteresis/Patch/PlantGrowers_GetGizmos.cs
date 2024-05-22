@@ -5,6 +5,7 @@ using Verse;
 using UnityEngine;
 using System;
 using System.Linq;
+using FarmingHysteresis.Extensions;
 
 namespace FarmingHysteresis.Patch
 {

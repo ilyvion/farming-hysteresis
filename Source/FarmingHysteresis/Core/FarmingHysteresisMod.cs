@@ -1,8 +1,10 @@
 ﻿using HarmonyLib;
 using Verse;
-using System.Reflection;
 using UnityEngine;
 using System;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("FarmingHysteresis.VanillaPlantsExpandedMorePlants")]
 
 namespace FarmingHysteresis
 {
@@ -33,6 +35,14 @@ namespace FarmingHysteresis
         public static void Message(string msg)
         {
             Log.Message("[Farming Hysteresis] " + msg);
+        }
+
+        public static void Dev(string msg)
+        {
+            if (Prefs.DevMode)
+            {
+                Log.Message("[Farming Hysteresis][DEV] " + msg);
+            }
         }
 
         public static void Warning(string msg)

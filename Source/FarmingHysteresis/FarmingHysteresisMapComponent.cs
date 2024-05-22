@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using FarmingHysteresis.Defs;
+using FarmingHysteresis.Extensions;
 using RimWorld;
 using Verse;
 
@@ -99,21 +101,12 @@ namespace FarmingHysteresis
             // No need to make these checks every single tick; once every 6 in-game minutes (4.16 seconds real time) should be enough.
             if (Find.TickManager.TicksGame % 250 != 0) return;
 
-            foreach (var zone in map.zoneManager.AllZones.OfType<Zone_Growing>())
+            foreach (var plantGrower in DefDatabase<FarmingHysteresisControlDef>.AllDefs.SelectMany(d => d.Worker.GetControlledPlantGrowers(map)))
             {
-                var data = zone.GetFarmingHysteresisData();
+                var data = plantGrower.GetFarmingHysteresisData();
                 if (data.Enabled)
                 {
-                    data.UpdateLatchModeAndHandling(zone);
-                }
-            }
-
-            foreach (var buildingPlantGrower in map.listerBuildings.AllBuildingsColonistOfClass<Building_PlantGrower>())
-            {
-                var data = buildingPlantGrower.GetFarmingHysteresisData();
-                if (data.Enabled)
-                {
-                    data.UpdateLatchModeAndHandling(buildingPlantGrower);
+                    data.UpdateLatchModeAndHandling(plantGrower);
                 }
             }
         }

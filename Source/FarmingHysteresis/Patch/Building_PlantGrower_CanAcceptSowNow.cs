@@ -1,4 +1,4 @@
-using FarmingHysteresis.Helpers.Extensions;
+using FarmingHysteresis.Extensions;
 using HarmonyLib;
 using RimWorld;
 

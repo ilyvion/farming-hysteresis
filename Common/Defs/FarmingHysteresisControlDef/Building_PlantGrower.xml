@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+    <FarmingHysteresis.Defs.FarmingHysteresisControlDef>
+        <defName>FarmingHysteresisControl_Building_PlantGrower</defName>
+        <workerClass>FarmingHysteresis.Defs.FarmingHysteresisControlWorker_Building_PlantGrower</workerClass>
+        <controlledClass>Building_PlantGrower</controlledClass>
+    </FarmingHysteresis.Defs.FarmingHysteresisControlDef>
+
+</Defs>

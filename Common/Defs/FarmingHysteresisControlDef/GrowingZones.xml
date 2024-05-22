@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+
+    <FarmingHysteresis.Defs.FarmingHysteresisControlDef>
+        <defName>FarmingHysteresisControl_Zone_Growing</defName>
+        <workerClass>FarmingHysteresis.Defs.FarmingHysteresisControlWorker_Zone_Growing</workerClass>
+        <controlledClass>Zone_Growing</controlledClass>
+    </FarmingHysteresis.Defs.FarmingHysteresisControlDef>
+
+    <FarmingHysteresis.Defs.FarmingHysteresisControlDef MayRequire="VanillaExpanded.VPlantsEMore">
+        <defName>FarmingHysteresisControl_Zone_GrowingAquatic</defName>
+        <workerClass>FarmingHysteresis.VanillaPlantsExpandedMorePlants.Defs.FarmingHysteresisControlWorker_Zone_GrowingAquatic</workerClass>
+        <controlledClass>VanillaPlantsExpandedMorePlants.Zone_GrowingAquatic</controlledClass>
+    </FarmingHysteresis.Defs.FarmingHysteresisControlDef>
+
+    <FarmingHysteresis.Defs.FarmingHysteresisControlDef MayRequire="VanillaExpanded.VPlantsEMore">
+        <defName>FarmingHysteresisControl_Zone_GrowingSandy</defName>
+        <workerClass>FarmingHysteresis.VanillaPlantsExpandedMorePlants.Defs.FarmingHysteresisControlWorker_Zone_GrowingSandy</workerClass>
+        <controlledClass>VanillaPlantsExpandedMorePlants.Zone_GrowingSandy</controlledClass>
+    </FarmingHysteresis.Defs.FarmingHysteresisControlDef>
+
+</Defs>

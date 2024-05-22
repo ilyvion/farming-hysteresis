@@ -23,10 +23,6 @@ In this example, we assume the lower bound is set to 500, and the upper bound is
 
 What this gives us is a way to build up a buffer of product, then hold off on production while we're consuming some of it, and then turning production back on when we're running low, but before we're running out.
 
-## Contributors
-
--   Proxyer: Japanese translation
-
 ## License
 
 Licensed under either of

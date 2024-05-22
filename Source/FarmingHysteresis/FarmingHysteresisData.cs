@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.CompilerServices;
-using FarmingHysteresis.Helpers.Extensions;
+using FarmingHysteresis.Extensions;
 using RimWorld;
 using Verse;
 
@@ -274,21 +274,6 @@ namespace FarmingHysteresis
             {
                 FarmingHysteresisMod.Warning($"Unknown type {plantToGrowSettable.GetType().FullName} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
             }
-        }
-    }
-
-    internal static class FarmingHysteresisDataExtensions
-    {
-        private static readonly ConditionalWeakTable<IPlantToGrowSettable, FarmingHysteresisData> dataTable = new();
-
-        internal static FarmingHysteresisData GetFarmingHysteresisData(this Zone_Growing zone)
-        {
-            return dataTable.GetValue(zone, (z) => new FarmingHysteresisData(new System.WeakReference<IPlantToGrowSettable>(z)));
-        }
-
-        internal static FarmingHysteresisData GetFarmingHysteresisData(this Building_PlantGrower plantGrower)
-        {
-            return dataTable.GetValue(plantGrower, (p) => new FarmingHysteresisData(new System.WeakReference<IPlantToGrowSettable>(p)));
         }
     }
 }

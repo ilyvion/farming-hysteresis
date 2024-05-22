@@ -1,4 +1,4 @@
-using FarmingHysteresis.Helpers.Extensions;
+using FarmingHysteresis.Extensions;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -177,13 +177,9 @@ class ITab_Hysteresis : ITab
     private FarmingHysteresisData? GetFarmingHysteresisData()
     {
         FarmingHysteresisData? data = null;
-        if (SelObject is Zone_Growing zoneGrowing)
+        if (SelObject is IPlantToGrowSettable plantGrower)
         {
-            data = zoneGrowing.GetFarmingHysteresisData();
-        }
-        else if (SelObject is Building_PlantGrower buildingPlantGrower)
-        {
-            data = buildingPlantGrower.GetFarmingHysteresisData();
+            data = plantGrower.GetFarmingHysteresisData();
         }
         return data;
     }
