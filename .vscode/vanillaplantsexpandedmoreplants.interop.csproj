@@ -13,9 +13,8 @@
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
         <!-- Intellisense doesn't work without specifying these explicitly -->
-        <!-- !! Don't check in with these uncommented !! -->
-        <!-- <RimWorldSteamWorkshopFolderPath>C:\Program Files (x86)\Steam\steamapps\workshop\content\294100</RimWorldSteamWorkshopFolderPath>
-        <RimWorldVersion>1.5</RimWorldVersion> -->
+        <RimWorldSteamWorkshopFolderPath Condition="'$(RimWorldSteamWorkshopFolderPath)'==''">C:\Program Files (x86)\Steam\steamapps\workshop\content\294100</RimWorldSteamWorkshopFolderPath>
+        <RimWorldVersion Condition="'$(RimWorldVersion)'==''">1.5</RimWorldVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">

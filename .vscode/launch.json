@@ -8,7 +8,7 @@
             "name": "Rimworld Mod Project",
             "type": "clr",
             "request": "launch",
-            "preLaunchTask": "build dll",
+            "preLaunchTask": "build ${input:rimWorldVersion}",
             "args": [
                 "-savedatafolder=${workspaceFolder}\\.savedatafolder\\${input:rimWorldVersion}",
                 //"-quicktest",

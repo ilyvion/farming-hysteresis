@@ -13,6 +13,45 @@
                 "${input:rimWorldVersion}"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "build 1.5",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "command": ".vscode/build.ps1",
+            "args": [
+                "1.5"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "build 1.4",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "command": ".vscode/build.ps1",
+            "args": [
+                "1.4"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "build 1.3",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "command": ".vscode/build.ps1",
+            "args": [
+                "1.3"
+            ],
+            "problemMatcher": []
         }
     ],
     "inputs": [
