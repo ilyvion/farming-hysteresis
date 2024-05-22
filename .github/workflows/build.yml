@@ -63,6 +63,6 @@ jobs:
                       CHANGELOG.md
                       LoadFolders.xml
                       !**/.*
-                      !About/*.pdn
-                      !About/*.svg
-                      !About/*.ttf
+                      !**/*.pdn
+                      !**/*.svg
+                      !**/*.ttf

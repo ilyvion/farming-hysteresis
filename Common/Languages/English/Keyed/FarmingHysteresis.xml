@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LanguageData>
-    <FarmingHysteresis.EnableFarmingHysteresis>Enable farming hysteresis</FarmingHysteresis.EnableFarmingHysteresis>
+    <FarmingHysteresis.EnableFarmingHysteresis>Enable hysteresis</FarmingHysteresis.EnableFarmingHysteresis>
     <FarmingHysteresis.EnableFarmingHysteresisisDesc>Allow {0} when the amount gets lower than the configured lower amount and disallow {0} when it gets above the configured upper amount.</FarmingHysteresis.EnableFarmingHysteresisisDesc>
 
     <FarmingHysteresis.UseGlobalValues>Use global hysteresis values</FarmingHysteresis.UseGlobalValues>

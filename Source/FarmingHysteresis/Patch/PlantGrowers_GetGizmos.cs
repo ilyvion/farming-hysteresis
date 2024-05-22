@@ -61,7 +61,7 @@ namespace FarmingHysteresis.Patch
             {
                 defaultLabel = "FarmingHysteresis.EnableFarmingHysteresis".Translate(),
                 defaultDesc = "FarmingHysteresis.EnableFarmingHysteresisisDesc".Translate(Settings.HysteresisMode.AsString()),
-                icon = TexCommand.ForbidOff,
+                icon = TexCommand.Hysteresis,
                 isActive = () => data.Enabled,
                 toggleAction = () =>
                 {
@@ -105,7 +105,7 @@ namespace FarmingHysteresis.Patch
                     {
                         defaultLabel = "FarmingHysteresis.UseGlobalValues".Translate(),
                         defaultDesc = "FarmingHysteresis.UseGlobalValuesDesc".Translate(),
-                        icon = TexCommand.ForbidOff,
+                        icon = TexCommand.Hysteresis,
                         isActive = () => data.useGlobalValues,
                         toggleAction = () =>
                         {

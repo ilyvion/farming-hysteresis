@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LanguageData>
-    <FarmingHysteresis.EnableFarmingHysteresis>Aktiver jordbrukshysterese</FarmingHysteresis.EnableFarmingHysteresis>
+    <FarmingHysteresis.EnableFarmingHysteresis>Aktiver hysterese</FarmingHysteresis.EnableFarmingHysteresis>
     <FarmingHysteresis.EnableFarmingHysteresisisDesc>Tillat {0} av planter så lenge mengden innhøstingsprodukt er lavere enn den konfigurerte nedre hysteresegrensa og forby {0} i det mengden blir høyere enn den konfigurerte øvre hysteresegrensa.</FarmingHysteresis.EnableFarmingHysteresisisDesc>
 
     <FarmingHysteresis.UseGlobalValues>Bruk globale hysteresegrenser</FarmingHysteresis.UseGlobalValues>
