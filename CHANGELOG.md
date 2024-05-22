@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 -   Added compatibility with Vanilla Plants Expanded - More Plants' custom aquatic and sandy growing zones.
+-   Added filtering to hysteresis tab
 
 ## [0.7.0] - 2024-05-21
 

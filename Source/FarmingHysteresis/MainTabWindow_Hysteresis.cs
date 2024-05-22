@@ -82,13 +82,33 @@ namespace FarmingHysteresis
         private Vector2 messagesScrollPos;
         private float scrollViewHeight;
 
-        private void DoHysteresisValuesPage(Rect rect2)
+
+        private QuickSearchWidget _quickSearch = new QuickSearchWidget();
+        private List<ThingDef>? _filteredHarvestedThingDefs = null;
+
+        private void UpdateFilter()
         {
-            Rect viewRect = new Rect(0f, 0f, rect2.width - 16f, scrollViewHeight);
-            Widgets.BeginScrollView(rect2, ref messagesScrollPos, viewRect);
+            _filteredHarvestedThingDefs = globalBoundAccessors.Keys.Where(h => h.label.Contains(_quickSearch.filter.Text)).ToList();
+            _quickSearch.noResultsMatched = _filteredHarvestedThingDefs.Count == 0;
+        }
+
+        private void DoHysteresisValuesPage(Rect tabRect)
+        {
+            if (_filteredHarvestedThingDefs == null)
+            {
+                UpdateFilter();
+            }
+
+            Rect quickSearchRect = new(tabRect.x + 3f, tabRect.y + 5f, tabRect.width - 16f - 6f, 24f);
+            _quickSearch.OnGUI(quickSearchRect, () => UpdateFilter());
+
+            Rect listRect = new(tabRect.x, quickSearchRect.yMax + 5f, tabRect.width, tabRect.height - quickSearchRect.height - 5f);
+
+            Rect viewRect = new(0f, 0f, tabRect.width - 16f, scrollViewHeight);
+            Widgets.BeginScrollView(listRect, ref messagesScrollPos, viewRect);
 
             float num = 0f;
-            foreach (ThingDef harvestedThingDef in globalBoundAccessors.Keys)
+            foreach (ThingDef harvestedThingDef in _filteredHarvestedThingDefs!)
             {
                 var value = globalBounds[harvestedThingDef].Lower;
                 var buffer = globalBoundLowerBuffers[harvestedThingDef];
