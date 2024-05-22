@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+-   Added compatibility with Vanilla Plants Expanded - More Plants' custom aquatic and sandy growing zones.
+
 ## [0.7.0] - 2024-05-21
 
 ### Added
