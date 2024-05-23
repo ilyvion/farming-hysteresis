@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using FarmingHysteresis.Extensions;
 using RimWorld;
 using Verse;
@@ -20,19 +19,19 @@ namespace FarmingHysteresis
 
     internal class FarmingHysteresisData : IBoundedValueAccessor
     {
-        private System.WeakReference<IPlantToGrowSettable> zoneWeakReference;
+        private readonly System.WeakReference<IPlantToGrowSettable> _plantGrowerWeakReference;
 
-        private bool enabled;
-        private BoundValues bounds;
+        private bool _enabled;
+        private BoundValues _bounds;
+
         public LatchMode latchMode;
-
         public bool useGlobalValues;
 
-        public FarmingHysteresisData(System.WeakReference<IPlantToGrowSettable> weakReference)
+        public FarmingHysteresisData(IPlantToGrowSettable plantGrower)
         {
-            zoneWeakReference = weakReference;
-            enabled = Settings.EnabledByDefault;
-            bounds = new BoundValues
+            _plantGrowerWeakReference = new(plantGrower);
+            _enabled = Settings.EnabledByDefault;
+            _bounds = new BoundValues
             {
                 Upper = Settings.DefaultHysteresisUpperBound,
                 Lower = Settings.DefaultHysteresisLowerBound
@@ -43,25 +42,28 @@ namespace FarmingHysteresis
 
         internal void ExposeData()
         {
-            Scribe_Values.Look(ref enabled, "farmingHysteresisEnabled", Settings.EnabledByDefault, true);
+            Scribe_Values.Look(ref _enabled, "farmingHysteresisEnabled", Settings.EnabledByDefault, true);
             Scribe_Deep.Look(
-                ref bounds,
+                ref _bounds,
                 "farmingHysteresisBounds"
             );
-            if (bounds == null)
+            _bounds ??= new BoundValues
             {
-                bounds = new BoundValues
-                {
-                    Upper = Settings.DefaultHysteresisUpperBound,
-                    Lower = Settings.DefaultHysteresisLowerBound
-                };
-            }
+                Upper = Settings.DefaultHysteresisUpperBound,
+                Lower = Settings.DefaultHysteresisLowerBound
+            };
+
+#if v1_5
+#else
             if (Scribe.mode == LoadSaveMode.LoadingVars)
             {
                 TransferOldBounds();
             }
+#endif
 
             Scribe_Values.Look(ref latchMode, "farmingHysteresisLatchMode", LatchMode.Unknown, true);
+#if v1_5
+#else
             if (Scribe.mode == LoadSaveMode.LoadingVars)
             {
                 // Ignore obsolete warning (612) since we're explicitly
@@ -79,8 +81,11 @@ namespace FarmingHysteresis
                 }
 #pragma warning restore 612
             }
+#endif
             Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", Settings.UseGlobalValuesByDefault, true);
 
+#if v1_5
+#else
             void TransferOldBounds()
             {
                 int lowerBound = 0;
@@ -88,17 +93,18 @@ namespace FarmingHysteresis
                 Scribe_Values.Look(ref lowerBound, "farmingHysteresisLowerBound", 0);
                 if (lowerBound != 0)
                 {
-                    bounds.Lower = lowerBound;
+                    _bounds.Lower = lowerBound;
                 }
                 Scribe_Values.Look(ref upperBound, "farmingHysteresisUpperBound", 0);
                 if (upperBound != 0)
                 {
-                    bounds.Upper = upperBound;
+                    _bounds.Upper = upperBound;
                 }
             }
+#endif
         }
 
-        BoundValues IBoundedValueAccessor.BoundValueRaw => bounds;
+        BoundValues IBoundedValueAccessor.BoundValueRaw => _bounds;
 
         private IBoundedValueAccessor GetBoundedValueAccessor()
         {
@@ -109,7 +115,7 @@ namespace FarmingHysteresis
             }
             else
             {
-                if (zoneWeakReference.TryGetTarget(out var zone))
+                if (_plantGrowerWeakReference.TryGetTarget(out var zone))
                 {
                     var (harvestedThingDef, _) = zone.PlantHarvestInfo();
                     if (harvestedThingDef == null)
@@ -167,18 +173,18 @@ namespace FarmingHysteresis
 
         internal bool Enabled
         {
-            get { return enabled; }
+            get { return _enabled; }
         }
 
         internal void Enable(IPlantToGrowSettable plantToGrowSettable)
         {
-            enabled = true;
+            _enabled = true;
             UpdateLatchModeAndHandling(plantToGrowSettable);
         }
 
         internal void Disable(IPlantToGrowSettable plantToGrowSettable)
         {
-            enabled = false;
+            _enabled = false;
         }
 
         internal void UpdateLatchModeAndHandling(IPlantToGrowSettable plantToGrowSettable)
@@ -250,7 +256,7 @@ namespace FarmingHysteresis
 
         internal void DisableDueToMissingHarvestedThingDef(IPlantToGrowSettable plantToGrowSettable, ThingDef plantDef)
         {
-            enabled = false;
+            _enabled = false;
             if (plantToGrowSettable is Zone zone)
             {
                 FarmingHysteresisMod.Warning($"Zone '{zone.label}' has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");

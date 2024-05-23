@@ -10,7 +10,7 @@ using VanillaPlantsExpandedMorePlants;
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Patch;
 
 /// <summary>
-/// Add Farming Hysteresis gizmos to the growing zone
+/// Add Farming Hysteresis gizmos to the Zone_GrowingAquatic
 /// </summary>
 [HarmonyPatch(typeof(Zone_GrowingAquatic), nameof(Zone_GrowingAquatic.GetGizmos))]
 internal static class Zone_GrowingAquatic_GetGizmos
@@ -29,7 +29,7 @@ internal static class Zone_GrowingAquatic_GetGizmos
 }
 
 /// <summary>
-/// Add Farming Hysteresis gizmos to any Building_PlantGrower
+/// Add Farming Hysteresis gizmos to the Zone_GrowingSandy
 /// </summary>
 [HarmonyPatch(typeof(Zone_GrowingSandy), nameof(Zone_GrowingSandy.GetGizmos))]
 internal static class Zone_GrowingSandy_GetGizmos

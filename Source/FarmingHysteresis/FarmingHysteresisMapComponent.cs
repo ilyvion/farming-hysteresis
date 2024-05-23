@@ -2,21 +2,14 @@ using System.Collections.Generic;
 using System.Linq;
 using FarmingHysteresis.Defs;
 using FarmingHysteresis.Extensions;
-using RimWorld;
 using Verse;
 
 namespace FarmingHysteresis
 {
-    internal class GlobalThingDefBoundValueAccessor : IBoundedValueAccessor
+    internal class GlobalThingDefBoundValueAccessor(FarmingHysteresisMapComponent mapComponent, ThingDef thingDef) : IBoundedValueAccessor
     {
-        private FarmingHysteresisMapComponent mapComponent;
-        private ThingDef thingDef;
-
-        public GlobalThingDefBoundValueAccessor(FarmingHysteresisMapComponent mapComponent, ThingDef thingDef)
-        {
-            this.mapComponent = mapComponent;
-            this.thingDef = thingDef;
-        }
+        private readonly FarmingHysteresisMapComponent mapComponent = mapComponent;
+        private readonly ThingDef thingDef = thingDef;
 
         public BoundValues BoundValueRaw
         {
@@ -50,10 +43,7 @@ namespace FarmingHysteresis
         {
             get
             {
-                if (globalBoundValues == null)
-                {
-                    globalBoundValues = new Dictionary<ThingDef, BoundValues>();
-                }
+                globalBoundValues ??= [];
                 return globalBoundValues;
             }
         }
@@ -61,7 +51,10 @@ namespace FarmingHysteresis
         public FarmingHysteresisMapComponent(Map map) : base(map)
         {
             // if not created in SavingLoading, give yourself the ID of the map you were constructed on.
-            if (Scribe.mode == Verse.LoadSaveMode.Inactive) id = map.uniqueID;
+            if (Scribe.mode == LoadSaveMode.Inactive)
+            {
+                id = map.uniqueID;
+            }
         }
 
         internal bool HasBoundsFor(ThingDef harvestedThingDef)
@@ -116,6 +109,9 @@ namespace FarmingHysteresis
             base.ExposeData();
             Scribe_Values.Look(ref id, "id", -1, true);
             Scribe_Collections.Look(ref globalBoundValues, "globalBoundValues", LookMode.Def, LookMode.Deep);
+
+#if v1_5
+#else
             if (globalBoundValues == null || globalBoundValues.Count == 0)
             {
                 if (Scribe.mode == LoadSaveMode.LoadingVars)
@@ -126,8 +122,8 @@ namespace FarmingHysteresis
 
             void TransferOldBounds()
             {
-                Dictionary<ThingDef, int> globalLowerBoundValues = new();
-                Dictionary<ThingDef, int> globalUpperBoundValues = new();
+                Dictionary<ThingDef, int> globalLowerBoundValues = [];
+                Dictionary<ThingDef, int> globalUpperBoundValues = [];
                 Scribe_Collections.Look(ref globalLowerBoundValues, "globalLowerBoundValues", LookMode.Def, LookMode.Value);
                 Scribe_Collections.Look(ref globalUpperBoundValues, "globalUpperBoundValues", LookMode.Def, LookMode.Value);
 
@@ -159,6 +155,7 @@ namespace FarmingHysteresis
                     GlobalBoundValues.Add(thingDef, boundValues);
                 }
             }
+#endif
         }
     }
 }

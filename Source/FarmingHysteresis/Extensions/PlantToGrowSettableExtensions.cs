@@ -62,18 +62,18 @@ internal static class PlantToGrowSettableExtensions
 
     internal static bool GetAllowSow(this IPlantToGrowSettable plantGrower)
     {
-        var def = GetControlDefForPlantGrower(plantGrower, nameof(SetHysteresisControlState));
+        var def = GetControlDefForPlantGrower(plantGrower, nameof(GetAllowSow));
         return def.GetAllowSow(plantGrower);
     }
 
     internal static bool GetAllowHarvest(this IPlantToGrowSettable plantGrower)
     {
-        var def = GetControlDefForPlantGrower(plantGrower, nameof(SetHysteresisControlState));
+        var def = GetControlDefForPlantGrower(plantGrower, nameof(GetAllowHarvest));
         return def.GetAllowHarvest(plantGrower);
     }
 
     internal static FarmingHysteresisData GetFarmingHysteresisData(this IPlantToGrowSettable plantGrower)
     {
-        return dataTable.GetValue(plantGrower, (pg) => new FarmingHysteresisData(new System.WeakReference<IPlantToGrowSettable>(pg)));
+        return dataTable.GetValue(plantGrower, (pg) => new FarmingHysteresisData(pg));
     }
 }

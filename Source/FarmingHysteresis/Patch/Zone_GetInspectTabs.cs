@@ -13,10 +13,10 @@ namespace FarmingHysteresis.Patch
     [HarmonyPatch(typeof(Zone), nameof(Zone.GetInspectTabs))]
     internal static class Zone_GetInspectTabs
     {
-        private static readonly ITab[] ITabs = new ITab[1]
-        {
+        private static readonly ITab[] ITabs =
+        [
             new ITab_Hysteresis()
-        };
+        ];
 
         private static IEnumerable<InspectTabBase> Postfix(IEnumerable<InspectTabBase> values, Zone __instance)
         {

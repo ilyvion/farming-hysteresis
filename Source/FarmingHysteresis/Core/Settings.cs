@@ -20,17 +20,17 @@ namespace FarmingHysteresis
         private static bool _showOldCommands = false;
         private static bool _showHysteresisMainTab = true;
 
-        internal static int DefaultHysteresisLowerBound { get => _defaultHysteresisLowerBound; set => _defaultHysteresisLowerBound = value; }
-        internal static int DefaultHysteresisUpperBound { get => _defaultHysteresisUpperBound; set => _defaultHysteresisUpperBound = value; }
-        internal static bool EnabledByDefault { get => _enabledByDefault; set => _enabledByDefault = value; }
-        internal static bool UseGlobalValuesByDefault { get => _useGlobalValuesByDefault; set => _useGlobalValuesByDefault = value; }
-        internal static bool CountAllOnMap { get => _countAllOnMap; set => _countAllOnMap = value; }
-        internal static HysteresisMode HysteresisMode { get => _hysteresisMode; set => _hysteresisMode = value; }
-        internal static bool ShowOldCommands { get => _showOldCommands; set => _showOldCommands = value; }
-        internal static bool ShowHysteresisMainTab { get => _showHysteresisMainTab; set => _showHysteresisMainTab = value; }
+        public static int DefaultHysteresisLowerBound { get => _defaultHysteresisLowerBound; internal set => _defaultHysteresisLowerBound = value; }
+        public static int DefaultHysteresisUpperBound { get => _defaultHysteresisUpperBound; internal set => _defaultHysteresisUpperBound = value; }
+        public static bool EnabledByDefault { get => _enabledByDefault; internal set => _enabledByDefault = value; }
+        public static bool UseGlobalValuesByDefault { get => _useGlobalValuesByDefault; internal set => _useGlobalValuesByDefault = value; }
+        public static bool CountAllOnMap { get => _countAllOnMap; internal set => _countAllOnMap = value; }
+        public static HysteresisMode HysteresisMode { get => _hysteresisMode; internal set => _hysteresisMode = value; }
+        public static bool ShowOldCommands { get => _showOldCommands; internal set => _showOldCommands = value; }
+        public static bool ShowHysteresisMainTab { get => _showHysteresisMainTab; internal set => _showHysteresisMainTab = value; }
 
-        internal static bool ControlSowing => _hysteresisMode == HysteresisMode.Sowing || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
-        internal static bool ControlHarvesting => _hysteresisMode == HysteresisMode.Harvesting || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
+        public static bool ControlSowing => _hysteresisMode == HysteresisMode.Sowing || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
+        public static bool ControlHarvesting => _hysteresisMode == HysteresisMode.Harvesting || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
 
         public override void ExposeData()
         {
@@ -48,7 +48,7 @@ namespace FarmingHysteresis
 
         public static void DoSettingsWindowContents(Rect inRect)
         {
-            Listing_Standard listingStandard = new Listing_Standard();
+            Listing_Standard listingStandard = new();
             listingStandard.Begin(inRect);
 
             listingStandard.CheckboxLabeled("FarmingHysteresis.EnabledByDefault".Translate(), ref _enabledByDefault);
@@ -56,7 +56,7 @@ namespace FarmingHysteresis
 
             // Calculate where the CountAllOnMap checkbox will go
             var textHeight = Text.CalcHeight("FarmingHysteresis.CountAllOnMap".Translate(), listingStandard.ColumnWidth);
-            Rect textRect = new Rect(
+            Rect textRect = new(
                 Traverse.Create(listingStandard).Field<float>("curX").Value,
                 Traverse.Create(listingStandard).Field<float>("curY").Value,
                 listingStandard.ColumnWidth,
@@ -94,8 +94,8 @@ namespace FarmingHysteresis
                 TextAnchor.MiddleLeft))
             {
 #endif
-                List<FloatMenuOption> list = new()
-                {
+                List<FloatMenuOption> list =
+                [
                     new FloatMenuOption(
                         "FarmingHysteresis.Control".Translate("FarmingHysteresis.Sowing".Translate()),
                         () => _hysteresisMode = HysteresisMode.Sowing),
@@ -105,7 +105,7 @@ namespace FarmingHysteresis
                     new FloatMenuOption(
                         "FarmingHysteresis.Control".Translate("FarmingHysteresis.SowingAndHarvesting".Translate()),
                         () => _hysteresisMode = HysteresisMode.SowingAndHarvesting)
-                };
+                ];
                 Find.WindowStack.Add(new FloatMenu(list));
             }
 
@@ -129,18 +129,13 @@ namespace FarmingHysteresis
     {
         public static string AsString(this HysteresisMode mode)
         {
-            switch (mode)
+            return mode switch
             {
-                case HysteresisMode.Sowing:
-                    return "FarmingHysteresis.Sowing".Translate();
-                case HysteresisMode.Harvesting:
-                    return "FarmingHysteresis.Harvesting".Translate();
-                case HysteresisMode.SowingAndHarvesting:
-                    return "FarmingHysteresis.SowingAndHarvesting".Translate();
-
-                default:
-                    throw new Exception($"Uncovered HysteresisMode: {mode}");
-            }
+                HysteresisMode.Sowing => "FarmingHysteresis.Sowing".Translate(),
+                HysteresisMode.Harvesting => "FarmingHysteresis.Harvesting".Translate(),
+                HysteresisMode.SowingAndHarvesting => "FarmingHysteresis.SowingAndHarvesting".Translate(),
+                _ => throw new Exception($"Uncovered HysteresisMode: {mode}"),
+            };
         }
     }
 }

@@ -15,6 +15,8 @@ namespace FarmingHysteresis
         // Above upper bound - disabled
         AboveUpperBound,
 
+#if v1_5
+#else
         // We need to keep these around to avoid breaking saves; they get converted to the correct values on load
 
         [Obsolete]
@@ -22,5 +24,6 @@ namespace FarmingHysteresis
 
         [Obsolete]
         AboveLowerBoundDisabled,
+#endif
     }
 }

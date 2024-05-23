@@ -40,7 +40,7 @@ namespace FarmingHysteresis.Patch
                 __instance,
                 ref __result,
                 (i) => i.GetFarmingHysteresisData(),
-                (r) => new()
+                (r) => []
             );
         }
     }

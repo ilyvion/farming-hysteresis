@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using RimWorld;
@@ -20,14 +19,14 @@ namespace FarmingHysteresis
             SomethingElse,
         }
 
-        private List<TabRecord> tabs = new List<TabRecord>();
+        private readonly List<TabRecord> tabs = [];
 
         private static HysteresisTab currentTab = HysteresisTab.HysteresisValues;
 
-        private Dictionary<ThingDef, IBoundedValueAccessor> globalBoundAccessors = new Dictionary<ThingDef, IBoundedValueAccessor>();
-        private Dictionary<ThingDef, BoundValues> globalBounds = new();
-        private Dictionary<ThingDef, string?> globalBoundLowerBuffers = new();
-        private Dictionary<ThingDef, string?> globalBoundUpperBuffers = new();
+        private readonly Dictionary<ThingDef, IBoundedValueAccessor> globalBoundAccessors = [];
+        private readonly Dictionary<ThingDef, BoundValues> globalBounds = [];
+        private readonly Dictionary<ThingDef, string?> globalBoundLowerBuffers = [];
+        private readonly Dictionary<ThingDef, string?> globalBoundUpperBuffers = [];
 
         public override void PreOpen()
         {
@@ -83,7 +82,7 @@ namespace FarmingHysteresis
         private float scrollViewHeight;
 
 
-        private QuickSearchWidget _quickSearch = new QuickSearchWidget();
+        private readonly QuickSearchWidget _quickSearch = new();
         private List<ThingDef>? _filteredHarvestedThingDefs = null;
 
         private void UpdateFilter()
@@ -132,9 +131,9 @@ namespace FarmingHysteresis
 
         private float DrawPlantRow(ThingDef harvest, float rowY, Rect fillRect)
         {
-            Rect rowRect = new Rect(0f, rowY, fillRect.width, PLANT_ROW_HEIGHT);
-            Rect labelRect = new Rect(90f, rowY, 250f, PLANT_ROW_HEIGHT);
-            Rect plantIconRect = new Rect(24f, rowY + 3f, 42f, 42f);
+            Rect rowRect = new(0f, rowY, fillRect.width, PLANT_ROW_HEIGHT);
+            Rect labelRect = new(90f, rowY, 250f, PLANT_ROW_HEIGHT);
+            Rect plantIconRect = new(24f, rowY + 3f, 42f, 42f);
 
             GUI.color = new Color(1f, 1f, 1f, 0.5f);
             Widgets.DrawHighlightIfMouseover(rowRect);
@@ -160,12 +159,12 @@ namespace FarmingHysteresis
 
             if (Mouse.IsOver(harvestIconRect))
             {
-                TipSignal tip = new TipSignal(harvestDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n\n" + harvestDef.description);
+                TipSignal tip = new(harvestDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n\n" + harvestDef.description);
                 TooltipHandler.TipRegion(harvestIconRect, tip);
             }
             if (Mouse.IsOver(harvestLabelRect))
             {
-                TipSignal tip = new TipSignal(harvestDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n\n" + harvestDef.description);
+                TipSignal tip = new(harvestDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n\n" + harvestDef.description);
                 TooltipHandler.TipRegion(harvestLabelRect, tip);
             }
 

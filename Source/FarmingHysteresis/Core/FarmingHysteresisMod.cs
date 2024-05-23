@@ -10,7 +10,7 @@ namespace FarmingHysteresis
 {
     public class FarmingHysteresisMod : Mod
     {
-        private ModContentPack content;
+        private readonly ModContentPack content;
 
         public FarmingHysteresisMod(ModContentPack content) : base(content)
         {
