@@ -2,7 +2,17 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build dll",
+            "label": "build all versions",
+            "type": "shell",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "command": ".vscode/buildAll.ps1",
+            "problemMatcher": []
+        },
+        {
+            "label": "build choose version",
             "type": "shell",
             "group": {
                 "kind": "build",
