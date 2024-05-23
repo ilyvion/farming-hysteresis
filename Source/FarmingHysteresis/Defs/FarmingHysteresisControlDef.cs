@@ -41,7 +41,7 @@ public class FarmingHysteresisControlDef : Def
 
     private void ValidatePlantGrowerType(IPlantToGrowSettable plantGrower, string method)
     {
-        if (controlledClass != plantGrower.GetType())
+        if (!controlledClass.IsAssignableFrom(plantGrower.GetType()))
         {
             throw new InvalidOperationException($"Called {nameof(FarmingHysteresisControlDef)}.{method} with an IPlantToGrowSettable of the wrong type. Expected {controlledClass.FullName}, got {plantGrower.GetType().FullName}");
         }

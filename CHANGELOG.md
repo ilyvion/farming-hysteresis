@@ -7,13 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+-   Type checking code was a bit too narrow, causing exceptions where they weren't appropriate.
+
 ## [0.8.0] - 2024-05-22
 
 ### Added
 
 -   Added compatibility with Vanilla Plants Expanded - More Plants' custom aquatic and sandy growing zones.
--   Added filtering to hysteresis tab
--   Added a setting for counting all items on a map instead of only items in storage
+-   Added filtering to hysteresis tab.
+-   Added a setting for counting all items on a map instead of only items in storage.
 
 ## [0.7.0] - 2024-05-21
 
