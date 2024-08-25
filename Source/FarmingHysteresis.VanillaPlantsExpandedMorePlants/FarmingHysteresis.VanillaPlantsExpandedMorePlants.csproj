@@ -8,7 +8,7 @@
 
         <RootNamespace>FarmingHysteresis.VanillaPlantsExpandedMorePlants</RootNamespace>
         <AssemblyName>FarmingHysteresis.VanillaPlantsExpandedMorePlants</AssemblyName>
-        <VersionPrefix>0.8.1</VersionPrefix>
+        <VersionPrefix>0.8.2</VersionPrefix>
 
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 

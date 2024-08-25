@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.2] - 2024-05-25
+
 ### Added
 
 -   Added a dialog to get people to add a future dependency. Since Rimworld doesn't have a good mechanism to automatically add new dependencies, we need to be a little in-your-face about it.
@@ -141,7 +143,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 -   First implementation of the mod.
 
-[Unreleased]: https://github.com/ilyvion/farming-hysteresis/compare/v0.8.1...HEAD
+[Unreleased]: https://github.com/ilyvion/farming-hysteresis/compare/v0.8.2...HEAD
+[0.8.2]: https://github.com/ilyvion/farming-hysteresis/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/ilyvion/farming-hysteresis/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/ilyvion/farming-hysteresis/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/ilyvion/farming-hysteresis/compare/v0.6.1...v0.7.0
