@@ -1,4 +1,3 @@
-/.vscode/obj
+/Source/*/obj
 
 /*/Assemblies
-/.vscode/obj

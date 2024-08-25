@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mod", ".vscode\mod.csproj", "{5A7CCC0A-F3EF-42E9-8B4D-D359D562C647}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "mod", "Source\FarmingHysteresis\FarmingHysteresis.csproj", "{5A7CCC0A-F3EF-42E9-8B4D-D359D562C647}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "vanillaplantsexpandedmoreplants.interop", ".vscode\vanillaplantsexpandedmoreplants.interop.csproj", "{6C13CE39-83B8-4517-BA22-BCDADEC922FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmingHysteresis.VanillaPlantsExpandedMorePlants", "Source\FarmingHysteresis.VanillaPlantsExpandedMorePlants\FarmingHysteresis.VanillaPlantsExpandedMorePlants.csproj", "{6C13CE39-83B8-4517-BA22-BCDADEC922FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
