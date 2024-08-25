@@ -1,7 +1,6 @@
-namespace FarmingHysteresis
+namespace FarmingHysteresis;
+
+internal interface IBoundedValueAccessor
 {
-    internal interface IBoundedValueAccessor
-    {
-        BoundValues BoundValueRaw { get; }
-    }
+    BoundValues BoundValueRaw { get; }
 }
