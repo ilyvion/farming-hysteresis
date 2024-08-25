@@ -1,5 +1,3 @@
-using HarmonyLib;
-using Verse;
 using System.Reflection;
 
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants;

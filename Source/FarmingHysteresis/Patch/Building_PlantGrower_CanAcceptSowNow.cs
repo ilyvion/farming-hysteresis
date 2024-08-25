@@ -1,6 +1,4 @@
 using FarmingHysteresis.Extensions;
-using HarmonyLib;
-using RimWorld;
 
 namespace FarmingHysteresis.Patch
 {

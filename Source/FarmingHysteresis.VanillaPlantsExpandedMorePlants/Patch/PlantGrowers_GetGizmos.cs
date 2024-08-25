@@ -1,8 +1,3 @@
-using System.Collections.Generic;
-using HarmonyLib;
-using RimWorld;
-using Verse;
-using System.Linq;
 using FarmingHysteresis.Patch;
 using FarmingHysteresis.Extensions;
 using VanillaPlantsExpandedMorePlants;

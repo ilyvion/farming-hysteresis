@@ -1,9 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using FarmingHysteresis.Defs;
-using RimWorld;
 using VanillaPlantsExpandedMorePlants;
-using Verse;
 
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Defs;
 

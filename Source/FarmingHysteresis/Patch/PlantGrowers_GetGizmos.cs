@@ -1,10 +1,3 @@
-using System.Collections.Generic;
-using HarmonyLib;
-using RimWorld;
-using Verse;
-using UnityEngine;
-using System;
-using System.Linq;
 using FarmingHysteresis.Extensions;
 
 namespace FarmingHysteresis.Patch

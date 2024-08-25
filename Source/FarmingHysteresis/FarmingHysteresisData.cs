@@ -1,7 +1,4 @@
-using System;
 using FarmingHysteresis.Extensions;
-using RimWorld;
-using Verse;
 
 namespace FarmingHysteresis
 {

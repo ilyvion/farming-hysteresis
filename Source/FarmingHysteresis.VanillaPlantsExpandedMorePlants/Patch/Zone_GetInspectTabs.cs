@@ -1,10 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using FarmingHysteresis.ITabs;
-using HarmonyLib;
-using RimWorld;
 using VanillaPlantsExpandedMorePlants;
-using Verse;
 
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Patch;
 

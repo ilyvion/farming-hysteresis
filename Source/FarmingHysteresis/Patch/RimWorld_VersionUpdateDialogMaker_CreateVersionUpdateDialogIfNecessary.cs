@@ -1,8 +1,3 @@
-using System;
-using HarmonyLib;
-using RimWorld;
-using UnityEngine;
-using Verse;
 using Verse.Steam;
 
 namespace FarmingHysteresis.Patch;

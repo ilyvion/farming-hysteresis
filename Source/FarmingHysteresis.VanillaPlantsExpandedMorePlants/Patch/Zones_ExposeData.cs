@@ -1,5 +1,4 @@
 using FarmingHysteresis.Extensions;
-using HarmonyLib;
 using VanillaPlantsExpandedMorePlants;
 
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Patch;

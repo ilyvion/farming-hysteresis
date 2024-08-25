@@ -1,5 +1,3 @@
-using System;
-
 internal static class WeakReferenceExtensions
 {
     public static T GetTargetOrThrow<T>(this WeakReference<T> weakReference)

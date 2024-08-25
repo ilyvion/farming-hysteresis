@@ -1,8 +1,4 @@
-﻿using HarmonyLib;
-using Verse;
-using UnityEngine;
-using System;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("FarmingHysteresis.VanillaPlantsExpandedMorePlants")]
 

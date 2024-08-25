@@ -1,7 +1,4 @@
 using FarmingHysteresis.Extensions;
-using RimWorld;
-using UnityEngine;
-using Verse;
 
 namespace FarmingHysteresis.ITabs;
 

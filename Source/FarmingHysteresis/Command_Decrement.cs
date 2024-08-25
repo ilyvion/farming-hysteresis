@@ -1,6 +1,3 @@
-using UnityEngine;
-using Verse;
-
 namespace FarmingHysteresis
 {
     internal class Command_Decrement : Command_Action

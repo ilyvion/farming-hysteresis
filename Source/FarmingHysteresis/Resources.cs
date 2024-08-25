@@ -1,6 +1,3 @@
-using UnityEngine;
-using Verse;
-
 [StaticConstructorOnStartup]
 internal static class Resources
 {

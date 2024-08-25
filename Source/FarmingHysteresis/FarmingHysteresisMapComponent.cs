@@ -1,8 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
 using FarmingHysteresis.Defs;
 using FarmingHysteresis.Extensions;
-using Verse;
 
 namespace FarmingHysteresis
 {

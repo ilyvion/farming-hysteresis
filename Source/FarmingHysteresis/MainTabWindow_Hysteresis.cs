@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using RimWorld;
-using UnityEngine;
-using Verse;
-
 namespace FarmingHysteresis
 {
     public class MainButtonWorker_Hysteresis : MainButtonWorker_ToggleTab

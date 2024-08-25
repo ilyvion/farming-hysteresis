@@ -1,5 +1,3 @@
-using System;
-
 namespace FarmingHysteresis
 {
     internal enum LatchMode
