@@ -56,9 +56,9 @@ namespace FarmingHysteresis
             }
         }
 
-        public override void DoWindowContents(Rect rect)
+        public override void DoWindowContents(Rect inRect)
         {
-            Rect rect2 = rect;
+            Rect rect2 = inRect;
             rect2.yMin += 45f;
             TabDrawer.DrawTabs(rect2, tabs);
             switch (currentTab)
@@ -77,7 +77,7 @@ namespace FarmingHysteresis
 
 
         private readonly QuickSearchWidget _quickSearch = new();
-        private List<ThingDef>? _filteredHarvestedThingDefs = null;
+        private List<ThingDef>? _filteredHarvestedThingDefs;
 
         private void UpdateFilter()
         {
@@ -141,7 +141,7 @@ namespace FarmingHysteresis
             return PLANT_ROW_HEIGHT;
         }
 
-        public static void DrawHarvestIconWithLabelAndTooltip(Rect harvestIconRect, Rect harvestLabelRect, ThingDef harvestDef)
+        private static void DrawHarvestIconWithLabelAndTooltip(Rect harvestIconRect, Rect harvestLabelRect, ThingDef harvestDef)
         {
             GUI.DrawTexture(harvestIconRect, harvestDef.uiIcon);
 

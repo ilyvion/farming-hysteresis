@@ -6,6 +6,11 @@
         <LangVersion>12.0</LangVersion>
         <Nullable>enable</Nullable>
 
+        <EnableNETAnalyzers>True</EnableNETAnalyzers>
+        <AnalysisLevel>preview-all</AnalysisLevel>
+        <ErrorReport>prompt</ErrorReport>
+        <WarningLevel>5</WarningLevel>
+
         <RootNamespace>FarmingHysteresis.VanillaPlantsExpandedMorePlants</RootNamespace>
         <AssemblyName>FarmingHysteresis.VanillaPlantsExpandedMorePlants</AssemblyName>
         <VersionPrefix>0.8.2</VersionPrefix>

@@ -183,7 +183,8 @@ class ITab_Hysteresis : ITab
 
     private static HysteresisMode? _cachedHysteresisMode;
     private static string _cachedHysteresisModeString = string.Empty;
-    string HysteresisModeString
+
+    static string HysteresisModeString
     {
         get
         {

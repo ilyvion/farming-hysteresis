@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace FarmingHysteresis.Defs;
@@ -34,8 +35,14 @@ public class FarmingHysteresisControlDef : Def
         }
     }
 
-    private void ValidatePlantGrowerType(IPlantToGrowSettable plantGrower, string method)
+    private void ValidatePlantGrowerType(
+        [NotNull] IPlantToGrowSettable? plantGrower,
+        string method)
     {
+        if (plantGrower == null)
+        {
+            throw new ArgumentNullException(nameof(plantGrower));
+        }
         if (!controlledClass.IsAssignableFrom(plantGrower.GetType()))
         {
             throw new InvalidOperationException($"Called {nameof(FarmingHysteresisControlDef)}.{method} with an IPlantToGrowSettable of the wrong type. Expected {controlledClass.FullName}, got {plantGrower.GetType().FullName}");
@@ -161,23 +168,35 @@ public abstract class FarmingHysteresisControlWorker
 public class FarmingHysteresisControlWorker_Building_PlantGrower : FarmingHysteresisControlWorker
 {
     public override IEnumerable<IPlantToGrowSettable> GetControlledPlantGrowers(Map map) =>
-        map.listerBuildings.AllBuildingsColonistOfClass<Building_PlantGrower>();
+        (map ?? throw new ArgumentNullException(nameof(map))).listerBuildings
+            .AllBuildingsColonistOfClass<Building_PlantGrower>();
 }
 
 public class FarmingHysteresisControlWorker_Zone_Growing : FarmingHysteresisControlWorker
 {
     public override IEnumerable<IPlantToGrowSettable> GetControlledPlantGrowers(Map map) =>
-        map.zoneManager.AllZones.OfType<Zone_Growing>();
+        (map ?? throw new ArgumentNullException(nameof(map))).zoneManager.AllZones
+            .OfType<Zone_Growing>();
 
     public override bool HandleAllowSow => true;
 
     public override bool GetAllowSow(IPlantToGrowSettable plantGrower)
     {
+        if (plantGrower == null)
+        {
+            throw new ArgumentNullException(nameof(plantGrower));
+        }
+
         return ((Zone_Growing)plantGrower).allowSow;
     }
 
     public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
     {
+        if (plantGrower == null)
+        {
+            throw new ArgumentNullException(nameof(plantGrower));
+        }
+
         ((Zone_Growing)plantGrower).allowSow = value;
     }
 }

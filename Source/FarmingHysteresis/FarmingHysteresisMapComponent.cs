@@ -47,6 +47,11 @@ namespace FarmingHysteresis
 
         public FarmingHysteresisMapComponent(Map map) : base(map)
         {
+            if (map == null)
+            {
+                throw new ArgumentNullException(nameof(map));
+            }
+
             // if not created in SavingLoading, give yourself the ID of the map you were constructed on.
             if (Scribe.mode == LoadSaveMode.Inactive)
             {
@@ -70,6 +75,11 @@ namespace FarmingHysteresis
 
         public static FarmingHysteresisMapComponent For(Map map)
         {
+            if (map == null)
+            {
+                throw new ArgumentNullException(nameof(map));
+            }
+
             var instance = map.GetComponent<FarmingHysteresisMapComponent>();
             if (instance != null)
                 return instance;

@@ -9,9 +9,9 @@ namespace FarmingHysteresis
         private static int _defaultHysteresisUpperBound = Constants.DefaultHysteresisUpperBound;
         private static bool _enabledByDefault = true;
         private static bool _useGlobalValuesByDefault = true;
-        private static bool _countAllOnMap = false;
+        private static bool _countAllOnMap;
         private static HysteresisMode _hysteresisMode = HysteresisMode.Sowing;
-        private static bool _showOldCommands = false;
+        private static bool _showOldCommands;
         private static bool _showHysteresisMainTab = true;
         private static bool _showIlyvionLaboratoryWarning = true;
 

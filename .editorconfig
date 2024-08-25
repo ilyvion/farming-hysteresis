@@ -1,0 +1,14 @@
+# top-most EditorConfig file
+root = true
+
+# 4 space indentation
+[*.{cs,xml}]
+indent_style = space
+indent_size = 4
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped:warning
+
+# CA1051: Defs need public fields
+[{*Def}.cs]
+dotnet_diagnostic.CA1051.severity = none

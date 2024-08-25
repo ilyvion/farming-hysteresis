@@ -8,10 +8,10 @@ namespace FarmingHysteresis.Patch;
 internal static class RimWorld_VersionUpdateDialogMaker_CreateVersionUpdateDialogIfNecessary
 {
     private const uint IlyvionLaboratoryPublishedFileId = 3296362231;
-    private static readonly string IlyvionLaboratoryGitHubUrl =
+    private const string IlyvionLaboratoryGitHubUrl =
         "https://github.com/ilyvion/ilyvion-laboratory/releases/latest";
 
-    static bool ShownThisTime = false;
+    static bool ShownThisTime;
 
     private static bool IsIlyvionLaboratoryActive()
     {
