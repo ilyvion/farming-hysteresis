@@ -19,6 +19,7 @@ namespace FarmingHysteresis
         private static HysteresisMode _hysteresisMode = HysteresisMode.Sowing;
         private static bool _showOldCommands = false;
         private static bool _showHysteresisMainTab = true;
+        private static bool _showIlyvionLaboratoryWarning = true;
 
         public static int DefaultHysteresisLowerBound { get => _defaultHysteresisLowerBound; internal set => _defaultHysteresisLowerBound = value; }
         public static int DefaultHysteresisUpperBound { get => _defaultHysteresisUpperBound; internal set => _defaultHysteresisUpperBound = value; }
@@ -31,6 +32,11 @@ namespace FarmingHysteresis
 
         public static bool ControlSowing => _hysteresisMode == HysteresisMode.Sowing || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
         public static bool ControlHarvesting => _hysteresisMode == HysteresisMode.Harvesting || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
+        public static bool ShowIlyvionLaboratoryWarning
+        {
+            get => _showIlyvionLaboratoryWarning;
+            set => _showIlyvionLaboratoryWarning = value;
+        }
 
         public override void ExposeData()
         {
@@ -44,6 +50,8 @@ namespace FarmingHysteresis
             Scribe_Values.Look(ref _hysteresisMode, "hysteresisMode", HysteresisMode.Sowing);
             Scribe_Values.Look(ref _showOldCommands, "showOldCommands", false);
             Scribe_Values.Look(ref _showHysteresisMainTab, "showHysteresisMainTab", true);
+            Scribe_Values.Look(
+                ref _showIlyvionLaboratoryWarning, "showIlyvionLaboratoryWarning", true);
         }
 
         public static void DoSettingsWindowContents(Rect inRect)
