@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<LanguageData>
-
-    <!-- EN: hysteresis.label -->
-    <FarmingHysteresis_MainTabWindow_Hysteresis.label>hysterese</FarmingHysteresis_MainTabWindow_Hysteresis.label>
-    <!-- EN: hysteresis.description -->
-    <FarmingHysteresis_MainTabWindow_Hysteresis.description>Konfigurer globale hysteresegrenser for de forskjellige innhøstingstypene.</FarmingHysteresis_MainTabWindow_Hysteresis.description>
-
-</LanguageData>
