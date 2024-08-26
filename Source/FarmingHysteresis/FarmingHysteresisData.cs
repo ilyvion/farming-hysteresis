@@ -9,8 +9,8 @@ internal class BoundValues : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref Upper, "upper", Settings.DefaultHysteresisUpperBound);
-        Scribe_Values.Look(ref Lower, "lower", Settings.DefaultHysteresisLowerBound);
+        Scribe_Values.Look(ref Upper, "upper", FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound);
+        Scribe_Values.Look(ref Lower, "lower", FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound);
     }
 }
 
@@ -27,27 +27,27 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
     public FarmingHysteresisData(IPlantToGrowSettable plantGrower)
     {
         _plantGrowerWeakReference = new(plantGrower);
-        _enabled = Settings.EnabledByDefault;
+        _enabled = FarmingHysteresisMod.Settings.EnabledByDefault;
         _bounds = new BoundValues
         {
-            Upper = Settings.DefaultHysteresisUpperBound,
-            Lower = Settings.DefaultHysteresisLowerBound
+            Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
+            Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
         };
-        useGlobalValues = Settings.UseGlobalValuesByDefault;
+        useGlobalValues = FarmingHysteresisMod.Settings.UseGlobalValuesByDefault;
         latchMode = LatchMode.Unknown;
     }
 
     internal void ExposeData()
     {
-        Scribe_Values.Look(ref _enabled, "farmingHysteresisEnabled", Settings.EnabledByDefault, true);
+        Scribe_Values.Look(ref _enabled, "farmingHysteresisEnabled", FarmingHysteresisMod.Settings.EnabledByDefault, true);
         Scribe_Deep.Look(
             ref _bounds,
             "farmingHysteresisBounds"
         );
         _bounds ??= new BoundValues
         {
-            Upper = Settings.DefaultHysteresisUpperBound,
-            Lower = Settings.DefaultHysteresisLowerBound
+            Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
+            Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
         };
 
 #if v1_5
@@ -79,7 +79,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 #pragma warning restore 612
         }
 #endif
-        Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", Settings.UseGlobalValuesByDefault, true);
+        Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", FarmingHysteresisMod.Settings.UseGlobalValuesByDefault, true);
 
 #if v1_5
 #else
@@ -256,7 +256,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         _enabled = false;
         if (plantToGrowSettable is Zone zone)
         {
-            FarmingHysteresisMod.Warning($"Zone '{zone.label}' has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            FarmingHysteresisMod.Instance.LogWarning($"Zone '{zone.label}' has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
         }
         else if (plantToGrowSettable is Building building)
         {
@@ -267,15 +267,15 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
                 return;
             }
 
-            FarmingHysteresisMod.Warning($"Building named '{building.Label}' @ {building.InteractionCell.ToIntVec2} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            FarmingHysteresisMod.Instance.LogWarning($"Building named '{building.Label}' @ {building.InteractionCell.ToIntVec2} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
         }
         else if (plantToGrowSettable is ILoadReferenceable loadReferenceable)
         {
-            FarmingHysteresisMod.Warning($"{loadReferenceable.GetUniqueLoadID()} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            FarmingHysteresisMod.Instance.LogWarning($"{loadReferenceable.GetUniqueLoadID()} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
         }
         else
         {
-            FarmingHysteresisMod.Warning($"Unknown type {plantToGrowSettable.GetType().FullName} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            FarmingHysteresisMod.Instance.LogWarning($"Unknown type {plantToGrowSettable.GetType().FullName} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
         }
     }
 }

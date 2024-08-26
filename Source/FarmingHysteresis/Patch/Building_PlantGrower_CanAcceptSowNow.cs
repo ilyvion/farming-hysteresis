@@ -12,7 +12,7 @@ internal static class Building_PlantGrower_CanAcceptSowNow
             return;
         }
 
-        if (__result && Settings.ControlSowing)
+        if (__result && FarmingHysteresisMod.Settings.ControlSowing)
         {
             // We check that __result was true first so we don't mess up the game's
             // other reasons for disallowing sowing. But if sowing normally is

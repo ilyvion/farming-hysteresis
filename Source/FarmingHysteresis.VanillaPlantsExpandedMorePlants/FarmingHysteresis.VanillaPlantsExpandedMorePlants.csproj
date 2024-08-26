@@ -20,6 +20,8 @@
         <!-- Intellisense doesn't work without specifying these explicitly -->
         <RimWorldSteamWorkshopFolderPath Condition="'$(RimWorldSteamWorkshopFolderPath)'==''">C:\Program Files (x86)\Steam\steamapps\workshop\content\294100</RimWorldSteamWorkshopFolderPath>
         <RimWorldVersion Condition="'$(RimWorldVersion)'==''">1.5</RimWorldVersion>
+
+        <ProjectDependenciesBasePath Condition="'$(ProjectDependenciesBasePath)'==''">..\..\..</ProjectDependenciesBasePath>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -72,5 +74,11 @@
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(ProjectDependenciesBasePath)\ilyvion.Laboratory\ilyvion.Laboratory\ilyvion.Laboratory.csproj">
+            <Private>false</Private>
+        </ProjectReference>
     </ItemGroup>
 </Project>

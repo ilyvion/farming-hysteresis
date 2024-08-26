@@ -2,7 +2,7 @@ namespace FarmingHysteresis;
 
 public class MainButtonWorker_Hysteresis : MainButtonWorker_ToggleTab
 {
-    public override bool Visible => Settings.ShowHysteresisMainTab;
+    public override bool Visible => FarmingHysteresisMod.Settings.ShowHysteresisMainTab;
 }
 
 public class MainTabWindow_Hysteresis : MainTabWindow

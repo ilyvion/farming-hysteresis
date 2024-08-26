@@ -21,6 +21,8 @@
 
         <!-- Intellisense doesn't work without specifying this explicitly -->
         <RimWorldVersion Condition="'$(RimWorldVersion)'==''">1.5</RimWorldVersion>
+
+        <ProjectDependenciesBasePath Condition="'$(ProjectDependenciesBasePath)'==''">..\..\..</ProjectDependenciesBasePath>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -68,5 +70,11 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="$(ProjectDependenciesBasePath)\ilyvion.Laboratory\ilyvion.Laboratory\ilyvion.Laboratory.csproj">
+            <Private>false</Private>
+        </ProjectReference>
     </ItemGroup>
 </Project>

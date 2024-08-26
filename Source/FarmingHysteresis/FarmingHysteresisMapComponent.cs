@@ -20,8 +20,8 @@ internal class GlobalThingDefBoundValueAccessor(FarmingHysteresisMapComponent ma
             {
                 var boundValues = new BoundValues
                 {
-                    Upper = Settings.DefaultHysteresisUpperBound,
-                    Lower = Settings.DefaultHysteresisLowerBound
+                    Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
+                    Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
                 };
                 mapComponent.GlobalBoundValues.Add(thingDef, boundValues);
                 return boundValues;

@@ -2,31 +2,31 @@ namespace FarmingHysteresis;
 
 public class Settings : ModSettings
 {
-    private static string? _defaultHysteresisLowerBoundBuffer;
-    private static string? _defaultHysteresisUpperBoundBuffer;
+    private string? _defaultHysteresisLowerBoundBuffer;
+    private string? _defaultHysteresisUpperBoundBuffer;
 
-    private static int _defaultHysteresisLowerBound = Constants.DefaultHysteresisLowerBound;
-    private static int _defaultHysteresisUpperBound = Constants.DefaultHysteresisUpperBound;
-    private static bool _enabledByDefault = true;
-    private static bool _useGlobalValuesByDefault = true;
-    private static bool _countAllOnMap;
-    private static HysteresisMode _hysteresisMode = HysteresisMode.Sowing;
-    private static bool _showOldCommands;
-    private static bool _showHysteresisMainTab = true;
-    private static bool _showIlyvionLaboratoryWarning = true;
+    private int _defaultHysteresisLowerBound = Constants.DefaultHysteresisLowerBound;
+    private int _defaultHysteresisUpperBound = Constants.DefaultHysteresisUpperBound;
+    private bool _enabledByDefault = true;
+    private bool _useGlobalValuesByDefault = true;
+    private bool _countAllOnMap;
+    private HysteresisMode _hysteresisMode = HysteresisMode.Sowing;
+    private bool _showOldCommands;
+    private bool _showHysteresisMainTab = true;
+    private bool _showIlyvionLaboratoryWarning = true;
 
-    public static int DefaultHysteresisLowerBound { get => _defaultHysteresisLowerBound; internal set => _defaultHysteresisLowerBound = value; }
-    public static int DefaultHysteresisUpperBound { get => _defaultHysteresisUpperBound; internal set => _defaultHysteresisUpperBound = value; }
-    public static bool EnabledByDefault { get => _enabledByDefault; internal set => _enabledByDefault = value; }
-    public static bool UseGlobalValuesByDefault { get => _useGlobalValuesByDefault; internal set => _useGlobalValuesByDefault = value; }
-    public static bool CountAllOnMap { get => _countAllOnMap; internal set => _countAllOnMap = value; }
-    public static HysteresisMode HysteresisMode { get => _hysteresisMode; internal set => _hysteresisMode = value; }
-    public static bool ShowOldCommands { get => _showOldCommands; internal set => _showOldCommands = value; }
-    public static bool ShowHysteresisMainTab { get => _showHysteresisMainTab; internal set => _showHysteresisMainTab = value; }
+    public int DefaultHysteresisLowerBound { get => _defaultHysteresisLowerBound; internal set => _defaultHysteresisLowerBound = value; }
+    public int DefaultHysteresisUpperBound { get => _defaultHysteresisUpperBound; internal set => _defaultHysteresisUpperBound = value; }
+    public bool EnabledByDefault { get => _enabledByDefault; internal set => _enabledByDefault = value; }
+    public bool UseGlobalValuesByDefault { get => _useGlobalValuesByDefault; internal set => _useGlobalValuesByDefault = value; }
+    public bool CountAllOnMap { get => _countAllOnMap; internal set => _countAllOnMap = value; }
+    public HysteresisMode HysteresisMode { get => _hysteresisMode; internal set => _hysteresisMode = value; }
+    public bool ShowOldCommands { get => _showOldCommands; internal set => _showOldCommands = value; }
+    public bool ShowHysteresisMainTab { get => _showHysteresisMainTab; internal set => _showHysteresisMainTab = value; }
 
-    public static bool ControlSowing => _hysteresisMode == HysteresisMode.Sowing || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
-    public static bool ControlHarvesting => _hysteresisMode == HysteresisMode.Harvesting || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
-    public static bool ShowIlyvionLaboratoryWarning
+    public bool ControlSowing => _hysteresisMode == HysteresisMode.Sowing || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
+    public bool ControlHarvesting => _hysteresisMode == HysteresisMode.Harvesting || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
+    public bool ShowIlyvionLaboratoryWarning
     {
         get => _showIlyvionLaboratoryWarning;
         set => _showIlyvionLaboratoryWarning = value;
@@ -48,7 +48,7 @@ public class Settings : ModSettings
             ref _showIlyvionLaboratoryWarning, "showIlyvionLaboratoryWarning", true);
     }
 
-    public static void DoSettingsWindowContents(Rect inRect)
+    public void DoSettingsWindowContents(Rect inRect)
     {
         Listing_Standard listingStandard = new();
         listingStandard.Begin(inRect);

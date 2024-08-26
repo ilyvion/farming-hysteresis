@@ -113,7 +113,7 @@ class ITab_Hysteresis : ITab
         listingStandard.GapLine();
 
         listingStandard.Label("FarmingHysteresis.InStorage".Translate(harvestedThingDef.label, harvestedThingCount));
-        listingStandard.Label("FarmingHysteresis.LatchModeDesc".Translate(("FarmingHysteresis.LatchModeDesc." + data.latchMode.ToString()).Translate(Settings.HysteresisMode.AsString())));
+        listingStandard.Label("FarmingHysteresis.LatchModeDesc".Translate(("FarmingHysteresis.LatchModeDesc." + data.latchMode.ToString()).Translate(FarmingHysteresisMod.Settings.HysteresisMode.AsString())));
 
         listingStandard.End();
 
@@ -188,9 +188,9 @@ class ITab_Hysteresis : ITab
     {
         get
         {
-            if (_cachedHysteresisMode != Settings.HysteresisMode)
+            if (_cachedHysteresisMode != FarmingHysteresisMod.Settings.HysteresisMode)
             {
-                _cachedHysteresisMode = Settings.HysteresisMode;
+                _cachedHysteresisMode = FarmingHysteresisMod.Settings.HysteresisMode;
                 _cachedHysteresisModeString = ((HysteresisMode)_cachedHysteresisMode).AsString();
             }
 

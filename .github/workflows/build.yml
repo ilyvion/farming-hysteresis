@@ -13,9 +13,16 @@ jobs:
         runs-on: windows-latest
         env:
             RimWorldSteamWorkshopFolderPath: ..\..\.deps\refs
+            ProjectDependenciesBasePath: ..\..
         steps:
             - name: Checkout Repository
               uses: actions/checkout@v4
+
+            - name: Checkout ilyvion.Laboratory Repository
+              uses: actions/checkout@v4
+              with:
+                  repository: "ilyvion/ilyvion-laboratory"
+                  path: "ilyvion.Laboratory"
 
             - name: Setup Dotnet
               uses: actions/setup-dotnet@v4

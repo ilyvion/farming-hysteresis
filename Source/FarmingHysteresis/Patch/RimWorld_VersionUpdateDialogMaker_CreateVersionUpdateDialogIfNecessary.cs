@@ -24,7 +24,7 @@ internal static class RimWorld_VersionUpdateDialogMaker_CreateVersionUpdateDialo
 
     private static void Postfix()
     {
-        if (IsIlyvionLaboratoryActive() && Settings.ShowIlyvionLaboratoryWarning && !ShownThisTime)
+        if (IsIlyvionLaboratoryActive() && FarmingHysteresisMod.Settings.ShowIlyvionLaboratoryWarning && !ShownThisTime)
         {
             ShownThisTime = true;
 
@@ -37,7 +37,7 @@ internal static class RimWorld_VersionUpdateDialogMaker_CreateVersionUpdateDialo
                 "Don't show this again",
                 () =>
                 {
-                    Settings.ShowIlyvionLaboratoryWarning = false;
+                    FarmingHysteresisMod.Settings.ShowIlyvionLaboratoryWarning = false;
                     LoadedModManager.GetMod<FarmingHysteresisMod>().GetSettings<Settings>().Write();
                 },
                 "Open " + (SteamManager.Initialized ? "Steam Workshop page" : "GitHub release page"),

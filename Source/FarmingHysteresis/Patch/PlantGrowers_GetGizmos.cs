@@ -53,7 +53,7 @@ internal class GetGizmosPatcher
         var harvestHysteresisCommand = new Command_Toggle
         {
             defaultLabel = "FarmingHysteresis.EnableFarmingHysteresis".Translate(),
-            defaultDesc = "FarmingHysteresis.EnableFarmingHysteresisisDesc".Translate(Settings.HysteresisMode.AsString()),
+            defaultDesc = "FarmingHysteresis.EnableFarmingHysteresisisDesc".Translate(FarmingHysteresisMod.Settings.HysteresisMode.AsString()),
             icon = Resources.Hysteresis,
             isActive = () => data.Enabled,
             toggleAction = () =>
@@ -90,7 +90,7 @@ internal class GetGizmosPatcher
                 result.Remove(allowGizmo);
             }
 
-            if (Settings.ShowOldCommands && Find.Selector.NumSelected == 1)
+            if (FarmingHysteresisMod.Settings.ShowOldCommands && Find.Selector.NumSelected == 1)
             {
                 Texture2D uiIcon = harvestedThingDef.uiIcon;
 

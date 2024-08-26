@@ -8,7 +8,7 @@ internal static class WorkGiver_GrowerHarvestAquatic_HasJobOnCell
 {
     private static void Postfix(ref Pawn pawn, ref IntVec3 c, ref bool __result)
     {
-        if (__result && Settings.ControlHarvesting)
+        if (__result && FarmingHysteresisMod.Settings.ControlHarvesting)
         {
             // We check that __result was true first so we don't mess up the game's
             // other reasons for disallowing harvesting. But if harvesting normally is
@@ -26,7 +26,7 @@ internal static class WorkGiver_GrowerHarvestSandy_HasJobOnCell
 {
     private static void Postfix(ref Pawn pawn, ref IntVec3 c, ref bool __result)
     {
-        if (__result && Settings.ControlHarvesting)
+        if (__result && FarmingHysteresisMod.Settings.ControlHarvesting)
         {
             // We check that __result was true first so we don't mess up the game's
             // other reasons for disallowing harvesting. But if harvesting normally is
