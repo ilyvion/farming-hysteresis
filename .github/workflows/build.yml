@@ -29,6 +29,12 @@ jobs:
               with:
                   dotnet-version: 8.0.x
 
+            - name: Build Mod for 1.6
+              env:
+                  RimWorldVersion: 1.6
+              run: |
+                  dotnet build --configuration Release Source/FarmingHysteresis/FarmingHysteresis.csproj
+
             - name: Build Mod for 1.5
               env:
                   RimWorldVersion: 1.5
@@ -53,6 +59,7 @@ jobs:
                   name: FarmingHysteresis-${{ inputs.artifact-suffix }}
                   path: |
                       About/
+                      1.6/
                       1.5/
                       1.4/
                       1.3/

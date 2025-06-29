@@ -13,15 +13,11 @@
 
         <RootNamespace>FarmingHysteresis.VanillaPlantsExpandedMorePlants</RootNamespace>
         <AssemblyName>FarmingHysteresis.VanillaPlantsExpandedMorePlants</AssemblyName>
-        <VersionPrefix>0.8.2</VersionPrefix>
-
+        
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 
-        <!-- Intellisense doesn't work without specifying these explicitly -->
-        <RimWorldSteamWorkshopFolderPath Condition="'$(RimWorldSteamWorkshopFolderPath)'==''">C:\Program Files (x86)\Steam\steamapps\workshop\content\294100</RimWorldSteamWorkshopFolderPath>
-        <RimWorldVersion Condition="'$(RimWorldVersion)'==''">1.5</RimWorldVersion>
-
         <ProjectDependenciesBasePath Condition="'$(ProjectDependenciesBasePath)'==''">..\..\..</ProjectDependenciesBasePath>
+        <RimWorldSteamWorkshopFolderPath Condition="'$(RimWorldSteamWorkshopFolderPath)'==''">..\..\.deps\refs</RimWorldSteamWorkshopFolderPath>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -41,6 +37,12 @@
     </PropertyGroup>
 
     <Choose>
+        <When Condition="'$(RimWorldVersion)' == '1.6'">
+            <PropertyGroup>
+                <NoBuild>true</NoBuild>
+                <DefineConstants>$(DefineConstants);v1_6</DefineConstants>
+            </PropertyGroup>
+        </When>
         <When Condition="'$(RimWorldVersion)' == '1.5'">
             <PropertyGroup>
                 <DefineConstants>$(DefineConstants);v1_5</DefineConstants>
@@ -62,7 +64,7 @@
         <PackageReference Include="Lib.Harmony" Version="2.3.3">
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
-        <PackageReference Include="Krafs.Rimworld.Ref" Version="$(RimWorldVersion).*">
+        <PackageReference Include="Krafs.Rimworld.Ref" Version="$(RimWorldVersion).*-*">
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
         <ProjectReference Include="..\FarmingHysteresis\FarmingHysteresis.csproj">

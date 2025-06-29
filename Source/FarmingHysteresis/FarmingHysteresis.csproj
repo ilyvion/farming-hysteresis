@@ -15,12 +15,8 @@
 
         <RootNamespace>FarmingHysteresis</RootNamespace>
         <AssemblyName>FarmingHysteresis</AssemblyName>
-        <VersionPrefix>0.8.2</VersionPrefix>
 
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-
-        <!-- Intellisense doesn't work without specifying this explicitly -->
-        <RimWorldVersion Condition="'$(RimWorldVersion)'==''">1.5</RimWorldVersion>
 
         <ProjectDependenciesBasePath Condition="'$(ProjectDependenciesBasePath)'==''">..\..\..</ProjectDependenciesBasePath>
     </PropertyGroup>
@@ -57,13 +53,18 @@
                 <DefineConstants>$(DefineConstants);v1_5</DefineConstants>
             </PropertyGroup>
         </When>
+        <When Condition="'$(RimWorldVersion)' == '1.6'">
+            <PropertyGroup>
+                <DefineConstants>$(DefineConstants);v1_6</DefineConstants>
+            </PropertyGroup>
+        </When>
     </Choose>
 
     <ItemGroup>
         <PackageReference Include="Lib.Harmony" Version="2.3.3">
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
-        <PackageReference Include="Krafs.Rimworld.Ref" Version="$(RimWorldVersion).*">
+        <PackageReference Include="Krafs.Rimworld.Ref" Version="$(RimWorldVersion).*-*">
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>
         <PackageReference Include="Nullable" Version="1.3.1">

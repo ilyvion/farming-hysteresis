@@ -2,79 +2,15 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build all versions",
-            "type": "shell",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "command": ".vscode/buildAll.ps1",
-            "problemMatcher": []
-        },
-        {
-            "label": "build choose version",
-            "type": "shell",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "command": ".vscode/build.ps1",
-            "args": [
-                "${input:rimWorldVersion}"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "build 1.5",
+            "label": "build",
             "type": "shell",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "command": ".vscode/build.ps1",
-            "args": [
-                "1.5"
-            ],
+            "command": ".vscode/build.sh",
+            "args": [],
             "problemMatcher": []
-        },
-        {
-            "label": "build 1.4",
-            "type": "shell",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "command": ".vscode/build.ps1",
-            "args": [
-                "1.4"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "build 1.3",
-            "type": "shell",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "command": ".vscode/build.ps1",
-            "args": [
-                "1.3"
-            ],
-            "problemMatcher": []
-        }
-    ],
-    "inputs": [
-        {
-            "id": "rimWorldVersion",
-            "type": "pickString",
-            "description": "Rimworld version to build?",
-            "options": [
-                "1.5",
-                "1.4",
-                "1.3",
-            ],
-            "default": "1.5"
         }
     ]
 }
