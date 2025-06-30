@@ -136,7 +136,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
 
             if (globalLowerBoundValues == null || globalUpperBoundValues == null)
             {
-                FarmingHysteresisMod.Warning("globalLowerBoundValues or globalUpperBoundValues was null; expected a value. No bounds transferred from old game.");
+                FarmingHysteresisMod.Instance.LogWarning("globalLowerBoundValues or globalUpperBoundValues was null; expected a value. No bounds transferred from old game.");
                 return;
             }
 
@@ -144,8 +144,8 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
             {
                 var boundValues = new BoundValues
                 {
-                    Upper = Settings.DefaultHysteresisUpperBound,
-                    Lower = Settings.DefaultHysteresisLowerBound
+                    Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
+                    Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
                 };
                 {
                     if (globalLowerBoundValues.TryGetValue(thingDef, out var value))
