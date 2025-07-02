@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Gracefully handle the case where the plant-to-grow has been set to null. This does not happen normally, but some mods do it, such as "Progression: Agriculture."
+
 ## [0.9.0] - 2025-06-30
 
 ### Added

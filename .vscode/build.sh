@@ -9,6 +9,7 @@ export RimWorldSteamWorkshopFolderPath="../../.deps/refs"
 mkdir -p .savedatafolder/1.6
 mkdir -p .savedatafolder/1.5
 mkdir -p .savedatafolder/1.4
+mkdir -p .savedatafolder/1.3
 
 # build dlls
 export RimWorldVersion="1.3"

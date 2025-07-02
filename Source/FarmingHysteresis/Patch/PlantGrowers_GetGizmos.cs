@@ -48,7 +48,7 @@ internal class GetGizmosPatcher
         where T : IPlantToGrowSettable
     {
         var data = getHysteresisData(plantToGrowSettable);
-        var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow().plant.harvestedThingDef;
+        var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow()?.plant.harvestedThingDef;
 
         var harvestHysteresisCommand = new Command_Toggle
         {

@@ -254,28 +254,44 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
     internal void DisableDueToMissingHarvestedThingDef(IPlantToGrowSettable plantToGrowSettable, ThingDef plantDef)
     {
         _enabled = false;
+
+        string settableName;
+        bool suppressWarning = false;
+
         if (plantToGrowSettable is Zone zone)
         {
-            FarmingHysteresisMod.Instance.LogWarning($"Zone '{zone.label}' has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            settableName = $"Zone '{zone.label}'";
         }
         else if (plantToGrowSettable is Building building)
         {
             // Let's not cause unnecessary spam from flower pots and similar
             string? sowTag = building.def.building?.sowTag;
-            if (sowTag == "Decorative" || sowTag == "DecorativeTree")
+            if (sowTag is "Decorative" or "DecorativeTree")
             {
-                return;
+                suppressWarning = true;
             }
-
-            FarmingHysteresisMod.Instance.LogWarning($"Building named '{building.Label}' @ {building.InteractionCell.ToIntVec2} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            settableName = $"Building named '{building.Label}' @ {building.InteractionCell.ToIntVec2}";
         }
         else if (plantToGrowSettable is ILoadReferenceable loadReferenceable)
         {
-            FarmingHysteresisMod.Instance.LogWarning($"{loadReferenceable.GetUniqueLoadID()} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            settableName = loadReferenceable.GetUniqueLoadID();
         }
         else
         {
-            FarmingHysteresisMod.Instance.LogWarning($"Unknown type {plantToGrowSettable.GetType().FullName} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            settableName = $"Unknown type {plantToGrowSettable.GetType().FullName}";
+        }
+
+        if (!suppressWarning)
+        {
+            if (plantDef == null)
+            {
+                // This should never happen, but some mods may make plantDef null.
+                FarmingHysteresisMod.Instance.LogWarning($"{settableName} has no plant set. Disabling farming hysteresis.");
+            }
+            else
+            {
+                FarmingHysteresisMod.Instance.LogWarning($"{settableName} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+            }
         }
     }
 }
