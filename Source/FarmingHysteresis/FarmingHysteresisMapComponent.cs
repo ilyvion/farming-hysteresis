@@ -117,8 +117,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
         Scribe_Values.Look(ref id, "id", -1, true);
         Scribe_Collections.Look(ref globalBoundValues, "globalBoundValues", LookMode.Def, LookMode.Deep);
 
-#if v1_5
-#else
+#if v1_3 || v1_4
         if (globalBoundValues == null || globalBoundValues.Count == 0)
         {
             if (Scribe.mode == LoadSaveMode.LoadingVars)

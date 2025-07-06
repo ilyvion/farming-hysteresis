@@ -42,28 +42,45 @@
             <PropertyGroup>
                 <DefineConstants>$(DefineConstants);v1_3</DefineConstants>
             </PropertyGroup>
+            <ItemGroup>
+                <PackageReference Include="Lib.Harmony" Version="[2.2.2]">
+                    <ExcludeAssets>runtime</ExcludeAssets>
+                </PackageReference>
+            </ItemGroup>
         </When>
         <When Condition="'$(RimWorldVersion)' == '1.4'">
             <PropertyGroup>
                 <DefineConstants>$(DefineConstants);v1_4</DefineConstants>
             </PropertyGroup>
+            <ItemGroup>
+                <PackageReference Include="Lib.Harmony" Version="[2.2.2]">
+                    <ExcludeAssets>runtime</ExcludeAssets>
+                </PackageReference>
+            </ItemGroup>
         </When>
         <When Condition="'$(RimWorldVersion)' == '1.5'">
             <PropertyGroup>
                 <DefineConstants>$(DefineConstants);v1_5</DefineConstants>
             </PropertyGroup>
+            <ItemGroup>
+                <PackageReference Include="Lib.Harmony" Version="[2.2.2]">
+                    <ExcludeAssets>runtime</ExcludeAssets>
+                </PackageReference>
+            </ItemGroup>
         </When>
         <When Condition="'$(RimWorldVersion)' == '1.6'">
             <PropertyGroup>
                 <DefineConstants>$(DefineConstants);v1_6</DefineConstants>
             </PropertyGroup>
+            <ItemGroup>
+                <PackageReference Include="Lib.Harmony" Version="2.3.3">
+                    <ExcludeAssets>runtime</ExcludeAssets>
+                </PackageReference>
+            </ItemGroup>
         </When>
     </Choose>
 
     <ItemGroup>
-        <PackageReference Include="Lib.Harmony" Version="2.3.3">
-            <ExcludeAssets>runtime</ExcludeAssets>
-        </PackageReference>
         <PackageReference Include="Krafs.Rimworld.Ref" Version="$(RimWorldVersion).*-*">
             <ExcludeAssets>runtime</ExcludeAssets>
         </PackageReference>

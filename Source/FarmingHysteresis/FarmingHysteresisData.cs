@@ -50,8 +50,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
         };
 
-#if v1_5
-#else
+#if v1_3 || v1_4
         if (Scribe.mode == LoadSaveMode.LoadingVars)
         {
             TransferOldBounds();
@@ -59,8 +58,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 #endif
 
         Scribe_Values.Look(ref latchMode, "farmingHysteresisLatchMode", LatchMode.Unknown, true);
-#if v1_5
-#else
+#if v1_3 || v1_4
         if (Scribe.mode == LoadSaveMode.LoadingVars)
         {
             // Ignore obsolete warning (612) since we're explicitly
@@ -81,8 +79,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 #endif
         Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", FarmingHysteresisMod.Settings.UseGlobalValuesByDefault, true);
 
-#if v1_5
-#else
+#if v1_3 || v1_4
         void TransferOldBounds()
         {
             int lowerBound = 0;
