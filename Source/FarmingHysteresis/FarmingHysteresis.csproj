@@ -63,7 +63,7 @@
                 <DefineConstants>$(DefineConstants);v1_5</DefineConstants>
             </PropertyGroup>
             <ItemGroup>
-                <PackageReference Include="Lib.Harmony" Version="[2.2.2]">
+                <PackageReference Include="Lib.Harmony" Version="[2.3.3]">
                     <ExcludeAssets>runtime</ExcludeAssets>
                 </PackageReference>
             </ItemGroup>
@@ -73,7 +73,7 @@
                 <DefineConstants>$(DefineConstants);v1_6</DefineConstants>
             </PropertyGroup>
             <ItemGroup>
-                <PackageReference Include="Lib.Harmony" Version="2.3.3">
+                <PackageReference Include="Lib.Harmony" Version="2.3.6">
                     <ExcludeAssets>runtime</ExcludeAssets>
                 </PackageReference>
             </ItemGroup>

@@ -33,7 +33,7 @@ jobs:
               env:
                   RimWorldVersion: 1.6
               run: |
-                  dotnet build --configuration Release Source/FarmingHysteresis/FarmingHysteresis.csproj
+                  dotnet build --configuration Release FarmingHysteresis.sln
 
             - name: Build Mod for 1.5
               env:
@@ -63,6 +63,7 @@ jobs:
                       1.5/
                       1.4/
                       1.3/
+                      1.6_VanillaPlantsExpandedMorePlants/
                       1.5_VanillaPlantsExpandedMorePlants/
                       1.4_VanillaPlantsExpandedMorePlants/
                       1.3_VanillaPlantsExpandedMorePlants/
