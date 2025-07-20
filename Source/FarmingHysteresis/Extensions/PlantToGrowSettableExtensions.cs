@@ -21,7 +21,7 @@ internal static class PlantToGrowSettableExtensions
 
     internal static (ThingDef?, int) PlantHarvestInfo(this IPlantToGrowSettable plantToGrowSettable)
     {
-        var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow().plant.harvestedThingDef;
+        var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow()?.plant.harvestedThingDef;
         if (harvestedThingDef != null)
         {
             int harvestedThingCount;
@@ -29,7 +29,7 @@ internal static class PlantToGrowSettableExtensions
             {
                 harvestedThingCount = plantToGrowSettable.Map.listerThings.ThingsOfDef(harvestedThingDef)
                     .Where(t => !t.IsForbidden(Faction.OfPlayer) && !t.Position.Fogged(plantToGrowSettable.Map))
-                    .Select(t => t.stackCount).Sum();
+                    .Sum(t => t.stackCount);
             }
             else
             {

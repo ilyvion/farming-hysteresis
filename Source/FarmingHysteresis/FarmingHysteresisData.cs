@@ -248,7 +248,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         }
     }
 
-    internal void DisableDueToMissingHarvestedThingDef(IPlantToGrowSettable plantToGrowSettable, ThingDef plantDef)
+    internal void DisableDueToMissingHarvestedThingDef(IPlantToGrowSettable plantToGrowSettable, ThingDef? plantDef)
     {
         _enabled = false;
 
@@ -282,7 +282,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         {
             if (plantDef == null)
             {
-                // This should never happen, but some mods may make plantDef null.
+                // This should normally never happen, but some mods may make plantDef null.
                 FarmingHysteresisMod.Instance.LogWarning($"{settableName} has no plant set. Disabling farming hysteresis.");
             }
             else
