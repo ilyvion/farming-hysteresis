@@ -4,7 +4,8 @@ namespace FarmingHysteresis.Patch;
 
 [HarmonyPatch(
     typeof(VersionUpdateDialogMaker),
-    nameof(VersionUpdateDialogMaker.CreateVersionUpdateDialogIfNecessary))]
+    nameof(VersionUpdateDialogMaker.CreateVersionUpdateDialogIfNecessary)
+)]
 internal static class RimWorld_VersionUpdateDialogMaker_CreateVersionUpdateDialogIfNecessary
 {
     private const uint IlyvionLaboratoryPublishedFileId = 3296362231;
@@ -24,39 +25,51 @@ internal static class RimWorld_VersionUpdateDialogMaker_CreateVersionUpdateDialo
 
     private static void Postfix()
     {
-        if (IsIlyvionLaboratoryActive() && FarmingHysteresisMod.Settings.ShowIlyvionLaboratoryWarning && !ShownThisTime)
+        if (
+            IsIlyvionLaboratoryActive()
+            && FarmingHysteresisMod.Settings.ShowIlyvionLaboratoryWarning
+            && !ShownThisTime
+        )
         {
             ShownThisTime = true;
 
-            Find.WindowStack.Add(new NewModRequirement(
-                "Farming Hysteresis is going to require you to have ilyvion's Laboratory " +
-                "installed and enabled in a future version. In order for you not to suddenly get " +
-                "a bunch of errors when launching the game at a future date, I strongly " +
-                "recommend you install and enable it now. This message will stop showing up on " +
-                "game launch once the mod has been installed and enabled.",
-                "Don't show this again",
-                () =>
-                {
-                    FarmingHysteresisMod.Settings.ShowIlyvionLaboratoryWarning = false;
-                    LoadedModManager.GetMod<FarmingHysteresisMod>().GetSettings<Settings>().Write();
-                },
-                "Open " + (SteamManager.Initialized ? "Steam Workshop page" : "GitHub release page"),
-                () =>
-                {
-                    if (SteamManager.Initialized)
+            Find.WindowStack.Add(
+                new NewModRequirement(
+                    "Farming Hysteresis is going to require you to have ilyvion's Laboratory "
+                        + "installed and enabled in a future version. In order for you not to suddenly get "
+                        + "a bunch of errors when launching the game at a future date, I strongly "
+                        + "recommend you install and enable it now. This message will stop showing up on "
+                        + "game launch once the mod has been installed and enabled.",
+                    "Don't show this again",
+                    () =>
                     {
-                        SteamUtility.OpenWorkshopPage(new(IlyvionLaboratoryPublishedFileId));
-                    }
-                    else
+                        FarmingHysteresisMod.Settings.ShowIlyvionLaboratoryWarning = false;
+                        LoadedModManager
+                            .GetMod<FarmingHysteresisMod>()
+                            .GetSettings<Settings>()
+                            .Write();
+                    },
+                    "Open "
+                        + (
+                            SteamManager.Initialized ? "Steam Workshop page" : "GitHub release page"
+                        ),
+                    () =>
                     {
-                        Application.OpenURL(IlyvionLaboratoryGitHubUrl);
-                    }
-                },
-                buttonADestructive: true
-            )
-            {
-                buttonCText = "Remind me next time"
-            });
+                        if (SteamManager.Initialized)
+                        {
+                            SteamUtility.OpenWorkshopPage(new(IlyvionLaboratoryPublishedFileId));
+                        }
+                        else
+                        {
+                            Application.OpenURL(IlyvionLaboratoryGitHubUrl);
+                        }
+                    },
+                    buttonADestructive: true
+                )
+                {
+                    buttonCText = "Remind me next time",
+                }
+            );
         }
     }
 }
@@ -74,7 +87,8 @@ internal class NewModRequirement : Dialog_MessageBox
         string? title = null,
         bool buttonADestructive = false,
         Action? acceptAction = null,
-        Action? cancelAction = null)
+        Action? cancelAction = null
+    )
         : base(
             text,
             buttonAText,
@@ -84,7 +98,8 @@ internal class NewModRequirement : Dialog_MessageBox
             title,
             buttonADestructive,
             acceptAction,
-            cancelAction)
+            cancelAction
+        )
     {
         interactionDelay = 5f;
     }

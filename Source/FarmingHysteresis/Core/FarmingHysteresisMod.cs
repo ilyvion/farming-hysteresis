@@ -16,7 +16,8 @@ public class FarmingHysteresisMod : IlyvionMod
     }
 #pragma warning restore CS8618
 
-    public FarmingHysteresisMod(ModContentPack content) : base(content)
+    public FarmingHysteresisMod(ModContentPack content)
+        : base(content)
     {
         // This is kind of stupid, but also kind of correct. Correct wins.
         if (content == null)

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-
     <FarmingHysteresis.Defs.FarmingHysteresisControlDef>
         <defName>FarmingHysteresisControl_Zone_Growing</defName>
         <workerClass>FarmingHysteresis.Defs.FarmingHysteresisControlWorker_Zone_Growing</workerClass>
@@ -18,5 +17,4 @@
         <workerClass>FarmingHysteresis.VanillaPlantsExpandedMorePlants.Defs.FarmingHysteresisControlWorker_Zone_GrowingSandy</workerClass>
         <controlledClass>VanillaPlantsExpandedMorePlants.Zone_GrowingSandy</controlledClass>
     </FarmingHysteresis.Defs.FarmingHysteresisControlDef>
-
 </Defs>

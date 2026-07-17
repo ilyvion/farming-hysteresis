@@ -1,5 +1,5 @@
-using FarmingHysteresis.Patch;
 using FarmingHysteresis.Extensions;
+using FarmingHysteresis.Patch;
 using VanillaPlantsExpandedMorePlants;
 
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Patch;
@@ -16,9 +16,11 @@ internal static class Zone_GrowingAquatic_GetGizmos
             __instance,
             ref __result,
             (i) => i.GetFarmingHysteresisData(),
-            (r) => r.Where(g =>
-                g is Command_Toggle t &&
-                (t.defaultLabel == "CommandAllowSow".Translate())).ToList()
+            (r) =>
+                r.Where(g =>
+                        g is Command_Toggle t && (t.defaultLabel == "CommandAllowSow".Translate())
+                    )
+                    .ToList()
         );
     }
 }
@@ -35,9 +37,11 @@ internal static class Zone_GrowingSandy_GetGizmos
             __instance,
             ref __result,
             (i) => i.GetFarmingHysteresisData(),
-            (r) => r.Where(g =>
-                g is Command_Toggle t &&
-                (t.defaultLabel == "CommandAllowSow".Translate())).ToList()
+            (r) =>
+                r.Where(g =>
+                        g is Command_Toggle t && (t.defaultLabel == "CommandAllowSow".Translate())
+                    )
+                    .ToList()
         );
     }
 }

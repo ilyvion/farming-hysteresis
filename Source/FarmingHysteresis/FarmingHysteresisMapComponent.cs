@@ -3,7 +3,10 @@ using FarmingHysteresis.Extensions;
 
 namespace FarmingHysteresis;
 
-internal class GlobalThingDefBoundValueAccessor(FarmingHysteresisMapComponent mapComponent, ThingDef thingDef) : IBoundedValueAccessor
+internal class GlobalThingDefBoundValueAccessor(
+    FarmingHysteresisMapComponent mapComponent,
+    ThingDef thingDef
+) : IBoundedValueAccessor
 {
     private readonly FarmingHysteresisMapComponent mapComponent = mapComponent;
     private readonly ThingDef thingDef = thingDef;
@@ -21,7 +24,7 @@ internal class GlobalThingDefBoundValueAccessor(FarmingHysteresisMapComponent ma
                 var boundValues = new BoundValues
                 {
                     Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
-                    Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
+                    Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound,
                 };
                 mapComponent.GlobalBoundValues.Add(thingDef, boundValues);
                 return boundValues;
@@ -45,7 +48,8 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
         }
     }
 
-    public FarmingHysteresisMapComponent(Map map) : base(map)
+    public FarmingHysteresisMapComponent(Map map)
+        : base(map)
     {
         if (map == null)
         {
@@ -99,9 +103,14 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
         base.MapComponentTick();
 
         // No need to make these checks every single tick; once every 6 in-game minutes (4.16 seconds real time) should be enough.
-        if (Find.TickManager.TicksGame % 250 != 0) return;
+        if (Find.TickManager.TicksGame % 250 != 0)
+            return;
 
-        foreach (var plantGrower in DefDatabase<FarmingHysteresisControlDef>.AllDefs.SelectMany(d => d.Worker.GetControlledPlantGrowers(map)))
+        foreach (
+            var plantGrower in DefDatabase<FarmingHysteresisControlDef>.AllDefs.SelectMany(d =>
+                d.Worker.GetControlledPlantGrowers(map)
+            )
+        )
         {
             var data = plantGrower.GetFarmingHysteresisData();
             if (data.Enabled)
@@ -115,7 +124,12 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
     {
         base.ExposeData();
         Scribe_Values.Look(ref id, "id", -1, true);
-        Scribe_Collections.Look(ref globalBoundValues, "globalBoundValues", LookMode.Def, LookMode.Deep);
+        Scribe_Collections.Look(
+            ref globalBoundValues,
+            "globalBoundValues",
+            LookMode.Def,
+            LookMode.Deep
+        );
 
 #if v1_3 || v1_4
         if (globalBoundValues == null || globalBoundValues.Count == 0)
@@ -130,12 +144,24 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
         {
             Dictionary<ThingDef, int> globalLowerBoundValues = [];
             Dictionary<ThingDef, int> globalUpperBoundValues = [];
-            Scribe_Collections.Look(ref globalLowerBoundValues, "globalLowerBoundValues", LookMode.Def, LookMode.Value);
-            Scribe_Collections.Look(ref globalUpperBoundValues, "globalUpperBoundValues", LookMode.Def, LookMode.Value);
+            Scribe_Collections.Look(
+                ref globalLowerBoundValues,
+                "globalLowerBoundValues",
+                LookMode.Def,
+                LookMode.Value
+            );
+            Scribe_Collections.Look(
+                ref globalUpperBoundValues,
+                "globalUpperBoundValues",
+                LookMode.Def,
+                LookMode.Value
+            );
 
             if (globalLowerBoundValues == null || globalUpperBoundValues == null)
             {
-                FarmingHysteresisMod.Instance.LogWarning("globalLowerBoundValues or globalUpperBoundValues was null; expected a value. No bounds transferred from old game.");
+                FarmingHysteresisMod.Instance.LogWarning(
+                    "globalLowerBoundValues or globalUpperBoundValues was null; expected a value. No bounds transferred from old game."
+                );
                 return;
             }
 
@@ -144,7 +170,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
                 var boundValues = new BoundValues
                 {
                     Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
-                    Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
+                    Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound,
                 };
                 {
                     if (globalLowerBoundValues.TryGetValue(thingDef, out var value))

@@ -5,12 +5,22 @@ namespace FarmingHysteresis.Extensions;
 
 internal static class PlantToGrowSettableExtensions
 {
-    private static readonly ConditionalWeakTable<IPlantToGrowSettable, FarmingHysteresisData> dataTable = new();
+    private static readonly ConditionalWeakTable<
+        IPlantToGrowSettable,
+        FarmingHysteresisData
+    > dataTable = new();
 
-    private static FarmingHysteresisControlDef GetControlDefForPlantGrower(IPlantToGrowSettable plantToGrowSettable, string method)
+    private static FarmingHysteresisControlDef GetControlDefForPlantGrower(
+        IPlantToGrowSettable plantToGrowSettable,
+        string method
+    )
     {
-        var controlDef = DefDatabase<FarmingHysteresisControlDef>.AllDefs.SingleOrDefault(d => d.controlledClass == plantToGrowSettable.GetType());
-        controlDef ??= DefDatabase<FarmingHysteresisControlDef>.AllDefs.SingleOrDefault(d => d.controlledClass.IsAssignableFrom(plantToGrowSettable.GetType()));
+        var controlDef = DefDatabase<FarmingHysteresisControlDef>.AllDefs.SingleOrDefault(d =>
+            d.controlledClass == plantToGrowSettable.GetType()
+        );
+        controlDef ??= DefDatabase<FarmingHysteresisControlDef>.AllDefs.SingleOrDefault(d =>
+            d.controlledClass.IsAssignableFrom(plantToGrowSettable.GetType())
+        );
         if (controlDef == null)
         {
             ThrowError(plantToGrowSettable, method);
@@ -27,13 +37,19 @@ internal static class PlantToGrowSettableExtensions
             int harvestedThingCount;
             if (FarmingHysteresisMod.Settings.CountAllOnMap)
             {
-                harvestedThingCount = plantToGrowSettable.Map.listerThings.ThingsOfDef(harvestedThingDef)
-                    .Where(t => !t.IsForbidden(Faction.OfPlayer) && !t.Position.Fogged(plantToGrowSettable.Map))
+                harvestedThingCount = plantToGrowSettable
+                    .Map.listerThings.ThingsOfDef(harvestedThingDef)
+                    .Where(t =>
+                        !t.IsForbidden(Faction.OfPlayer)
+                        && !t.Position.Fogged(plantToGrowSettable.Map)
+                    )
                     .Sum(t => t.stackCount);
             }
             else
             {
-                harvestedThingCount = plantToGrowSettable.Map.resourceCounter.GetCount(harvestedThingDef);
+                harvestedThingCount = plantToGrowSettable.Map.resourceCounter.GetCount(
+                    harvestedThingDef
+                );
             }
             return (harvestedThingDef, harvestedThingCount);
         }
@@ -43,7 +59,10 @@ internal static class PlantToGrowSettableExtensions
         }
     }
 
-    internal static void SetHysteresisControlState(this IPlantToGrowSettable plantGrower, bool state)
+    internal static void SetHysteresisControlState(
+        this IPlantToGrowSettable plantGrower,
+        bool state
+    )
     {
         var def = GetControlDefForPlantGrower(plantGrower, nameof(SetHysteresisControlState));
 
@@ -53,7 +72,9 @@ internal static class PlantToGrowSettableExtensions
 
     private static void ThrowError(IPlantToGrowSettable plantGrower, string method)
     {
-        throw new InvalidOperationException($"Called {nameof(PlantToGrowSettableExtensions)}.{method} with an IPlantToGrowSettable without a FarmingHysteresisControlDef. Type was {plantGrower.GetType().FullName}");
+        throw new InvalidOperationException(
+            $"Called {nameof(PlantToGrowSettableExtensions)}.{method} with an IPlantToGrowSettable without a FarmingHysteresisControlDef. Type was {plantGrower.GetType().FullName}"
+        );
     }
 
     internal static bool GetAllowSow(this IPlantToGrowSettable plantGrower)
@@ -68,7 +89,9 @@ internal static class PlantToGrowSettableExtensions
         return def.GetAllowHarvest(plantGrower);
     }
 
-    internal static FarmingHysteresisData GetFarmingHysteresisData(this IPlantToGrowSettable plantGrower)
+    internal static FarmingHysteresisData GetFarmingHysteresisData(
+        this IPlantToGrowSettable plantGrower
+    )
     {
         return dataTable.GetValue(plantGrower, (pg) => new FarmingHysteresisData(pg));
     }

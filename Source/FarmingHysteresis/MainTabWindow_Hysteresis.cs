@@ -26,10 +26,16 @@ public class MainTabWindow_Hysteresis : MainTabWindow
     {
         base.PreOpen();
         tabs.Clear();
-        tabs.Add(new TabRecord("FarmingHysteresis.GlobalHysteresisBounds".Translate(), delegate
-        {
-            currentTab = HysteresisTab.HysteresisValues;
-        }, () => currentTab == HysteresisTab.HysteresisValues));
+        tabs.Add(
+            new TabRecord(
+                "FarmingHysteresis.GlobalHysteresisBounds".Translate(),
+                delegate
+                {
+                    currentTab = HysteresisTab.HysteresisValues;
+                },
+                () => currentTab == HysteresisTab.HysteresisValues
+            )
+        );
         // tabs.Add(new TabRecord("SomethingElse".Translate(), delegate
         // {
         //     currentTab = HysteresisTab.SomethingElse;
@@ -39,7 +45,11 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         globalBoundLowerBuffers.Clear();
         globalBoundUpperBuffers.Clear();
         globalBounds.Clear();
-        foreach (ThingDef plantDef in DefDatabase<ThingDef>.AllDefs.Where((ThingDef def) => def.category == ThingCategory.Plant))
+        foreach (
+            ThingDef plantDef in DefDatabase<ThingDef>.AllDefs.Where(
+                (ThingDef def) => def.category == ThingCategory.Plant
+            )
+        )
         {
             var harvestedThingDef = plantDef.plant.harvestedThingDef;
             if (harvestedThingDef == null || globalBoundAccessors.ContainsKey(harvestedThingDef))
@@ -48,9 +58,14 @@ public class MainTabWindow_Hysteresis : MainTabWindow
             }
             globalBoundAccessors.Add(
                 harvestedThingDef,
-                FarmingHysteresisMapComponent.For(Find.CurrentMap).GetGlobalBoundedValueAccessorFor(harvestedThingDef)
+                FarmingHysteresisMapComponent
+                    .For(Find.CurrentMap)
+                    .GetGlobalBoundedValueAccessorFor(harvestedThingDef)
             );
-            globalBounds.Add(harvestedThingDef, globalBoundAccessors[harvestedThingDef].BoundValueRaw);
+            globalBounds.Add(
+                harvestedThingDef,
+                globalBoundAccessors[harvestedThingDef].BoundValueRaw
+            );
             globalBoundLowerBuffers.Add(harvestedThingDef, null);
             globalBoundUpperBuffers.Add(harvestedThingDef, null);
         }
@@ -66,22 +81,23 @@ public class MainTabWindow_Hysteresis : MainTabWindow
             case HysteresisTab.HysteresisValues:
                 DoHysteresisValuesPage(rect2);
                 break;
-                // case HysteresisTab.SomethingElse:
-                //     DoSomethingElsePage(rect2);
-                //     break;
+            // case HysteresisTab.SomethingElse:
+            //     DoSomethingElsePage(rect2);
+            //     break;
         }
     }
 
     private Vector2 messagesScrollPos;
     private float scrollViewHeight;
 
-
     private readonly QuickSearchWidget _quickSearch = new();
     private List<ThingDef>? _filteredHarvestedThingDefs;
 
     private void UpdateFilter()
     {
-        _filteredHarvestedThingDefs = globalBoundAccessors.Keys.Where(h => h.label.Contains(_quickSearch.filter.Text)).ToList();
+        _filteredHarvestedThingDefs = globalBoundAccessors
+            .Keys.Where(h => h.label.Contains(_quickSearch.filter.Text))
+            .ToList();
         _quickSearch.noResultsMatched = _filteredHarvestedThingDefs.Count == 0;
     }
 
@@ -95,7 +111,12 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         Rect quickSearchRect = new(tabRect.x + 3f, tabRect.y + 5f, tabRect.width - 16f - 6f, 24f);
         _quickSearch.OnGUI(quickSearchRect, () => UpdateFilter());
 
-        Rect listRect = new(tabRect.x, quickSearchRect.yMax + 5f, tabRect.width, tabRect.height - quickSearchRect.height - 5f);
+        Rect listRect = new(
+            tabRect.x,
+            quickSearchRect.yMax + 5f,
+            tabRect.width,
+            tabRect.height - quickSearchRect.height - 5f
+        );
 
         Rect viewRect = new(0f, 0f, tabRect.width - 16f, scrollViewHeight);
         Widgets.BeginScrollView(listRect, ref messagesScrollPos, viewRect);
@@ -141,7 +162,11 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         return PLANT_ROW_HEIGHT;
     }
 
-    private static void DrawHarvestIconWithLabelAndTooltip(Rect harvestIconRect, Rect harvestLabelRect, ThingDef harvestDef)
+    private static void DrawHarvestIconWithLabelAndTooltip(
+        Rect harvestIconRect,
+        Rect harvestLabelRect,
+        ThingDef harvestDef
+    )
     {
         GUI.DrawTexture(harvestIconRect, harvestDef.uiIcon);
 
@@ -153,16 +178,27 @@ public class MainTabWindow_Hysteresis : MainTabWindow
 
         if (Mouse.IsOver(harvestIconRect))
         {
-            TipSignal tip = new(harvestDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n\n" + harvestDef.description);
+            TipSignal tip = new(
+                harvestDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor)
+                    + "\n\n"
+                    + harvestDef.description
+            );
             TooltipHandler.TipRegion(harvestIconRect, tip);
         }
         if (Mouse.IsOver(harvestLabelRect))
         {
-            TipSignal tip = new(harvestDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n\n" + harvestDef.description);
+            TipSignal tip = new(
+                harvestDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor)
+                    + "\n\n"
+                    + harvestDef.description
+            );
             TooltipHandler.TipRegion(harvestLabelRect, tip);
         }
 
-        if (Widgets.ButtonInvisible(harvestIconRect, doMouseoverSound: false) || Widgets.ButtonInvisible(harvestLabelRect, doMouseoverSound: false))
+        if (
+            Widgets.ButtonInvisible(harvestIconRect, doMouseoverSound: false)
+            || Widgets.ButtonInvisible(harvestLabelRect, doMouseoverSound: false)
+        )
         {
             Find.WindowStack.Add(new Dialog_InfoCard(harvestDef));
         }
@@ -184,7 +220,12 @@ public class MainTabWindow_Hysteresis : MainTabWindow
 
     public Rect DrawUpperBoundWidget(Rect prevRect, float rowY, ThingDef harvestDef)
     {
-        var upperBoundRect = new Rect(prevRect.xMax + PLANT_ROW_GAP_WIDTH, rowY, 250f, PLANT_ROW_HEIGHT);
+        var upperBoundRect = new Rect(
+            prevRect.xMax + PLANT_ROW_GAP_WIDTH,
+            rowY,
+            250f,
+            PLANT_ROW_HEIGHT
+        );
         var listingStandard = new Listing_Standard();
         listingStandard.Begin(upperBoundRect);
         ref var value = ref globalBounds[harvestDef].Upper;

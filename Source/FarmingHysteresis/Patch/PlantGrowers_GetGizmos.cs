@@ -14,9 +14,11 @@ internal static class RimWorld_Zone_Growing_GetGizmos
             __instance,
             ref __result,
             (i) => i.GetFarmingHysteresisData(),
-            (r) => r.Where(g =>
-                g is Command_Toggle t &&
-                (t.defaultLabel == "CommandAllowSow".Translate())).ToList()
+            (r) =>
+                r.Where(g =>
+                        g is Command_Toggle t && (t.defaultLabel == "CommandAllowSow".Translate())
+                    )
+                    .ToList()
         );
     }
 }
@@ -44,7 +46,8 @@ internal class GetGizmosPatcher
         T plantToGrowSettable,
         ref IEnumerable<Gizmo> __result,
         Func<T, FarmingHysteresisData> getHysteresisData,
-        Func<List<Gizmo>, List<Gizmo>> findAllowGizmos)
+        Func<List<Gizmo>, List<Gizmo>> findAllowGizmos
+    )
         where T : IPlantToGrowSettable
     {
         var data = getHysteresisData(plantToGrowSettable);
@@ -53,7 +56,9 @@ internal class GetGizmosPatcher
         var harvestHysteresisCommand = new Command_Toggle
         {
             defaultLabel = "FarmingHysteresis.EnableFarmingHysteresis".Translate(),
-            defaultDesc = "FarmingHysteresis.EnableFarmingHysteresisisDesc".Translate(FarmingHysteresisMod.Settings.HysteresisMode.AsString()),
+            defaultDesc = "FarmingHysteresis.EnableFarmingHysteresisisDesc".Translate(
+                FarmingHysteresisMod.Settings.HysteresisMode.AsString()
+            ),
             icon = Resources.Hysteresis,
             isActive = () => data.Enabled,
             toggleAction = () =>
@@ -66,7 +71,7 @@ internal class GetGizmosPatcher
                 {
                     data.Enable(plantToGrowSettable);
                 }
-            }
+            },
         };
 
         var result = new List<Gizmo>(__result);
@@ -79,7 +84,10 @@ internal class GetGizmosPatcher
         {
             if (harvestedThingDef == null)
             {
-                data.DisableDueToMissingHarvestedThingDef(plantToGrowSettable, plantToGrowSettable.GetPlantDefToGrow());
+                data.DisableDueToMissingHarvestedThingDef(
+                    plantToGrowSettable,
+                    plantToGrowSettable.GetPlantDefToGrow()
+                );
                 return;
             }
 
@@ -102,7 +110,12 @@ internal class GetGizmosPatcher
                     isActive = () => data.useGlobalValues,
                     toggleAction = () =>
                     {
-                        if (data.useGlobalValues || FarmingHysteresisMapComponent.For(Find.CurrentMap).HasBoundsFor(harvestedThingDef))
+                        if (
+                            data.useGlobalValues
+                            || FarmingHysteresisMapComponent
+                                .For(Find.CurrentMap)
+                                .HasBoundsFor(harvestedThingDef)
+                        )
                         {
                             // We were already using global values OR such global values already exist for this harvest type.
                             // So just flip the flag.
@@ -120,59 +133,67 @@ internal class GetGizmosPatcher
                             data.LowerBound = currentLowerBound;
                             data.UpperBound = currentUpperBound;
                         }
-                    }
+                    },
                 };
                 result.Add(useGlobalValuesCommand);
 
                 var decrementLowerHysteresisCommand = new Command_Decrement
                 {
-                    defaultLabel = "FarmingHysteresis.DecrementLowerHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+                    defaultLabel = "FarmingHysteresis.DecrementLowerHysteresis".Translate(
+                        GenUI.CurrentAdjustmentMultiplier()
+                    ),
                     defaultDesc = "FarmingHysteresis.DecrementLowerHysteresisDesc".Translate(
                         GenUI.CurrentAdjustmentMultiplier(),
                         KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
                         KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
                     ),
                     icon = uiIcon,
-                    action = () => data.LowerBound -= GenUI.CurrentAdjustmentMultiplier()
+                    action = () => data.LowerBound -= GenUI.CurrentAdjustmentMultiplier(),
                 };
                 result.Add(decrementLowerHysteresisCommand);
 
                 var incrementLowerHysteresisCommand = new Command_Increment
                 {
-                    defaultLabel = "FarmingHysteresis.IncrementLowerHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+                    defaultLabel = "FarmingHysteresis.IncrementLowerHysteresis".Translate(
+                        GenUI.CurrentAdjustmentMultiplier()
+                    ),
                     defaultDesc = "FarmingHysteresis.IncrementLowerHysteresisDesc".Translate(
                         GenUI.CurrentAdjustmentMultiplier(),
                         KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
                         KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
                     ),
                     icon = uiIcon,
-                    action = () => data.LowerBound += GenUI.CurrentAdjustmentMultiplier()
+                    action = () => data.LowerBound += GenUI.CurrentAdjustmentMultiplier(),
                 };
                 result.Add(incrementLowerHysteresisCommand);
 
                 var decrementUpperHysteresisCommand = new Command_Decrement
                 {
-                    defaultLabel = "FarmingHysteresis.DecrementUpperHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+                    defaultLabel = "FarmingHysteresis.DecrementUpperHysteresis".Translate(
+                        GenUI.CurrentAdjustmentMultiplier()
+                    ),
                     defaultDesc = "FarmingHysteresis.DecrementUpperHysteresisDesc".Translate(
                         GenUI.CurrentAdjustmentMultiplier(),
                         KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
                         KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
                     ),
                     icon = uiIcon,
-                    action = () => data.UpperBound -= GenUI.CurrentAdjustmentMultiplier()
+                    action = () => data.UpperBound -= GenUI.CurrentAdjustmentMultiplier(),
                 };
                 result.Add(decrementUpperHysteresisCommand);
 
                 var incrementUpperHysteresisCommand = new Command_Increment
                 {
-                    defaultLabel = "FarmingHysteresis.IncrementUpperHysteresis".Translate(GenUI.CurrentAdjustmentMultiplier()),
+                    defaultLabel = "FarmingHysteresis.IncrementUpperHysteresis".Translate(
+                        GenUI.CurrentAdjustmentMultiplier()
+                    ),
                     defaultDesc = "FarmingHysteresis.IncrementUpperHysteresisDesc".Translate(
                         GenUI.CurrentAdjustmentMultiplier(),
                         KeyBindingDefOf.ModifierIncrement_10x.MainKeyLabel,
                         KeyBindingDefOf.ModifierIncrement_100x.MainKeyLabel
                     ),
                     icon = uiIcon,
-                    action = () => data.UpperBound += GenUI.CurrentAdjustmentMultiplier()
+                    action = () => data.UpperBound += GenUI.CurrentAdjustmentMultiplier(),
                 };
                 result.Add(incrementUpperHysteresisCommand);
             }

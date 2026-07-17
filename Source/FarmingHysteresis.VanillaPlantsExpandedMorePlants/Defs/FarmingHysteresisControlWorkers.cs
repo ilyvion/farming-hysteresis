@@ -6,8 +6,10 @@ namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Defs;
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "Microsoft.Performance",
     "CA1812:AvoidUninstantiatedInternalClasses",
-    Justification = "Class is instantiated via reflection")]
-internal sealed class FarmingHysteresisControlWorker_Zone_GrowingAquatic : FarmingHysteresisControlWorker
+    Justification = "Class is instantiated via reflection"
+)]
+internal sealed class FarmingHysteresisControlWorker_Zone_GrowingAquatic
+    : FarmingHysteresisControlWorker
 {
     public override IEnumerable<IPlantToGrowSettable> GetControlledPlantGrowers(Map map) =>
         map.zoneManager.AllZones.OfType<Zone_GrowingAquatic>();
@@ -28,8 +30,10 @@ internal sealed class FarmingHysteresisControlWorker_Zone_GrowingAquatic : Farmi
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
     "Microsoft.Performance",
     "CA1812:AvoidUninstantiatedInternalClasses",
-    Justification = "Class is instantiated via reflection")]
-internal sealed class FarmingHysteresisControlWorker_Zone_GrowingSandy : FarmingHysteresisControlWorker
+    Justification = "Class is instantiated via reflection"
+)]
+internal sealed class FarmingHysteresisControlWorker_Zone_GrowingSandy
+    : FarmingHysteresisControlWorker
 {
     public override IEnumerable<IPlantToGrowSettable> GetControlledPlantGrowers(Map map) =>
         map.zoneManager.AllZones.OfType<Zone_GrowingSandy>();

@@ -9,8 +9,16 @@ internal class BoundValues : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref Upper, "upper", FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound);
-        Scribe_Values.Look(ref Lower, "lower", FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound);
+        Scribe_Values.Look(
+            ref Upper,
+            "upper",
+            FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound
+        );
+        Scribe_Values.Look(
+            ref Lower,
+            "lower",
+            FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
+        );
     }
 }
 
@@ -31,7 +39,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         _bounds = new BoundValues
         {
             Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
-            Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
+            Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound,
         };
         useGlobalValues = FarmingHysteresisMod.Settings.UseGlobalValuesByDefault;
         latchMode = LatchMode.Unknown;
@@ -39,15 +47,17 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 
     internal void ExposeData()
     {
-        Scribe_Values.Look(ref _enabled, "farmingHysteresisEnabled", FarmingHysteresisMod.Settings.EnabledByDefault, true);
-        Scribe_Deep.Look(
-            ref _bounds,
-            "farmingHysteresisBounds"
+        Scribe_Values.Look(
+            ref _enabled,
+            "farmingHysteresisEnabled",
+            FarmingHysteresisMod.Settings.EnabledByDefault,
+            true
         );
+        Scribe_Deep.Look(ref _bounds, "farmingHysteresisBounds");
         _bounds ??= new BoundValues
         {
             Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
-            Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
+            Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound,
         };
 
 #if v1_3 || v1_4
@@ -77,7 +87,12 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 #pragma warning restore 612
         }
 #endif
-        Scribe_Values.Look(ref useGlobalValues, "farmingHysteresisUseGlobalValues", FarmingHysteresisMod.Settings.UseGlobalValuesByDefault, true);
+        Scribe_Values.Look(
+            ref useGlobalValues,
+            "farmingHysteresisUseGlobalValues",
+            FarmingHysteresisMod.Settings.UseGlobalValuesByDefault,
+            true
+        );
 
 #if v1_3 || v1_4
         void TransferOldBounds()
@@ -116,7 +131,9 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
                 {
                     throw new Exception("This should not happen. Code: FHD-GBVA-PI");
                 }
-                values = FarmingHysteresisMapComponent.For(Find.CurrentMap).GetGlobalBoundedValueAccessorFor(harvestedThingDef);
+                values = FarmingHysteresisMapComponent
+                    .For(Find.CurrentMap)
+                    .GetGlobalBoundedValueAccessorFor(harvestedThingDef);
             }
             else
             {
@@ -186,7 +203,10 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         var (harvestedThingDef, harvestedThingCount) = plantToGrowSettable.PlantHarvestInfo();
         if (harvestedThingDef == null)
         {
-            DisableDueToMissingHarvestedThingDef(plantToGrowSettable, plantToGrowSettable.GetPlantDefToGrow());
+            DisableDueToMissingHarvestedThingDef(
+                plantToGrowSettable,
+                plantToGrowSettable.GetPlantDefToGrow()
+            );
             return;
         }
 
@@ -244,11 +264,16 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
                 break;
 
             default:
-                throw new Exception($"We should never be in this state. This is a bug! State was {latchMode}.");
+                throw new Exception(
+                    $"We should never be in this state. This is a bug! State was {latchMode}."
+                );
         }
     }
 
-    internal void DisableDueToMissingHarvestedThingDef(IPlantToGrowSettable plantToGrowSettable, ThingDef? plantDef)
+    internal void DisableDueToMissingHarvestedThingDef(
+        IPlantToGrowSettable plantToGrowSettable,
+        ThingDef? plantDef
+    )
     {
         _enabled = false;
 
@@ -267,7 +292,8 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             {
                 suppressWarning = true;
             }
-            settableName = $"Building named '{building.Label}' @ {building.InteractionCell.ToIntVec2}";
+            settableName =
+                $"Building named '{building.Label}' @ {building.InteractionCell.ToIntVec2}";
         }
         else if (plantToGrowSettable is ILoadReferenceable loadReferenceable)
         {
@@ -283,11 +309,15 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             if (plantDef == null)
             {
                 // This should normally never happen, but some mods may make plantDef null.
-                FarmingHysteresisMod.Instance.LogWarning($"{settableName} has no plant set. Disabling farming hysteresis.");
+                FarmingHysteresisMod.Instance.LogWarning(
+                    $"{settableName} has no plant set. Disabling farming hysteresis."
+                );
             }
             else
             {
-                FarmingHysteresisMod.Instance.LogWarning($"{settableName} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis.");
+                FarmingHysteresisMod.Instance.LogWarning(
+                    $"{settableName} has a plant type without a harvestable product ({plantDef.label}). Disabling farming hysteresis."
+                );
             }
         }
     }

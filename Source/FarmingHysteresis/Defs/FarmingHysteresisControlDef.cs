@@ -14,7 +14,10 @@ public class FarmingHysteresisControlDef : Def
         public bool allowHarvest = true;
     }
 
-    private static readonly ConditionalWeakTable<IPlantToGrowSettable, PlantToGrowSettableCustomFields> plantGrowerControlFields = new();
+    private static readonly ConditionalWeakTable<
+        IPlantToGrowSettable,
+        PlantToGrowSettableCustomFields
+    > plantGrowerControlFields = new();
 
     public Type workerClass = typeof(FarmingHysteresisControlWorker);
     public Type controlledClass = typeof(IPlantToGrowSettable);
@@ -35,9 +38,7 @@ public class FarmingHysteresisControlDef : Def
         }
     }
 
-    private void ValidatePlantGrowerType(
-        [NotNull] IPlantToGrowSettable? plantGrower,
-        string method)
+    private void ValidatePlantGrowerType([NotNull] IPlantToGrowSettable? plantGrower, string method)
     {
         if (plantGrower == null)
         {
@@ -45,7 +46,9 @@ public class FarmingHysteresisControlDef : Def
         }
         if (!controlledClass.IsAssignableFrom(plantGrower.GetType()))
         {
-            throw new InvalidOperationException($"Called {nameof(FarmingHysteresisControlDef)}.{method} with an IPlantToGrowSettable of the wrong type. Expected {controlledClass.FullName}, got {plantGrower.GetType().FullName}");
+            throw new InvalidOperationException(
+                $"Called {nameof(FarmingHysteresisControlDef)}.{method} with an IPlantToGrowSettable of the wrong type. Expected {controlledClass.FullName}, got {plantGrower.GetType().FullName}"
+            );
         }
     }
 
@@ -168,15 +171,17 @@ public abstract class FarmingHysteresisControlWorker
 public class FarmingHysteresisControlWorker_Building_PlantGrower : FarmingHysteresisControlWorker
 {
     public override IEnumerable<IPlantToGrowSettable> GetControlledPlantGrowers(Map map) =>
-        (map ?? throw new ArgumentNullException(nameof(map))).listerBuildings
-            .AllBuildingsColonistOfClass<Building_PlantGrower>();
+        (
+            map ?? throw new ArgumentNullException(nameof(map))
+        ).listerBuildings.AllBuildingsColonistOfClass<Building_PlantGrower>();
 }
 
 public class FarmingHysteresisControlWorker_Zone_Growing : FarmingHysteresisControlWorker
 {
     public override IEnumerable<IPlantToGrowSettable> GetControlledPlantGrowers(Map map) =>
-        (map ?? throw new ArgumentNullException(nameof(map))).zoneManager.AllZones
-            .OfType<Zone_Growing>();
+        (
+            map ?? throw new ArgumentNullException(nameof(map))
+        ).zoneManager.AllZones.OfType<Zone_Growing>();
 
     public override bool HandleAllowSow => true;
 

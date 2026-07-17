@@ -9,6 +9,8 @@ public class VanillaPlantsExpandedMorePlantsMod : Mod
     {
         new Harmony(Constants.Id).PatchAll(Assembly.GetExecutingAssembly());
 
-        FarmingHysteresisMod.Instance.LogMessage("\"Vanilla Plants Expanded - More Plants\" interop loaded successfully!");
+        FarmingHysteresisMod.Instance.LogMessage(
+            "\"Vanilla Plants Expanded - More Plants\" interop loaded successfully!"
+        );
     }
 }

@@ -3,7 +3,10 @@ using VanillaPlantsExpandedMorePlants;
 
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Patch;
 
-[HarmonyPatch(typeof(WorkGiver_GrowerHarvestAquatic), nameof(WorkGiver_GrowerHarvestAquatic.HasJobOnCell))]
+[HarmonyPatch(
+    typeof(WorkGiver_GrowerHarvestAquatic),
+    nameof(WorkGiver_GrowerHarvestAquatic.HasJobOnCell)
+)]
 internal static class WorkGiver_GrowerHarvestAquatic_HasJobOnCell
 {
     private static void Postfix(ref Pawn pawn, ref IntVec3 c, ref bool __result)
@@ -21,7 +24,10 @@ internal static class WorkGiver_GrowerHarvestAquatic_HasJobOnCell
     }
 }
 
-[HarmonyPatch(typeof(WorkGiver_GrowerHarvestSandy), nameof(WorkGiver_GrowerHarvestSandy.HasJobOnCell))]
+[HarmonyPatch(
+    typeof(WorkGiver_GrowerHarvestSandy),
+    nameof(WorkGiver_GrowerHarvestSandy.HasJobOnCell)
+)]
 internal static class WorkGiver_GrowerHarvestSandy_HasJobOnCell
 {
     private static void Postfix(ref Pawn pawn, ref IntVec3 c, ref bool __result)

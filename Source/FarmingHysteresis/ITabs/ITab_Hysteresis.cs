@@ -66,10 +66,7 @@ class ITab_Hysteresis : ITab
 
         Rect rect = new Rect(0f, 0f, size.x, size.y).ContractedBy(10f);
 
-        Listing_Standard listingStandard = new()
-        {
-            maxOneColumn = true
-        };
+        Listing_Standard listingStandard = new() { maxOneColumn = true };
 
         listingStandard.Begin(rect);
 
@@ -80,7 +77,10 @@ class ITab_Hysteresis : ITab
         listingStandard.GapLine(ProductRowPadding);
         listingStandard.Gap(5f);
 
-        listingStandard.CheckboxLabeled("FarmingHysteresis.UseGlobalBoundsLabel".Translate(), ref _useGlobalValues);
+        listingStandard.CheckboxLabeled(
+            "FarmingHysteresis.UseGlobalBoundsLabel".Translate(),
+            ref _useGlobalValues
+        );
         if (data.useGlobalValues != _useGlobalValues)
         {
             data.useGlobalValues = _useGlobalValues;
@@ -94,7 +94,14 @@ class ITab_Hysteresis : ITab
 
         listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
         listingStandard.IntEntry(ref _lowerBound, ref _lowerBoundBuffer);
-        listingStandard.Label("FarmingHysteresis.LowerBound".Translate(plant.label, data.LowerBound, harvestedThingDef.label, HysteresisModeString));
+        listingStandard.Label(
+            "FarmingHysteresis.LowerBound".Translate(
+                plant.label,
+                data.LowerBound,
+                harvestedThingDef.label,
+                HysteresisModeString
+            )
+        );
 
         if (_lowerBound != data.LowerBound)
         {
@@ -103,7 +110,14 @@ class ITab_Hysteresis : ITab
 
         listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
         listingStandard.IntEntry(ref _upperBound, ref _upperBoundBuffer);
-        listingStandard.Label("FarmingHysteresis.UpperBound".Translate(plant.label, data.UpperBound, harvestedThingDef.label, HysteresisModeString));
+        listingStandard.Label(
+            "FarmingHysteresis.UpperBound".Translate(
+                plant.label,
+                data.UpperBound,
+                harvestedThingDef.label,
+                HysteresisModeString
+            )
+        );
 
         if (_upperBound != data.UpperBound)
         {
@@ -112,8 +126,16 @@ class ITab_Hysteresis : ITab
 
         listingStandard.GapLine();
 
-        listingStandard.Label("FarmingHysteresis.InStorage".Translate(harvestedThingDef.label, harvestedThingCount));
-        listingStandard.Label("FarmingHysteresis.LatchModeDesc".Translate(("FarmingHysteresis.LatchModeDesc." + data.latchMode.ToString()).Translate(FarmingHysteresisMod.Settings.HysteresisMode.AsString())));
+        listingStandard.Label(
+            "FarmingHysteresis.InStorage".Translate(harvestedThingDef.label, harvestedThingCount)
+        );
+        listingStandard.Label(
+            "FarmingHysteresis.LatchModeDesc".Translate(
+                ("FarmingHysteresis.LatchModeDesc." + data.latchMode.ToString()).Translate(
+                    FarmingHysteresisMod.Settings.HysteresisMode.AsString()
+                )
+            )
+        );
 
         listingStandard.End();
 
@@ -121,8 +143,18 @@ class ITab_Hysteresis : ITab
 
         void DrawProductRow(ThingDef harvestedThingDef, float rowY)
         {
-            Rect rowRect = new(0f, rowY, size.x - 4 * ProductRowPadding, ProductIconSize + 2 * ProductRowPadding);
-            Rect harvestLabelRect = new(ProductIconSize + 2 * ProductRowPadding, rowY, rowRect.width - ProductIconSize + 2 * ProductRowPadding, rowRect.height);
+            Rect rowRect = new(
+                0f,
+                rowY,
+                size.x - 4 * ProductRowPadding,
+                ProductIconSize + 2 * ProductRowPadding
+            );
+            Rect harvestLabelRect = new(
+                ProductIconSize + 2 * ProductRowPadding,
+                rowY,
+                rowRect.width - ProductIconSize + 2 * ProductRowPadding,
+                rowRect.height
+            );
             Rect harvestIconRect = new(5f, rowY + 5f, ProductIconSize, ProductIconSize);
 
             GUI.color = new Color(1f, 1f, 1f, 0.5f);
@@ -139,7 +171,11 @@ class ITab_Hysteresis : ITab
 
             if (Mouse.IsOver(rowRect))
             {
-                TipSignal tip = new(harvestedThingDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor) + "\n\n" + harvestedThingDef.description);
+                TipSignal tip = new(
+                    harvestedThingDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor)
+                        + "\n\n"
+                        + harvestedThingDef.description
+                );
                 TooltipHandler.TipRegion(rowRect, tip);
             }
 
@@ -152,10 +188,7 @@ class ITab_Hysteresis : ITab
 
     public override bool IsVisible
     {
-        get
-        {
-            return !Hidden;
-        }
+        get { return !Hidden; }
     }
 
 #if v1_3

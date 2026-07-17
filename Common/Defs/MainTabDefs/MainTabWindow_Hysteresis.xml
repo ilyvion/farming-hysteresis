@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Defs>
-
     <MainButtonDef>
         <defName>FarmingHysteresis_MainTabWindow_Hysteresis</defName>
         <label>hysteresis.label</label>
@@ -9,5 +8,4 @@
         <order>20</order>
         <workerClass>FarmingHysteresis.MainButtonWorker_Hysteresis</workerClass>
     </MainButtonDef>
-
 </Defs>
