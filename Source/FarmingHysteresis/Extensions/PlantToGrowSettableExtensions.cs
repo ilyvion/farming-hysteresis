@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using FarmingHysteresis.Defs;
 
 namespace FarmingHysteresis.Extensions;
@@ -8,7 +7,9 @@ internal static class PlantToGrowSettableExtensions
     private static readonly ConditionalWeakTable<
         IPlantToGrowSettable,
         FarmingHysteresisData
+#pragma warning disable IDE0028 // Simplify collection initialization
     > dataTable = new();
+#pragma warning restore IDE0028 // Simplify collection initialization
 
     private static FarmingHysteresisControlDef GetControlDefForPlantGrower(
         IPlantToGrowSettable plantToGrowSettable,
@@ -34,23 +35,15 @@ internal static class PlantToGrowSettableExtensions
         var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow()?.plant.harvestedThingDef;
         if (harvestedThingDef != null)
         {
-            int harvestedThingCount;
-            if (FarmingHysteresisMod.Settings.CountAllOnMap)
-            {
-                harvestedThingCount = plantToGrowSettable
+            var harvestedThingCount = FarmingHysteresisMod.Settings.CountAllOnMap
+                ? plantToGrowSettable
                     .Map.listerThings.ThingsOfDef(harvestedThingDef)
                     .Where(t =>
                         !t.IsForbidden(Faction.OfPlayer)
                         && !t.Position.Fogged(plantToGrowSettable.Map)
                     )
-                    .Sum(t => t.stackCount);
-            }
-            else
-            {
-                harvestedThingCount = plantToGrowSettable.Map.resourceCounter.GetCount(
-                    harvestedThingDef
-                );
-            }
+                    .Sum(t => t.stackCount)
+                : plantToGrowSettable.Map.resourceCounter.GetCount(harvestedThingDef);
             return (harvestedThingDef, harvestedThingCount);
         }
         else
@@ -70,12 +63,10 @@ internal static class PlantToGrowSettableExtensions
         def.SetAllowHarvest(plantGrower, !FarmingHysteresisMod.Settings.ControlHarvesting || state);
     }
 
-    private static void ThrowError(IPlantToGrowSettable plantGrower, string method)
-    {
+    private static void ThrowError(IPlantToGrowSettable plantGrower, string method) =>
         throw new InvalidOperationException(
             $"Called {nameof(PlantToGrowSettableExtensions)}.{method} with an IPlantToGrowSettable without a FarmingHysteresisControlDef. Type was {plantGrower.GetType().FullName}"
         );
-    }
 
     internal static bool GetAllowSow(this IPlantToGrowSettable plantGrower)
     {
@@ -91,8 +82,5 @@ internal static class PlantToGrowSettableExtensions
 
     internal static FarmingHysteresisData GetFarmingHysteresisData(
         this IPlantToGrowSettable plantGrower
-    )
-    {
-        return dataTable.GetValue(plantGrower, (pg) => new FarmingHysteresisData(pg));
-    }
+    ) => dataTable.GetValue(plantGrower, (pg) => new FarmingHysteresisData(pg));
 }

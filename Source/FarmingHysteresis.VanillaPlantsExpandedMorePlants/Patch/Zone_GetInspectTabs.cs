@@ -16,19 +16,12 @@ internal static class Zone_GetInspectTabs
         Zone __instance
     )
     {
-        if (__instance is not Zone_GrowingAquatic && __instance is not Zone_GrowingSandy)
+        if (__instance is not Zone_GrowingAquatic and not Zone_GrowingSandy)
         {
             return values;
         }
 
-        if (values == null)
-        {
-            values = ITabs;
-        }
-        else
-        {
-            values = values.Concat(ITabs);
-        }
+        values = values == null ? ITabs : values.Concat(ITabs);
 
         return values;
     }

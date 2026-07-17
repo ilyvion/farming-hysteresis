@@ -1,6 +1,3 @@
-using System.Reflection;
-using System.Runtime.CompilerServices;
-
 [assembly: InternalsVisibleTo("FarmingHysteresis.VanillaPlantsExpandedMorePlants")]
 
 namespace FarmingHysteresis;
@@ -8,12 +5,7 @@ namespace FarmingHysteresis;
 public class FarmingHysteresisMod : IlyvionMod
 {
 #pragma warning disable CS8618 // Set by constructor
-    private static FarmingHysteresisMod _instance;
-    public static FarmingHysteresisMod Instance
-    {
-        get => _instance;
-        private set => _instance = value;
-    }
+    public static FarmingHysteresisMod Instance { get; private set; }
 #pragma warning restore CS8618
 
     public FarmingHysteresisMod(ModContentPack content)
@@ -46,13 +38,8 @@ public class FarmingHysteresisMod : IlyvionMod
     protected override bool HasSettings => true;
     public static Settings Settings => Instance.GetSettings<Settings>();
 
-    public override void DoSettingsWindowContents(Rect inRect)
-    {
+    public override void DoSettingsWindowContents(Rect inRect) =>
         Settings.DoSettingsWindowContents(inRect);
-    }
 
-    public override string SettingsCategory()
-    {
-        return Content.Name;
-    }
+    public override string SettingsCategory() => Content.Name;
 }

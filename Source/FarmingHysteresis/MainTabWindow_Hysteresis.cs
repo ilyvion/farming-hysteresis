@@ -46,8 +46,8 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         globalBoundUpperBuffers.Clear();
         globalBounds.Clear();
         foreach (
-            ThingDef plantDef in DefDatabase<ThingDef>.AllDefs.Where(
-                (ThingDef def) => def.category == ThingCategory.Plant
+            var plantDef in DefDatabase<ThingDef>.AllDefs.Where(def =>
+                def.category == ThingCategory.Plant
             )
         )
         {
@@ -73,17 +73,19 @@ public class MainTabWindow_Hysteresis : MainTabWindow
 
     public override void DoWindowContents(Rect inRect)
     {
-        Rect rect2 = inRect;
+        var rect2 = inRect;
         rect2.yMin += 45f;
-        TabDrawer.DrawTabs(rect2, tabs);
+        _ = TabDrawer.DrawTabs(rect2, tabs);
         switch (currentTab)
         {
             case HysteresisTab.HysteresisValues:
                 DoHysteresisValuesPage(rect2);
                 break;
-            // case HysteresisTab.SomethingElse:
-            //     DoSomethingElsePage(rect2);
-            //     break;
+            case HysteresisTab.SomethingElse:
+                //DoSomethingElsePage(rect2);
+                break;
+            default:
+                break;
         }
     }
 
@@ -95,9 +97,16 @@ public class MainTabWindow_Hysteresis : MainTabWindow
 
     private void UpdateFilter()
     {
-        _filteredHarvestedThingDefs = globalBoundAccessors
-            .Keys.Where(h => h.label.Contains(_quickSearch.filter.Text))
-            .ToList();
+        _filteredHarvestedThingDefs =
+        [
+            .. globalBoundAccessors.Keys.Where(h =>
+#if v1_3 || v1_4 || v1_5
+                h.label.Contains(_quickSearch.filter.Text)
+#else
+                h.label.Contains(_quickSearch.filter.Text, StringComparison.OrdinalIgnoreCase)
+#endif
+            ),
+        ];
         _quickSearch.noResultsMatched = _filteredHarvestedThingDefs.Count == 0;
     }
 
@@ -109,7 +118,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         }
 
         Rect quickSearchRect = new(tabRect.x + 3f, tabRect.y + 5f, tabRect.width - 16f - 6f, 24f);
-        _quickSearch.OnGUI(quickSearchRect, () => UpdateFilter());
+        _quickSearch.OnGUI(quickSearchRect, UpdateFilter);
 
         Rect listRect = new(
             tabRect.x,
@@ -121,8 +130,8 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         Rect viewRect = new(0f, 0f, tabRect.width - 16f, scrollViewHeight);
         Widgets.BeginScrollView(listRect, ref messagesScrollPos, viewRect);
 
-        float num = 0f;
-        foreach (ThingDef harvestedThingDef in _filteredHarvestedThingDefs!)
+        var num = 0f;
+        foreach (var harvestedThingDef in _filteredHarvestedThingDefs!)
         {
             var value = globalBounds[harvestedThingDef].Lower;
             var buffer = globalBoundLowerBuffers[harvestedThingDef];
@@ -141,8 +150,8 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         Widgets.EndScrollView();
     }
 
-    const float PLANT_ROW_HEIGHT = 52f;
-    const float PLANT_ROW_GAP_WIDTH = 32f;
+    private const float PLANT_ROW_HEIGHT = 52f;
+    private const float PLANT_ROW_GAP_WIDTH = 32f;
 
     private float DrawPlantRow(ThingDef harvest, float rowY, Rect fillRect)
     {
@@ -211,7 +220,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         listingStandard.Begin(lowerBoundRect);
         ref var value = ref globalBounds[harvestDef].Lower;
         var buffer = globalBoundLowerBuffers[harvestDef];
-        listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
+        _ = listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
         listingStandard.End();
 
@@ -230,7 +239,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         listingStandard.Begin(upperBoundRect);
         ref var value = ref globalBounds[harvestDef].Upper;
         var buffer = globalBoundUpperBuffers[harvestDef];
-        listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
+        _ = listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
         listingStandard.End();
 

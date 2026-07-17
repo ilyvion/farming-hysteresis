@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants;
 
 public class VanillaPlantsExpandedMorePlantsMod : Mod

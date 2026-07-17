@@ -16,15 +16,11 @@ internal sealed class FarmingHysteresisControlWorker_Zone_GrowingAquatic
 
     public override bool HandleAllowSow => true;
 
-    public override bool GetAllowSow(IPlantToGrowSettable plantGrower)
-    {
-        return ((Zone_GrowingAquatic)plantGrower).allowSow;
-    }
+    public override bool GetAllowSow(IPlantToGrowSettable plantGrower) =>
+        ((Zone_GrowingAquatic)plantGrower).allowSow;
 
-    public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
-    {
+    public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value) =>
         ((Zone_GrowingAquatic)plantGrower).allowSow = value;
-    }
 }
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
@@ -40,13 +36,9 @@ internal sealed class FarmingHysteresisControlWorker_Zone_GrowingSandy
 
     public override bool HandleAllowSow => true;
 
-    public override bool GetAllowSow(IPlantToGrowSettable plantGrower)
-    {
-        return ((Zone_GrowingSandy)plantGrower).allowSow;
-    }
+    public override bool GetAllowSow(IPlantToGrowSettable plantGrower) =>
+        ((Zone_GrowingSandy)plantGrower).allowSow;
 
-    public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
-    {
+    public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value) =>
         ((Zone_GrowingSandy)plantGrower).allowSow = value;
-    }
 }

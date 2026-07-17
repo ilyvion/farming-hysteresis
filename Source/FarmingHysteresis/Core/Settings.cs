@@ -57,11 +57,9 @@ public class Settings : ModSettings
     }
 
     public bool ControlSowing =>
-        _hysteresisMode == HysteresisMode.Sowing
-        || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
+        _hysteresisMode is HysteresisMode.Sowing or HysteresisMode.SowingAndHarvesting;
     public bool ControlHarvesting =>
-        _hysteresisMode == HysteresisMode.Harvesting
-        || _hysteresisMode == HysteresisMode.SowingAndHarvesting;
+        _hysteresisMode is HysteresisMode.Harvesting or HysteresisMode.SowingAndHarvesting;
     public bool ShowIlyvionLaboratoryWarning
     {
         get => _showIlyvionLaboratoryWarning;
@@ -124,7 +122,7 @@ public class Settings : ModSettings
         );
 
         // Render expensive icon inline in CountAllOnMap checkbox row
-        Rect iconRect = new Rect(inRect.xMax - 16f - 32f, 0f, 16f, 16f).CenteredOnYIn(textRect);
+        var iconRect = new Rect(inRect.xMax - 16f - 32f, 0f, 16f, 16f).CenteredOnYIn(textRect);
         TooltipHandler.TipRegion(iconRect, "FarmingHysteresis.Expensive.Tooltip".Translate());
         GUI.color = _countAllOnMap ? Resources.Orange : Color.grey;
         GUI.DrawTexture(iconRect, Resources.Stopwatch);
@@ -207,15 +205,13 @@ public enum HysteresisMode
 
 public static class HysteresisModeExtensions
 {
-    public static string AsString(this HysteresisMode mode)
-    {
-        return mode switch
+    public static string AsString(this HysteresisMode mode) =>
+        mode switch
         {
             HysteresisMode.Sowing => "FarmingHysteresis.Sowing".Translate(),
             HysteresisMode.Harvesting => "FarmingHysteresis.Harvesting".Translate(),
             HysteresisMode.SowingAndHarvesting =>
                 "FarmingHysteresis.SowingAndHarvesting".Translate(),
-            _ => throw new Exception($"Uncovered HysteresisMode: {mode}"),
+            _ => throw new InvalidOperationException($"Uncovered HysteresisMode: {mode}"),
         };
-    }
 }

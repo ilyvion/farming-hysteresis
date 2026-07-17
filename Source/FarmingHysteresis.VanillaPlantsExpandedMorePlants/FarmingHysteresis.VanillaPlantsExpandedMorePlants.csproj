@@ -2,6 +2,8 @@
     <PropertyGroup>
         <RootNamespace>FarmingHysteresis.VanillaPlantsExpandedMorePlants</RootNamespace>
         <AssemblyName>FarmingHysteresis.VanillaPlantsExpandedMorePlants</AssemblyName>
+
+        <NoWarn>CS1591</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup>

@@ -8,19 +8,18 @@ namespace FarmingHysteresis.Patch;
 [HarmonyPatch(typeof(Zone_Growing), nameof(Zone_Growing.GetGizmos))]
 internal static class RimWorld_Zone_Growing_GetGizmos
 {
-    private static void Postfix(Zone_Growing __instance, ref IEnumerable<Gizmo> __result)
-    {
+    private static void Postfix(Zone_Growing __instance, ref IEnumerable<Gizmo> __result) =>
         GetGizmosPatcher.Patch(
             __instance,
             ref __result,
             (i) => i.GetFarmingHysteresisData(),
             (r) =>
-                r.Where(g =>
+                [
+                    .. r.Where(g =>
                         g is Command_Toggle t && (t.defaultLabel == "CommandAllowSow".Translate())
-                    )
-                    .ToList()
+                    ),
+                ]
         );
-    }
 }
 
 /// <summary>
@@ -29,15 +28,13 @@ internal static class RimWorld_Zone_Growing_GetGizmos
 [HarmonyPatch(typeof(Building_PlantGrower), nameof(Building_PlantGrower.GetGizmos))]
 internal static class RimWorld_Building_PlantGrower_GetGizmos
 {
-    private static void Postfix(Building_PlantGrower __instance, ref IEnumerable<Gizmo> __result)
-    {
+    private static void Postfix(Building_PlantGrower __instance, ref IEnumerable<Gizmo> __result) =>
         GetGizmosPatcher.Patch(
             __instance,
             ref __result,
             (i) => i.GetFarmingHysteresisData(),
             (r) => []
         );
-    }
 }
 
 internal class GetGizmosPatcher
@@ -65,7 +62,7 @@ internal class GetGizmosPatcher
             {
                 if (data.Enabled)
                 {
-                    data.Disable(plantToGrowSettable);
+                    data.Disable();
                 }
                 else
                 {
@@ -95,12 +92,12 @@ internal class GetGizmosPatcher
             var allowGizmos = findAllowGizmos(result);
             foreach (var allowGizmo in allowGizmos)
             {
-                result.Remove(allowGizmo);
+                _ = result.Remove(allowGizmo);
             }
 
             if (FarmingHysteresisMod.Settings.ShowOldCommands && Find.Selector.NumSelected == 1)
             {
-                Texture2D uiIcon = harvestedThingDef.uiIcon;
+                var uiIcon = harvestedThingDef.uiIcon;
 
                 var useGlobalValuesCommand = new Command_Toggle
                 {

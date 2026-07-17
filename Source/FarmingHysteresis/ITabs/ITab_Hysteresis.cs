@@ -2,7 +2,7 @@ using FarmingHysteresis.Extensions;
 
 namespace FarmingHysteresis.ITabs;
 
-class ITab_Hysteresis : ITab
+internal class ITab_Hysteresis : ITab
 {
     private const float ProductIconSize = 24f;
     private const float ProductRowPadding = 5f;
@@ -33,7 +33,7 @@ class ITab_Hysteresis : ITab
     private void RefreshFields()
     {
         var data = GetFarmingHysteresisData();
-        IPlantToGrowSettable plantToGrowSettable = (IPlantToGrowSettable)SelObject;
+        var plantToGrowSettable = (IPlantToGrowSettable)SelObject;
         var (harvestedThingDef, _) = plantToGrowSettable.PlantHarvestInfo();
 
         if (data != null && harvestedThingDef != null)
@@ -57,14 +57,14 @@ class ITab_Hysteresis : ITab
     {
         var data = GetFarmingHysteresisData();
 
-        IPlantToGrowSettable plantToGrowSettable = (IPlantToGrowSettable)SelObject;
+        var plantToGrowSettable = (IPlantToGrowSettable)SelObject;
         var (harvestedThingDef, harvestedThingCount) = plantToGrowSettable.PlantHarvestInfo();
         if (data == null || harvestedThingDef == null)
         {
             return;
         }
 
-        Rect rect = new Rect(0f, 0f, size.x, size.y).ContractedBy(10f);
+        var rect = new Rect(0f, 0f, size.x, size.y).ContractedBy(10f);
 
         Listing_Standard listingStandard = new() { maxOneColumn = true };
 
@@ -73,7 +73,7 @@ class ITab_Hysteresis : ITab
         var productLabelRect = listingStandard.Label("FarmingHysteresis.ProductLabel".Translate());
 
         DrawProductRow(harvestedThingDef, productLabelRect.yMax);
-        listingStandard.Gap(ProductIconSize + 3 * ProductRowPadding);
+        listingStandard.Gap(ProductIconSize + (3 * ProductRowPadding));
         listingStandard.GapLine(ProductRowPadding);
         listingStandard.Gap(5f);
 
@@ -92,9 +92,9 @@ class ITab_Hysteresis : ITab
 
         var plant = plantToGrowSettable.GetPlantDefToGrow();
 
-        listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
+        _ = listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
         listingStandard.IntEntry(ref _lowerBound, ref _lowerBoundBuffer);
-        listingStandard.Label(
+        _ = listingStandard.Label(
             "FarmingHysteresis.LowerBound".Translate(
                 plant.label,
                 data.LowerBound,
@@ -108,9 +108,9 @@ class ITab_Hysteresis : ITab
             data.LowerBound = _lowerBound;
         }
 
-        listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
+        _ = listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
         listingStandard.IntEntry(ref _upperBound, ref _upperBoundBuffer);
-        listingStandard.Label(
+        _ = listingStandard.Label(
             "FarmingHysteresis.UpperBound".Translate(
                 plant.label,
                 data.UpperBound,
@@ -126,10 +126,10 @@ class ITab_Hysteresis : ITab
 
         listingStandard.GapLine();
 
-        listingStandard.Label(
+        _ = listingStandard.Label(
             "FarmingHysteresis.InStorage".Translate(harvestedThingDef.label, harvestedThingCount)
         );
-        listingStandard.Label(
+        _ = listingStandard.Label(
             "FarmingHysteresis.LatchModeDesc".Translate(
                 ("FarmingHysteresis.LatchModeDesc." + data.latchMode.ToString()).Translate(
                     FarmingHysteresisMod.Settings.HysteresisMode.AsString()
@@ -146,13 +146,13 @@ class ITab_Hysteresis : ITab
             Rect rowRect = new(
                 0f,
                 rowY,
-                size.x - 4 * ProductRowPadding,
-                ProductIconSize + 2 * ProductRowPadding
+                size.x - (4 * ProductRowPadding),
+                ProductIconSize + (2 * ProductRowPadding)
             );
             Rect harvestLabelRect = new(
-                ProductIconSize + 2 * ProductRowPadding,
+                ProductIconSize + (2 * ProductRowPadding),
                 rowY,
-                rowRect.width - ProductIconSize + 2 * ProductRowPadding,
+                rowRect.width - ProductIconSize + (2 * ProductRowPadding),
                 rowRect.height
             );
             Rect harvestIconRect = new(5f, rowY + 5f, ProductIconSize, ProductIconSize);
@@ -186,10 +186,7 @@ class ITab_Hysteresis : ITab
         }
     }
 
-    public override bool IsVisible
-    {
-        get { return !Hidden; }
-    }
+    public override bool IsVisible => !Hidden;
 
 #if v1_3
     public bool Hidden
@@ -215,19 +212,18 @@ class ITab_Hysteresis : ITab
     }
 
     private static HysteresisMode? _cachedHysteresisMode;
-    private static string _cachedHysteresisModeString = string.Empty;
 
-    static string HysteresisModeString
+    private static string HysteresisModeString
     {
         get
         {
             if (_cachedHysteresisMode != FarmingHysteresisMod.Settings.HysteresisMode)
             {
                 _cachedHysteresisMode = FarmingHysteresisMod.Settings.HysteresisMode;
-                _cachedHysteresisModeString = ((HysteresisMode)_cachedHysteresisMode).AsString();
+                field = ((HysteresisMode)_cachedHysteresisMode).AsString();
             }
 
-            return _cachedHysteresisModeString;
+            return field;
         }
-    }
+    } = string.Empty;
 }

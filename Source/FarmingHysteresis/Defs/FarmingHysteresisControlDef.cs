@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 
 namespace FarmingHysteresis.Defs;
 
@@ -17,24 +16,24 @@ public class FarmingHysteresisControlDef : Def
     private static readonly ConditionalWeakTable<
         IPlantToGrowSettable,
         PlantToGrowSettableCustomFields
+#pragma warning disable IDE0028 // Simplify collection initialization
     > plantGrowerControlFields = new();
+#pragma warning restore IDE0028 // Simplify collection initialization
 
     public Type workerClass = typeof(FarmingHysteresisControlWorker);
     public Type controlledClass = typeof(IPlantToGrowSettable);
 
-    [Unsaved(false)]
-    private FarmingHysteresisControlWorker workerInt;
-
+    [field: Unsaved(false)]
     public FarmingHysteresisControlWorker Worker
     {
         get
         {
-            if (workerInt == null)
+            if (field == null)
             {
-                workerInt = (FarmingHysteresisControlWorker)Activator.CreateInstance(workerClass);
-                workerInt.def = this;
+                field = (FarmingHysteresisControlWorker)Activator.CreateInstance(workerClass);
+                field.def = this;
             }
-            return workerInt;
+            return field;
         }
     }
 
@@ -56,14 +55,9 @@ public class FarmingHysteresisControlDef : Def
     {
         ValidatePlantGrowerType(plantGrower, nameof(GetAllowSow));
 
-        if (Worker.HandleAllowSow)
-        {
-            return Worker.GetAllowSow(plantGrower);
-        }
-        else
-        {
-            return plantGrowerControlFields.GetValue(plantGrower, (z) => new()).allowSow;
-        }
+        return Worker.HandleAllowSow
+            ? Worker.GetAllowSow(plantGrower)
+            : plantGrowerControlFields.GetValue(plantGrower, (z) => new()).allowSow;
     }
 
     public void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
@@ -84,14 +78,9 @@ public class FarmingHysteresisControlDef : Def
     {
         ValidatePlantGrowerType(plantGrower, nameof(GetAllowHarvest));
 
-        if (Worker.HandleAllowHarvest)
-        {
-            return Worker.GetAllowHarvest(plantGrower);
-        }
-        else
-        {
-            return plantGrowerControlFields.GetValue(plantGrower, (z) => new()).allowHarvest;
-        }
+        return Worker.HandleAllowHarvest
+            ? Worker.GetAllowHarvest(plantGrower)
+            : plantGrowerControlFields.GetValue(plantGrower, (z) => new()).allowHarvest;
     }
 
     public void SetAllowHarvest(IPlantToGrowSettable plantGrower, bool value)
@@ -135,37 +124,29 @@ public abstract class FarmingHysteresisControlWorker
     /// Returns whether the plant grower allows or disallows sowing. If HandleAllowSow
     /// returns false, this method is unused.
     /// </summary>
-    public virtual bool GetAllowSow(IPlantToGrowSettable plantGrower)
-    {
+    public virtual bool GetAllowSow(IPlantToGrowSettable plantGrower) =>
         throw new NotImplementedException();
-    }
 
     /// <summary>
     /// Tells the plant grower to allow or disallow sowing. If HandleAllowSow
     /// returns false, this method is unused.
     /// </summary>
-    public virtual void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
-    {
+    public virtual void SetAllowSow(IPlantToGrowSettable plantGrower, bool value) =>
         throw new NotImplementedException();
-    }
 
     /// <summary>
     /// Returns whether the plant grower allows or disallows harvesting. If HandleAllowSow
     /// returns false, this method is unused.
     /// </summary>
-    public virtual bool GetAllowHarvest(IPlantToGrowSettable plantGrower)
-    {
+    public virtual bool GetAllowHarvest(IPlantToGrowSettable plantGrower) =>
         throw new NotImplementedException();
-    }
 
     /// <summary>
     /// Tells the plant grower to allow or disallow harvesting. If HandleAllowSow
     /// returns false, this method is unused.
     /// </summary>
-    public virtual void SetAllowHarvest(IPlantToGrowSettable plantGrower, bool value)
-    {
+    public virtual void SetAllowHarvest(IPlantToGrowSettable plantGrower, bool value) =>
         throw new NotImplementedException();
-    }
 }
 
 public class FarmingHysteresisControlWorker_Building_PlantGrower : FarmingHysteresisControlWorker
@@ -185,15 +166,10 @@ public class FarmingHysteresisControlWorker_Zone_Growing : FarmingHysteresisCont
 
     public override bool HandleAllowSow => true;
 
-    public override bool GetAllowSow(IPlantToGrowSettable plantGrower)
-    {
-        if (plantGrower == null)
-        {
-            throw new ArgumentNullException(nameof(plantGrower));
-        }
-
-        return ((Zone_Growing)plantGrower).allowSow;
-    }
+    public override bool GetAllowSow(IPlantToGrowSettable plantGrower) =>
+        plantGrower == null
+            ? throw new ArgumentNullException(nameof(plantGrower))
+            : ((Zone_Growing)plantGrower).allowSow;
 
     public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
     {

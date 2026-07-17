@@ -22,14 +22,7 @@ internal static class Zone_GetInspectTabs
             return values;
         }
 
-        if (values == null)
-        {
-            values = ITabs;
-        }
-        else
-        {
-            values = values.Concat(ITabs);
-        }
+        values = values == null ? ITabs : values.Concat(ITabs);
 
         return values;
     }

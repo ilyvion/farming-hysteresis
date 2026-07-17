@@ -83,6 +83,14 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
                 case LatchMode.AboveLowerBoundEnabled:
                     latchMode = LatchMode.BetweenBoundsEnabled;
                     break;
+
+                case LatchMode.Unknown:
+                case LatchMode.BelowLowerBound:
+                case LatchMode.BetweenBoundsEnabled:
+                case LatchMode.BetweenBoundsDisabled:
+                case LatchMode.AboveUpperBound:
+                default:
+                    break;
             }
 #pragma warning restore 612
         }
@@ -97,8 +105,8 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 #if v1_3 || v1_4
         void TransferOldBounds()
         {
-            int lowerBound = 0;
-            int upperBound = 0;
+            var lowerBound = 0;
+            var upperBound = 0;
             Scribe_Values.Look(ref lowerBound, "farmingHysteresisLowerBound", 0);
             if (lowerBound != 0)
             {
@@ -129,7 +137,9 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
                 var (harvestedThingDef, _) = zone.PlantHarvestInfo();
                 if (harvestedThingDef == null)
                 {
-                    throw new Exception("This should not happen. Code: FHD-GBVA-PI");
+                    throw new InvalidOperationException(
+                        "This should not happen. Code: FHD-GBVA-PI"
+                    );
                 }
                 values = FarmingHysteresisMapComponent
                     .For(Find.CurrentMap)
@@ -137,7 +147,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             }
             else
             {
-                throw new Exception("This should not happen. Code: FHD-GBVA-ZWR");
+                throw new InvalidOperationException("This should not happen. Code: FHD-GBVA-ZWR");
             }
         }
         return values;
@@ -148,7 +158,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         get => GetBoundedValueAccessor().BoundValueRaw.Lower;
         set
         {
-            IBoundedValueAccessor values = GetBoundedValueAccessor();
+            var values = GetBoundedValueAccessor();
             ref var lower = ref values.BoundValueRaw.Lower;
             var upper = values.BoundValueRaw.Upper;
             if (value < 0)
@@ -170,7 +180,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         get => GetBoundedValueAccessor().BoundValueRaw.Upper;
         set
         {
-            IBoundedValueAccessor values = GetBoundedValueAccessor();
+            var values = GetBoundedValueAccessor();
             ref var upper = ref values.BoundValueRaw.Upper;
             var lower = values.BoundValueRaw.Lower;
             if (value < lower)
@@ -182,10 +192,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         }
     }
 
-    internal bool Enabled
-    {
-        get { return _enabled; }
-    }
+    internal bool Enabled => _enabled;
 
     internal void Enable(IPlantToGrowSettable plantToGrowSettable)
     {
@@ -193,10 +200,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         UpdateLatchModeAndHandling(plantToGrowSettable);
     }
 
-    internal void Disable(IPlantToGrowSettable plantToGrowSettable)
-    {
-        _enabled = false;
-    }
+    internal void Disable() => _enabled = false;
 
     internal void UpdateLatchModeAndHandling(IPlantToGrowSettable plantToGrowSettable)
     {
@@ -210,7 +214,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             return;
         }
 
-        IBoundedValueAccessor values = GetBoundedValueAccessor();
+        var values = GetBoundedValueAccessor();
 
         // First, check the simple cases
         if (harvestedThingCount < values.BoundValueRaw.Lower)
@@ -248,6 +252,17 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
                         latchMode = LatchMode.BetweenBoundsDisabled;
                     }
                     break;
+
+                case LatchMode.BetweenBoundsEnabled:
+                case LatchMode.BetweenBoundsDisabled:
+#if v1_3 || v1_4
+#pragma warning disable CS0612
+                case LatchMode.AboveLowerBoundDisabled:
+                case LatchMode.AboveLowerBoundEnabled:
+#pragma warning restore CS0612
+#endif
+                default:
+                    break;
             }
         }
 
@@ -263,8 +278,17 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
                 plantToGrowSettable.SetHysteresisControlState(true);
                 break;
 
+#if v1_3 || v1_4
+#pragma warning disable CS0612
+            case LatchMode.AboveLowerBoundDisabled:
+            case LatchMode.AboveLowerBoundEnabled:
+                break;
+#pragma warning restore CS0612
+#endif
+
+            case LatchMode.Unknown:
             default:
-                throw new Exception(
+                throw new InvalidOperationException(
                     $"We should never be in this state. This is a bug! State was {latchMode}."
                 );
         }
@@ -278,7 +302,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         _enabled = false;
 
         string settableName;
-        bool suppressWarning = false;
+        var suppressWarning = false;
 
         if (plantToGrowSettable is Zone zone)
         {
@@ -287,7 +311,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         else if (plantToGrowSettable is Building building)
         {
             // Let's not cause unnecessary spam from flower pots and similar
-            string? sowTag = building.def.building?.sowTag;
+            var sowTag = building.def.building?.sowTag;
             if (sowTag is "Decorative" or "DecorativeTree")
             {
                 suppressWarning = true;
@@ -295,13 +319,11 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             settableName =
                 $"Building named '{building.Label}' @ {building.InteractionCell.ToIntVec2}";
         }
-        else if (plantToGrowSettable is ILoadReferenceable loadReferenceable)
-        {
-            settableName = loadReferenceable.GetUniqueLoadID();
-        }
         else
         {
-            settableName = $"Unknown type {plantToGrowSettable.GetType().FullName}";
+            settableName = plantToGrowSettable is ILoadReferenceable loadReferenceable
+                ? loadReferenceable.GetUniqueLoadID()
+                : $"Unknown type {plantToGrowSettable.GetType().FullName}";
         }
 
         if (!suppressWarning)

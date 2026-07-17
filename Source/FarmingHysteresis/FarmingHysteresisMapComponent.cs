@@ -63,19 +63,10 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
         }
     }
 
-    internal bool HasBoundsFor(ThingDef harvestedThingDef)
-    {
-        if (globalBoundValues == null)
-        {
-            return false;
-        }
-        return globalBoundValues.ContainsKey(harvestedThingDef);
-    }
+    internal bool HasBoundsFor(ThingDef harvestedThingDef) =>
+        globalBoundValues != null && globalBoundValues.ContainsKey(harvestedThingDef);
 
-    public string GetUniqueLoadID()
-    {
-        return "FarmingHysteresisMapComponent_" + id;
-    }
+    public string GetUniqueLoadID() => "FarmingHysteresisMapComponent_" + id;
 
     public static FarmingHysteresisMapComponent For(Map map)
     {
@@ -86,17 +77,17 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
 
         var instance = map.GetComponent<FarmingHysteresisMapComponent>();
         if (instance != null)
+        {
             return instance;
+        }
 
         instance = new FarmingHysteresisMapComponent(map);
         map.components.Add(instance);
         return instance;
     }
 
-    internal IBoundedValueAccessor GetGlobalBoundedValueAccessorFor(ThingDef thingDef)
-    {
-        return new GlobalThingDefBoundValueAccessor(this, thingDef);
-    }
+    internal IBoundedValueAccessor GetGlobalBoundedValueAccessorFor(ThingDef thingDef) =>
+        new GlobalThingDefBoundValueAccessor(this, thingDef);
 
     public override void MapComponentTick()
     {
@@ -104,7 +95,9 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
 
         // No need to make these checks every single tick; once every 6 in-game minutes (4.16 seconds real time) should be enough.
         if (Find.TickManager.TicksGame % 250 != 0)
+        {
             return;
+        }
 
         foreach (
             var plantGrower in DefDatabase<FarmingHysteresisControlDef>.AllDefs.SelectMany(d =>

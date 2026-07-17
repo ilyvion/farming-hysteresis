@@ -3,6 +3,6 @@
         <RootNamespace>FarmingHysteresis</RootNamespace>
         <AssemblyName>FarmingHysteresis</AssemblyName>
 
-        <NoWarn>CA1707;CA2201</NoWarn>
+        <NoWarn>CS1591</NoWarn>
     </PropertyGroup>
 </Project>
