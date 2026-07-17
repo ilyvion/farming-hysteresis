@@ -1,0 +1,9 @@
+MOD_NAME="FarmingHysteresis"
+EXTRA_FILES=(
+    "LICENSE.Apache-2.0"
+    "LICENSE.MIT"
+)
+EXTRA_RW_1_6_FILES=("1.6_VanillaPlantsExpandedMorePlants")
+EXTRA_RW_1_5_FILES=("1.5_VanillaPlantsExpandedMorePlants")
+EXTRA_RW_1_4_FILES=("1.4_VanillaPlantsExpandedMorePlants")
+EXTRA_RW_1_3_FILES=("1.3_VanillaPlantsExpandedMorePlants")
