@@ -5,6 +5,10 @@ namespace FarmingHysteresis.Defs;
 // Rimworld Defs have values set through reflection
 #pragma warning disable CS8618
 
+/// <summary>
+/// A def describing how a class of plant growers (e.g. plant pots or growing zones) is
+/// discovered and controlled by Farming Hysteresis.
+/// </summary>
 public class FarmingHysteresisControlDef : Def
 {
     private class PlantToGrowSettableCustomFields
@@ -20,9 +24,15 @@ public class FarmingHysteresisControlDef : Def
     > plantGrowerControlFields = new();
 #pragma warning restore IDE0028 // Simplify collection initialization
 
+    /// <summary>The <see cref="FarmingHysteresisControlWorker"/> subclass to instantiate for this def.</summary>
     public Type workerClass = typeof(FarmingHysteresisControlWorker);
+
+    /// <summary>The <see cref="IPlantToGrowSettable"/> implementation this def controls.</summary>
     public Type controlledClass = typeof(IPlantToGrowSettable);
 
+    /// <summary>
+    /// Gets the worker instance for this def, created from <see cref="workerClass"/> on first access.
+    /// </summary>
     [field: Unsaved(false)]
     public FarmingHysteresisControlWorker Worker
     {
@@ -51,6 +61,10 @@ public class FarmingHysteresisControlDef : Def
         }
     }
 
+    /// <summary>
+    /// Gets whether sowing is currently allowed for the given <paramref name="plantGrower"/>.
+    /// </summary>
+    /// <param name="plantGrower">The plant grower to check.</param>
     public bool GetAllowSow(IPlantToGrowSettable plantGrower)
     {
         ValidatePlantGrowerType(plantGrower, nameof(GetAllowSow));
@@ -60,6 +74,11 @@ public class FarmingHysteresisControlDef : Def
             : plantGrowerControlFields.GetValue(plantGrower, (z) => new()).allowSow;
     }
 
+    /// <summary>
+    /// Sets whether sowing is allowed for the given <paramref name="plantGrower"/>.
+    /// </summary>
+    /// <param name="plantGrower">The plant grower to update.</param>
+    /// <param name="value">Whether sowing should be allowed.</param>
     public void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
     {
         ValidatePlantGrowerType(plantGrower, nameof(SetAllowSow));
@@ -74,6 +93,10 @@ public class FarmingHysteresisControlDef : Def
         }
     }
 
+    /// <summary>
+    /// Gets whether harvesting is currently allowed for the given <paramref name="plantGrower"/>.
+    /// </summary>
+    /// <param name="plantGrower">The plant grower to check.</param>
     public bool GetAllowHarvest(IPlantToGrowSettable plantGrower)
     {
         ValidatePlantGrowerType(plantGrower, nameof(GetAllowHarvest));
@@ -83,6 +106,11 @@ public class FarmingHysteresisControlDef : Def
             : plantGrowerControlFields.GetValue(plantGrower, (z) => new()).allowHarvest;
     }
 
+    /// <summary>
+    /// Sets whether harvesting is allowed for the given <paramref name="plantGrower"/>.
+    /// </summary>
+    /// <param name="plantGrower">The plant grower to update.</param>
+    /// <param name="value">Whether harvesting should be allowed.</param>
     public void SetAllowHarvest(IPlantToGrowSettable plantGrower, bool value)
     {
         ValidatePlantGrowerType(plantGrower, nameof(SetAllowHarvest));
@@ -98,10 +126,19 @@ public class FarmingHysteresisControlDef : Def
     }
 }
 
+/// <summary>
+/// Handles discovery of, and (optionally) sow/harvest control for, a class of plant growers
+/// on behalf of a <see cref="FarmingHysteresisControlDef"/>.
+/// </summary>
 public abstract class FarmingHysteresisControlWorker
 {
+    /// <summary>The def this worker was created for.</summary>
     public FarmingHysteresisControlDef def;
 
+    /// <summary>
+    /// Gets all plant growers of the controlled class present on <paramref name="map"/>.
+    /// </summary>
+    /// <param name="map">The map to search.</param>
     public abstract IEnumerable<IPlantToGrowSettable> GetControlledPlantGrowers(Map map);
 
     /// <summary>
@@ -149,28 +186,39 @@ public abstract class FarmingHysteresisControlWorker
         throw new NotImplementedException();
 }
 
+/// <summary>
+/// A <see cref="FarmingHysteresisControlWorker"/> that controls <see cref="Building_PlantGrower"/> buildings.
+/// </summary>
 public class FarmingHysteresisControlWorker_Building_PlantGrower : FarmingHysteresisControlWorker
 {
+    /// <inheritdoc/>
     public override IEnumerable<IPlantToGrowSettable> GetControlledPlantGrowers(Map map) =>
         (
             map ?? throw new ArgumentNullException(nameof(map))
         ).listerBuildings.AllBuildingsColonistOfClass<Building_PlantGrower>();
 }
 
+/// <summary>
+/// A <see cref="FarmingHysteresisControlWorker"/> that controls <see cref="Zone_Growing"/> zones.
+/// </summary>
 public class FarmingHysteresisControlWorker_Zone_Growing : FarmingHysteresisControlWorker
 {
+    /// <inheritdoc/>
     public override IEnumerable<IPlantToGrowSettable> GetControlledPlantGrowers(Map map) =>
         (
             map ?? throw new ArgumentNullException(nameof(map))
         ).zoneManager.AllZones.OfType<Zone_Growing>();
 
+    /// <inheritdoc/>
     public override bool HandleAllowSow => true;
 
+    /// <inheritdoc/>
     public override bool GetAllowSow(IPlantToGrowSettable plantGrower) =>
         plantGrower == null
             ? throw new ArgumentNullException(nameof(plantGrower))
             : ((Zone_Growing)plantGrower).allowSow;
 
+    /// <inheritdoc/>
     public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
     {
         if (plantGrower == null)

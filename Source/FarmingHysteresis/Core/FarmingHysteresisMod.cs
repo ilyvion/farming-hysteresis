@@ -2,12 +2,22 @@
 
 namespace FarmingHysteresis;
 
+/// <summary>
+/// The main mod class for Farming Hysteresis.
+/// </summary>
 public class FarmingHysteresisMod : IlyvionMod
 {
 #pragma warning disable CS8618 // Set by constructor
+    /// <summary>
+    /// Gets the singleton instance of the <see cref="FarmingHysteresisMod"/> class.
+    /// </summary>
     public static FarmingHysteresisMod Instance { get; private set; }
 #pragma warning restore CS8618
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FarmingHysteresisMod"/> class.
+    /// </summary>
+    /// <param name="content">The mod content pack.</param>
     public FarmingHysteresisMod(ModContentPack content)
         : base(content)
     {
@@ -35,11 +45,18 @@ public class FarmingHysteresisMod : IlyvionMod
         });
     }
 
+    /// <inheritdoc/>
     protected override bool HasSettings => true;
+
+    /// <summary>
+    /// Gets the settings for the Farming Hysteresis mod.
+    /// </summary>
     public static Settings Settings => Instance.GetSettings<Settings>();
 
+    /// <inheritdoc/>
     public override void DoSettingsWindowContents(Rect inRect) =>
         Settings.DoSettingsWindowContents(inRect);
 
+    /// <inheritdoc/>
     public override string SettingsCategory() => Content.Name;
 }

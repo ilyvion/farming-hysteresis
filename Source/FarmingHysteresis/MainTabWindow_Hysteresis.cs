@@ -1,10 +1,17 @@
 namespace FarmingHysteresis;
 
+/// <summary>
+/// The main button worker for the Hysteresis main tab, hidden unless enabled in settings.
+/// </summary>
 public class MainButtonWorker_Hysteresis : MainButtonWorker_ToggleTab
 {
+    /// <inheritdoc/>
     public override bool Visible => FarmingHysteresisMod.Settings.ShowHysteresisMainTab;
 }
 
+/// <summary>
+/// The main tab window showing and allowing editing of the map-global hysteresis bounds.
+/// </summary>
 public class MainTabWindow_Hysteresis : MainTabWindow
 {
     private enum HysteresisTab : byte
@@ -22,6 +29,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
     private readonly Dictionary<ThingDef, string?> globalBoundLowerBuffers = [];
     private readonly Dictionary<ThingDef, string?> globalBoundUpperBuffers = [];
 
+    /// <inheritdoc/>
     public override void PreOpen()
     {
         base.PreOpen();
@@ -71,6 +79,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         }
     }
 
+    /// <inheritdoc/>
     public override void DoWindowContents(Rect inRect)
     {
         var rect2 = inRect;
@@ -213,6 +222,13 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         }
     }
 
+    /// <summary>
+    /// Draws the lower-bound entry widget for the given <paramref name="harvestDef"/>.
+    /// </summary>
+    /// <param name="prevRect">The rect of the widget drawn immediately before this one.</param>
+    /// <param name="rowY">The vertical position of the row being drawn.</param>
+    /// <param name="harvestDef">The harvested thing def the widget is for.</param>
+    /// <returns>The rect the widget was drawn in.</returns>
     public Rect DrawLowerBoundWidget(Rect prevRect, float rowY, ThingDef harvestDef)
     {
         var lowerBoundRect = new Rect(prevRect.xMax, rowY, 250f, PLANT_ROW_HEIGHT);
@@ -227,6 +243,13 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         return lowerBoundRect;
     }
 
+    /// <summary>
+    /// Draws the upper-bound entry widget for the given <paramref name="harvestDef"/>.
+    /// </summary>
+    /// <param name="prevRect">The rect of the widget drawn immediately before this one.</param>
+    /// <param name="rowY">The vertical position of the row being drawn.</param>
+    /// <param name="harvestDef">The harvested thing def the widget is for.</param>
+    /// <returns>The rect the widget was drawn in.</returns>
     public Rect DrawUpperBoundWidget(Rect prevRect, float rowY, ThingDef harvestDef)
     {
         var upperBoundRect = new Rect(

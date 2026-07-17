@@ -2,7 +2,5 @@
     <PropertyGroup>
         <RootNamespace>FarmingHysteresis</RootNamespace>
         <AssemblyName>FarmingHysteresis</AssemblyName>
-
-        <NoWarn>CS1591</NoWarn>
     </PropertyGroup>
 </Project>

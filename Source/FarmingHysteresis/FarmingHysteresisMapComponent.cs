@@ -33,6 +33,10 @@ internal class GlobalThingDefBoundValueAccessor(
     }
 }
 
+/// <summary>
+/// Tracks per-map global hysteresis bounds and periodically re-evaluates plant growers that
+/// use them.
+/// </summary>
 public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
 {
     private int id = -1;
@@ -48,6 +52,10 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
         }
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="FarmingHysteresisMapComponent"/> class.
+    /// </summary>
+    /// <param name="map">The map this component belongs to.</param>
     public FarmingHysteresisMapComponent(Map map)
         : base(map)
     {
@@ -66,8 +74,14 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
     internal bool HasBoundsFor(ThingDef harvestedThingDef) =>
         globalBoundValues != null && globalBoundValues.ContainsKey(harvestedThingDef);
 
+    /// <inheritdoc/>
     public string GetUniqueLoadID() => "FarmingHysteresisMapComponent_" + id;
 
+    /// <summary>
+    /// Gets the <see cref="FarmingHysteresisMapComponent"/> for the given <paramref name="map"/>,
+    /// creating and attaching one if it doesn't already exist.
+    /// </summary>
+    /// <param name="map">The map to get the component for.</param>
     public static FarmingHysteresisMapComponent For(Map map)
     {
         if (map == null)
@@ -89,6 +103,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
     internal IBoundedValueAccessor GetGlobalBoundedValueAccessorFor(ThingDef thingDef) =>
         new GlobalThingDefBoundValueAccessor(this, thingDef);
 
+    /// <inheritdoc/>
     public override void MapComponentTick()
     {
         base.MapComponentTick();
@@ -113,6 +128,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
         }
     }
 
+    /// <inheritdoc/>
     public override void ExposeData()
     {
         base.ExposeData();
