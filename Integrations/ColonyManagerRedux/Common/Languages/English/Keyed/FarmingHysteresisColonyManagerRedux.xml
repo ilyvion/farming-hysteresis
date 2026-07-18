@@ -13,4 +13,20 @@
     <FarmingHysteresis.CMR.GrowerScope.Specific.Tip>Only the growers you explicitly select are managed by this job.</FarmingHysteresis.CMR.GrowerScope.Specific.Tip>
     <FarmingHysteresis.CMR.GrowerScope.NoEligibleGrowers>No eligible growers found on this map yet.</FarmingHysteresis.CMR.GrowerScope.NoEligibleGrowers>
     <FarmingHysteresis.CMR.GrowerScope.ManagedByOtherJob>Already managed by another Farming Hysteresis job ({0}). A grower can only be controlled by one job at a time.</FarmingHysteresis.CMR.GrowerScope.ManagedByOtherJob>
+
+    <FarmingHysteresis.CMR.TargetPlant>Target plant</FarmingHysteresis.CMR.TargetPlant>
+    <FarmingHysteresis.CMR.TargetPlant.None>Select a plant&#8230;</FarmingHysteresis.CMR.TargetPlant.None>
+    <FarmingHysteresis.CMR.TargetPlant.NoneAvailable>None of this job's managed growers can currently grow the same plant (e.g. mixing a hydroponics basin with an aquatic growing zone), so there's nothing to select. Narrow the grower scope to growers that share at least one growable plant.</FarmingHysteresis.CMR.TargetPlant.NoneAvailable>
+
+    <FarmingHysteresis.CMR.Trigger>Hysteresis bounds</FarmingHysteresis.CMR.Trigger>
+    <FarmingHysteresis.CMR.Trigger.Lower>Lower bound</FarmingHysteresis.CMR.Trigger.Lower>
+    <FarmingHysteresis.CMR.Trigger.Upper>Upper bound</FarmingHysteresis.CMR.Trigger.Upper>
+    <FarmingHysteresis.CMR.Trigger.Status>{0} {1} in stock (bounds: {2} - {3}).</FarmingHysteresis.CMR.Trigger.Status>
+    <FarmingHysteresis.CMR.Trigger.NoTargetPlant>No target plant selected yet - choose one in the "Target plant" section above to start gating sow/harvest.</FarmingHysteresis.CMR.Trigger.NoTargetPlant>
+
+    <FarmingHysteresis.CMR.Logs.LatchState>{0}</FarmingHysteresis.CMR.Logs.LatchState>
+    <FarmingHysteresis.CMR.Logs.GrowerPlantSet>{0}: now set to grow {1}</FarmingHysteresis.CMR.Logs.GrowerPlantSet>
+    <FarmingHysteresis.CMR.Logs.GrowerStateChanged>{0}: {1}</FarmingHysteresis.CMR.Logs.GrowerStateChanged>
+    <FarmingHysteresis.CMR.Logs.Enabled>enabled</FarmingHysteresis.CMR.Logs.Enabled>
+    <FarmingHysteresis.CMR.Logs.Disabled>disabled</FarmingHysteresis.CMR.Logs.Disabled>
 </LanguageData>

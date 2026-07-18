@@ -8,6 +8,9 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     : ManagerTab<ManagerJob_FarmingHysteresis, ManagerSettings_FarmingHysteresis>(manager)
 {
+    private const float TargetPlantIconSize = 24f;
+    private const float TargetPlantRowPadding = 5f;
+
     protected override void DoMainContent(Rect rect)
     {
         Widgets.DrawMenuSection(rect);
@@ -21,7 +24,134 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             DrawGrowerScope,
             "FarmingHysteresis.CMR.GrowerScope".Translate()
         );
+        DrawSection(
+            "FarmingHysteresis.Job",
+            "TargetPlant",
+            ref position,
+            width,
+            DrawTargetPlant,
+            "FarmingHysteresis.CMR.TargetPlant".Translate()
+        );
+        DrawSection(
+            "FarmingHysteresis.Job",
+            "Trigger",
+            ref position,
+            width,
+            DrawTriggerConfig,
+            "FarmingHysteresis.CMR.Trigger".Translate()
+        );
         Widgets_Section.EndSectionColumn("FarmingHysteresis.Job", position);
+    }
+
+    private static float DrawTargetPlant(ManagerJob_FarmingHysteresis job, Vector2 pos, float width)
+    {
+        var start = pos;
+        var validTargetPlants = job.ValidTargetPlants.ToList();
+
+        if (validTargetPlants.Count == 0)
+        {
+            job.TargetPlantDef = null;
+            var message = "FarmingHysteresis.CMR.TargetPlant.NoneAvailable".Translate();
+            var emptyHeight = Mathf.Max(ListEntryHeight, Text.CalcHeight(message, width));
+            Widgets.Label(new Rect(pos.x, pos.y, width, emptyHeight), message);
+            pos.y += emptyHeight;
+            return pos.y - start.y;
+        }
+
+        if (job.TargetPlantDef != null && !validTargetPlants.Contains(job.TargetPlantDef))
+        {
+            job.TargetPlantDef = null;
+        }
+
+        pos.y += DrawTargetPlantRow(job, validTargetPlants, pos, width);
+
+        return pos.y - start.y;
+    }
+
+    /// <summary>
+    /// The plant picker itself, styled to match <c>Trigger_Hysteresis.DrawProductRow</c> (icon +
+    /// label over a hover highlight, opened via an invisible button) instead of a plain
+    /// <c>Widgets.ButtonText</c> - a generic-looking button doesn't read as well here as
+    /// the growers' own "Plant: X" gizmo does. The FloatMenu options mirror vanilla's own
+    /// <c>Command_SetPlantToGrow.ProcessInput</c> construction (icon via the
+    /// <c>shownItemForIcon</c> overload, trailing info-card button) rather than plain text
+    /// entries, so it looks and behaves the same as the grower's own plant picker.
+    /// </summary>
+    private static float DrawTargetPlantRow(
+        ManagerJob_FarmingHysteresis job,
+        List<ThingDef> validTargetPlants,
+        Vector2 pos,
+        float width
+    )
+    {
+        var targetPlantDef = job.TargetPlantDef;
+        var rowHeight = TargetPlantIconSize + (2 * TargetPlantRowPadding);
+        var rowRect = new Rect(pos.x, pos.y, width, rowHeight);
+
+        GUI.color = new Color(1f, 1f, 1f, 0.5f);
+        Widgets.DrawHighlightIfMouseover(rowRect);
+        GUI.color = Color.white;
+
+        if (targetPlantDef != null)
+        {
+            var iconRect = new Rect(
+                pos.x + TargetPlantRowPadding,
+                pos.y + TargetPlantRowPadding,
+                TargetPlantIconSize,
+                TargetPlantIconSize
+            );
+            Widgets.DefIcon(iconRect, targetPlantDef);
+
+            var labelRect = new Rect(
+                iconRect.xMax + TargetPlantRowPadding,
+                pos.y,
+                width - iconRect.width - (3 * TargetPlantRowPadding),
+                rowHeight
+            );
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(labelRect, targetPlantDef.LabelCap);
+            Text.Anchor = TextAnchor.UpperLeft;
+        }
+        else
+        {
+            var labelRect = new Rect(
+                pos.x + TargetPlantRowPadding,
+                pos.y,
+                width - (2 * TargetPlantRowPadding),
+                rowHeight
+            );
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(labelRect, "FarmingHysteresis.CMR.TargetPlant.None".Translate());
+            Text.Anchor = TextAnchor.UpperLeft;
+        }
+
+        if (Widgets.ButtonInvisible(rowRect, doMouseoverSound: false))
+        {
+            var options = validTargetPlants
+                .Select(plantDef => new FloatMenuOption(
+                    plantDef.LabelCap,
+                    () => job.TargetPlantDef = plantDef,
+                    plantDef,
+                    null,
+                    forceBasicStyle: false,
+                    MenuOptionPriority.Default,
+                    null,
+                    null,
+                    29f,
+                    rect => Widgets.InfoCardButton(rect.x + 5f, rect.y + ((rect.height - 24f) / 2f), plantDef)
+                ))
+                .ToList();
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+
+        return rowHeight;
+    }
+
+    private static float DrawTriggerConfig(ManagerJob_FarmingHysteresis job, Vector2 pos, float width)
+    {
+        var start = pos;
+        job.HysteresisTrigger.DrawTriggerConfig(ref pos, width, ListEntryHeight);
+        return pos.y - start.y;
     }
 
     private static void DrawAssignmentModeSelector(
@@ -174,7 +304,7 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     ) =>
         grower switch
         {
-            Zone_Growing zone => job.SpecificGrowingZones.Contains(zone),
+            Zone zone => job.SpecificGrowingZones.Contains(zone),
             Building_PlantGrower building => job.SpecificPlantGrowerBuildings.Contains(building),
             _ => false,
         };
@@ -187,10 +317,10 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     {
         switch (grower)
         {
-            case Zone_Growing zone when selected:
+            case Zone zone when selected:
                 _ = job.SpecificGrowingZones.Add(zone);
                 break;
-            case Zone_Growing zone:
+            case Zone zone:
                 _ = job.SpecificGrowingZones.Remove(zone);
                 break;
             case Building_PlantGrower building when selected:

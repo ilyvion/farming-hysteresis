@@ -59,6 +59,34 @@ internal static class ManagerJobFarmingHysteresisScopeTests
     }
 }
 
+// Regression guard for the "don't even offer it" fix: plants with no harvestedThingDef (e.g.
+// purely decorative plants like roses) must never appear in ValidTargetPlants, since
+// Trigger_Hysteresis would have nothing to count for them. See Docs/CMRIntegrationRework.md.
+[HotSwappable]
+[TestSuite]
+internal static class ValidTargetPlantCandidateTests
+{
+    [Test]
+    public static void PlantWithNoHarvestedThingDefIsNeverValidRegardlessOfAvailability()
+    {
+        var plantDef = new ThingDef { plant = new PlantProperties { harvestedThingDef = null } };
+
+        Assert.That(IsValidTargetPlantCandidate(plantDef, _ => true)).Is.False();
+    }
+
+    [Test]
+    public static void PlantWithHarvestedThingDefFollowsAvailabilityPredicate()
+    {
+        var plantDef = new ThingDef
+        {
+            plant = new PlantProperties { harvestedThingDef = new ThingDef() },
+        };
+
+        Assert.That(IsValidTargetPlantCandidate(plantDef, _ => true)).Is.True();
+        Assert.That(IsValidTargetPlantCandidate(plantDef, _ => false)).Is.False();
+    }
+}
+
 // FindOwningJob/ManagedGrowers themselves need a live Manager/JobTracker to exercise end to end,
 // but the "first claim wins" exclusion they're built on is plain set arithmetic - covered here
 // with plain fakes standing in for growers and per-job scopes.

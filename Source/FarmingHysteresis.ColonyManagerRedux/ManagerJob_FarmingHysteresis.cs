@@ -1,5 +1,6 @@
 using ColonyManagerRedux;
 using FarmingHysteresis.Defs;
+using FarmingHysteresis.Extensions;
 
 namespace FarmingHysteresis.ColonyManagerRedux;
 
@@ -15,18 +16,56 @@ internal enum GrowerAssignmentMode
     Specific,
 }
 
-internal sealed class ManagerJob_FarmingHysteresis(Manager manager)
-    : ManagerJob<ManagerSettings_FarmingHysteresis, ManagerJob_FarmingHysteresis.WorkData>(manager)
+internal sealed class ManagerJob_FarmingHysteresis
+    : ManagerJob<ManagerSettings_FarmingHysteresis, ManagerJob_FarmingHysteresis.WorkData>
 {
-    // Placeholder gather->execute payload; a later slice of Step 2 replaces this with real
-    // trigger/bounds evaluation. See Docs/CMRIntegrationRework.md.
-    internal sealed class WorkData;
+    /// <summary>
+    /// The gather phase's verdict: the growers to apply it to, and the single enabled/disabled
+    /// state (from <see cref="Trigger_Hysteresis.State"/>) to apply uniformly to all of them.
+    /// </summary>
+    internal sealed class WorkData(
+        IReadOnlyList<IPlantToGrowSettable> growers,
+        bool enabled,
+        ThingDef targetPlantDef
+    )
+    {
+        public IReadOnlyList<IPlantToGrowSettable> Growers { get; } = growers;
+        public bool Enabled { get; } = enabled;
+        public ThingDef TargetPlantDef { get; } = targetPlantDef;
+    }
+
+    public ManagerJob_FarmingHysteresis(Manager manager)
+        : base(manager)
+    {
+        Trigger = new Trigger_Hysteresis(this);
+    }
+
+    public Trigger_Hysteresis HysteresisTrigger => (Trigger_Hysteresis)Trigger!;
+
+    public override bool IsValid => base.IsValid && Trigger != null;
 
     public GrowerAssignmentMode AssignmentMode = GrowerAssignmentMode.All;
     public Area? GrowerArea;
     public bool InvertGrowerArea;
-    public HashSet<Zone_Growing> SpecificGrowingZones = [];
+
+    /// <summary>
+    /// Deliberately typed as <see cref="Zone"/> rather than <see cref="Zone_Growing"/> - soft-mod
+    /// integrations (e.g. Vanilla Plants Expanded: More Plants' <c>Zone_GrowingAquatic</c>/
+    /// <c>Zone_GrowingSandy</c>) register their own <c>FarmingHysteresisControlDef</c> for zone
+    /// types that implement <see cref="IPlantToGrowSettable"/> directly without deriving from
+    /// <see cref="Zone_Growing"/>. Narrowing this to <see cref="Zone_Growing"/> silently dropped
+    /// those grower types from ever being selectable.
+    /// </summary>
+    public HashSet<Zone> SpecificGrowingZones = [];
     public HashSet<Building_PlantGrower> SpecificPlantGrowerBuildings = [];
+
+    /// <summary>
+    /// The single plant this job assigns to every grower it manages (see
+    /// <see cref="ExecuteJobDataCoroutine"/>) - analogous to <c>ManagerJob_Production</c> picking
+    /// a recipe for the workbenches it manages. Restricted to <see cref="ValidTargetPlants"/> so a
+    /// job never ends up demanding a plant one of its growers can't actually grow.
+    /// </summary>
+    public ThingDef? TargetPlantDef;
 
     private string? _tmpGrowerAreaLabel;
 
@@ -60,7 +99,7 @@ internal sealed class ManagerJob_FarmingHysteresis(Manager manager)
                 && GrowerArea != null,
             grower switch
             {
-                Zone_Growing zone => SpecificGrowingZones.Contains(zone),
+                Zone zone => SpecificGrowingZones.Contains(zone),
                 Building_PlantGrower building => SpecificPlantGrowerBuildings.Contains(building),
                 _ => false,
             }
@@ -133,13 +172,89 @@ internal sealed class ManagerJob_FarmingHysteresis(Manager manager)
 
     public override IEnumerable<string> Targets => ManagedGrowers.Select(GrowerLabel);
 
+    /// <summary>
+    /// The plants every one of this job's <see cref="ManagedGrowers"/> can currently grow -
+    /// reuses vanilla's own grower/plant compatibility checks (the same ones behind the "Plant: X"
+    /// gizmo's floating menu) rather than reimplementing sow-tag/research/darkness filtering:
+    /// <see cref="PlantUtility.ValidPlantTypesForGrowers"/> for the per-grower sow-tag
+    /// intersection, <see cref="Command_SetPlantToGrow.IsPlantAvailable"/> for research/darkness/
+    /// wild-only gating. Empty when there are no managed growers, or when they share no common
+    /// growable plant (e.g. mixing a hydroponics basin with an aquatic growing zone).
+    /// </summary>
+    /// <remarks>
+    /// Also excludes plants with no <c>harvestedThingDef</c> (e.g. purely decorative plants like
+    /// roses) - there's nothing for <see cref="Trigger_Hysteresis"/> to ever count for those, so
+    /// the job could never do anything but sit disabled. The legacy per-grower engine only
+    /// noticed this after the fact and disabled itself (see
+    /// <c>FarmingHysteresis.DisabledDueToMissingHarvestedThingDef</c>); filtering it out here
+    /// means the player is never offered a choice that can't work in the first place.
+    /// </remarks>
+    public IEnumerable<ThingDef> ValidTargetPlants
+    {
+        get
+        {
+            var growers = ManagedGrowers;
+            if (growers.Count == 0)
+            {
+                yield break;
+            }
+
+            foreach (
+                var plantDef in PlantUtility.ValidPlantTypesForGrowers([.. growers])
+            )
+            {
+                if (
+                    IsValidTargetPlantCandidate(
+                        plantDef,
+                        def => Command_SetPlantToGrow.IsPlantAvailable(def, Manager.map)
+                    )
+                )
+                {
+                    yield return plantDef;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Pure decision logic behind <see cref="ValidTargetPlants"/>'s per-candidate filter, split
+    /// out so it's unit-testable without a live map (<paramref name="isPlantAvailable"/> stands in
+    /// for <see cref="Command_SetPlantToGrow.IsPlantAvailable"/>, which needs one).
+    /// </summary>
+    internal static bool IsValidTargetPlantCandidate(
+        ThingDef plantDef,
+        Func<ThingDef, bool> isPlantAvailable
+    ) => plantDef.plant.harvestedThingDef != null && isPlantAvailable(plantDef);
+
     public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Growing;
 
     public override void CleanUp(ManagerLog? jobLog = null) { }
 
     protected override Coroutine GatherJobDataCoroutine(ManagerLog jobLog, AnyBoxed<WorkData?> data)
     {
-        yield break;
+        var growers = ManagedGrowers;
+        if (growers.Count == 0)
+        {
+            JobState = ManagerJobState.Completed;
+            yield break;
+        }
+
+        var targetPlantDef = TargetPlantDef;
+        if (targetPlantDef == null || !ValidTargetPlants.Contains(targetPlantDef))
+        {
+            // No target plant chosen yet, or the previously chosen one is no longer growable by
+            // every currently-managed grower (e.g. the scope changed) - nothing to push down or
+            // gate off of until the player (re-)picks one in the "Target plant" section.
+            JobState = ManagerJobState.Completed;
+            yield break;
+        }
+
+        var enabled = HysteresisTrigger.State;
+
+        JobState = ManagerJobState.Active;
+        jobLog.AddDetail("FarmingHysteresis.CMR.Logs.LatchState".Translate(HysteresisTrigger.StatusTooltip));
+
+        data.Value = new WorkData(growers, enabled, targetPlantDef);
     }
 
     protected override Coroutine ExecuteJobDataCoroutine(
@@ -148,6 +263,38 @@ internal sealed class ManagerJob_FarmingHysteresis(Manager manager)
         Boxed<bool> workDone
     )
     {
+        foreach (var grower in data.Growers)
+        {
+            if (grower.GetPlantDefToGrow() != data.TargetPlantDef)
+            {
+                grower.SetPlantDefToGrow(data.TargetPlantDef);
+                workDone.Value = true;
+                jobLog.AddDetail(
+                    "FarmingHysteresis.CMR.Logs.GrowerPlantSet".Translate(
+                        GrowerLabel(grower),
+                        data.TargetPlantDef.LabelCap
+                    )
+                );
+            }
+
+            var beforeSow = grower.GetAllowSow();
+            var beforeHarvest = grower.GetAllowHarvest();
+
+            grower.SetHysteresisControlState(data.Enabled);
+
+            if (grower.GetAllowSow() != beforeSow || grower.GetAllowHarvest() != beforeHarvest)
+            {
+                workDone.Value = true;
+                jobLog.AddDetail(
+                    "FarmingHysteresis.CMR.Logs.GrowerStateChanged".Translate(
+                        GrowerLabel(grower),
+                        data.Enabled
+                            ? "FarmingHysteresis.CMR.Logs.Enabled".Translate()
+                            : "FarmingHysteresis.CMR.Logs.Disabled".Translate()
+                    )
+                );
+            }
+        }
         yield break;
     }
 
@@ -157,6 +304,7 @@ internal sealed class ManagerJob_FarmingHysteresis(Manager manager)
 
         Scribe_Values.Look(ref AssignmentMode, "assignmentMode", GrowerAssignmentMode.All);
         Scribe_Values.Look(ref InvertGrowerArea, "invertGrowerArea");
+        Scribe_Defs.Look(ref TargetPlantDef, "targetPlantDef");
 
         if (Manager.ScribeSameMapData)
         {

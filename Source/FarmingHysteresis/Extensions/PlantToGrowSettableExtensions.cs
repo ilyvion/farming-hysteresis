@@ -33,24 +33,24 @@ internal static class PlantToGrowSettableExtensions
     internal static (ThingDef?, int) PlantHarvestInfo(this IPlantToGrowSettable plantToGrowSettable)
     {
         var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow()?.plant.harvestedThingDef;
-        if (harvestedThingDef != null)
-        {
-            var harvestedThingCount = FarmingHysteresisMod.Settings.CountAllOnMap
-                ? plantToGrowSettable
-                    .Map.listerThings.ThingsOfDef(harvestedThingDef)
-                    .Where(t =>
-                        !t.IsForbidden(Faction.OfPlayer)
-                        && !t.Position.Fogged(plantToGrowSettable.Map)
-                    )
-                    .Sum(t => t.stackCount)
-                : plantToGrowSettable.Map.resourceCounter.GetCount(harvestedThingDef);
-            return (harvestedThingDef, harvestedThingCount);
-        }
-        else
-        {
-            return (null, 0);
-        }
+        return harvestedThingDef != null
+            ? (harvestedThingDef, plantToGrowSettable.Map.CountOfHarvestedThingDef(harvestedThingDef))
+            : (null, 0);
     }
+
+    /// <summary>
+    /// The current map-wide stock of <paramref name="harvestedThingDef"/> - shared by the
+    /// per-grower <see cref="PlantHarvestInfo"/> lookup (default engine) and
+    /// <c>Trigger_Hysteresis</c> (CMR integration), which tracks a job-chosen def directly rather
+    /// than deriving it from any one grower's current selection.
+    /// </summary>
+    internal static int CountOfHarvestedThingDef(this Map map, ThingDef harvestedThingDef) =>
+        FarmingHysteresisMod.Settings.CountAllOnMap
+            ? map
+                .listerThings.ThingsOfDef(harvestedThingDef)
+                .Where(t => !t.IsForbidden(Faction.OfPlayer) && !t.Position.Fogged(map))
+                .Sum(t => t.stackCount)
+            : map.resourceCounter.GetCount(harvestedThingDef);
 
     internal static void SetHysteresisControlState(
         this IPlantToGrowSettable plantGrower,
