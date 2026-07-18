@@ -99,40 +99,15 @@ internal class GetGizmosPatcher
             {
                 var uiIcon = harvestedThingDef.uiIcon;
 
-                var useGlobalValuesCommand = new Command_Toggle
+                var boundsSourceCommand = new Command_Action
                 {
-                    defaultLabel = "FarmingHysteresis.UseGlobalValues".Translate(),
-                    defaultDesc = "FarmingHysteresis.UseGlobalValuesDesc".Translate(),
+                    defaultLabel = "FarmingHysteresis.BoundsSourceLabel".Translate(),
+                    defaultDesc = "FarmingHysteresis.BoundsSourceDesc".Translate(),
                     icon = Resources.Hysteresis,
-                    isActive = () => data.useGlobalValues,
-                    toggleAction = () =>
-                    {
-                        if (
-                            data.useGlobalValues
-                            || FarmingHysteresisMapComponent
-                                .For(Find.CurrentMap)
-                                .HasBoundsFor(harvestedThingDef)
-                        )
-                        {
-                            // We were already using global values OR such global values already exist for this harvest type.
-                            // So just flip the flag.
-                            data.useGlobalValues = !data.useGlobalValues;
-                        }
-                        else
-                        {
-                            // This is the first time this harvest type is switching to global values.
-                            // Copy the initial global values over from the local values for a better user experience.
-                            var currentLowerBound = data.LowerBound;
-                            var currentUpperBound = data.UpperBound;
-
-                            data.useGlobalValues = true;
-
-                            data.LowerBound = currentLowerBound;
-                            data.UpperBound = currentUpperBound;
-                        }
-                    },
+                    action = () =>
+                        BoundsSourceUi.OpenFloatMenu(data, plantToGrowSettable, harvestedThingDef),
                 };
-                result.Add(useGlobalValuesCommand);
+                result.Add(boundsSourceCommand);
 
                 var decrementLowerHysteresisCommand = new Command_Decrement
                 {

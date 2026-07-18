@@ -3,7 +3,7 @@ using FarmingHysteresis.Extensions;
 
 namespace FarmingHysteresis;
 
-internal class GlobalThingDefBoundValueAccessor(
+internal class MapThingDefBoundValueAccessor(
     FarmingHysteresisMapComponent mapComponent,
     ThingDef thingDef
 ) : IBoundedValueAccessor
@@ -15,7 +15,7 @@ internal class GlobalThingDefBoundValueAccessor(
     {
         get
         {
-            if (mapComponent.GlobalBoundValues.TryGetValue(thingDef, out var value))
+            if (mapComponent.MapBoundValues.TryGetValue(thingDef, out var value))
             {
                 return value;
             }
@@ -26,7 +26,7 @@ internal class GlobalThingDefBoundValueAccessor(
                     Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
                     Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound,
                 };
-                mapComponent.GlobalBoundValues.Add(thingDef, boundValues);
+                mapComponent.MapBoundValues.Add(thingDef, boundValues);
                 return boundValues;
             }
         }
@@ -34,8 +34,7 @@ internal class GlobalThingDefBoundValueAccessor(
 }
 
 /// <summary>
-/// Tracks per-map global hysteresis bounds and periodically re-evaluates plant growers that
-/// use them.
+/// Tracks per-map hysteresis bounds and periodically re-evaluates plant growers that use them.
 /// </summary>
 public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
 {
@@ -43,7 +42,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
 
     private Dictionary<ThingDef, BoundValues>? globalBoundValues;
 
-    internal Dictionary<ThingDef, BoundValues> GlobalBoundValues
+    internal Dictionary<ThingDef, BoundValues> MapBoundValues
     {
         get
         {
@@ -74,6 +73,9 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
     internal bool HasBoundsFor(ThingDef harvestedThingDef) =>
         globalBoundValues != null && globalBoundValues.ContainsKey(harvestedThingDef);
 
+    internal IBoundedValueAccessor GetMapBoundedValueAccessorFor(ThingDef thingDef) =>
+        new MapThingDefBoundValueAccessor(this, thingDef);
+
     /// <inheritdoc/>
     public string GetUniqueLoadID() => "FarmingHysteresisMapComponent_" + id;
 
@@ -99,9 +101,6 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
         map.components.Add(instance);
         return instance;
     }
-
-    internal IBoundedValueAccessor GetGlobalBoundedValueAccessorFor(ThingDef thingDef) =>
-        new GlobalThingDefBoundValueAccessor(this, thingDef);
 
     /// <inheritdoc/>
     public override void MapComponentTick()
@@ -193,7 +192,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
                         boundValues.Upper = value;
                     }
                 }
-                GlobalBoundValues.Add(thingDef, boundValues);
+                MapBoundValues.Add(thingDef, boundValues);
             }
         }
 #endif

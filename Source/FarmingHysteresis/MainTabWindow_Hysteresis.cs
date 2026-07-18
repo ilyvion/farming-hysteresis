@@ -10,7 +10,7 @@ public class MainButtonWorker_Hysteresis : MainButtonWorker_ToggleTab
 }
 
 /// <summary>
-/// The main tab window showing and allowing editing of the map-global hysteresis bounds.
+/// The main tab window showing and allowing editing of the Map- and Game-tier hysteresis bounds.
 /// </summary>
 public class MainTabWindow_Hysteresis : MainTabWindow
 {
@@ -24,10 +24,54 @@ public class MainTabWindow_Hysteresis : MainTabWindow
 
     private static HysteresisTab currentTab = HysteresisTab.HysteresisValues;
 
-    private readonly Dictionary<ThingDef, IBoundedValueAccessor> globalBoundAccessors = [];
-    private readonly Dictionary<ThingDef, BoundValues> globalBounds = [];
-    private readonly Dictionary<ThingDef, string?> globalBoundLowerBuffers = [];
-    private readonly Dictionary<ThingDef, string?> globalBoundUpperBuffers = [];
+    // Self is intentionally not selectable here: it's per-grower storage, edited only via
+    // ITab_Hysteresis.
+    private static BoundsSource selectedSource = BoundsSource.Map;
+
+    private readonly Dictionary<ThingDef, IBoundedValueAccessor> boundAccessors = [];
+    private readonly Dictionary<ThingDef, BoundValues> bounds = [];
+    private readonly Dictionary<ThingDef, string?> boundLowerBuffers = [];
+    private readonly Dictionary<ThingDef, string?> boundUpperBuffers = [];
+
+    private static IBoundedValueAccessor GetAccessorFor(ThingDef thingDef) =>
+        selectedSource switch
+        {
+            BoundsSource.Map => FarmingHysteresisMapComponent
+                .For(Find.CurrentMap)
+                .GetMapBoundedValueAccessorFor(thingDef),
+            BoundsSource.Game => FarmingHysteresisGameComponent
+                .For(Current.Game)
+                .GetGameBoundedValueAccessorFor(thingDef),
+            BoundsSource.Self => throw new InvalidOperationException(
+                $"MainTabWindow_Hysteresis has no list view for {selectedSource}."
+            ),
+            _ => throw new InvalidOperationException($"Uncovered BoundsSource: {selectedSource}."),
+        };
+
+    private void RebuildBoundsList()
+    {
+        boundAccessors.Clear();
+        boundLowerBuffers.Clear();
+        boundUpperBuffers.Clear();
+        bounds.Clear();
+        foreach (
+            var plantDef in DefDatabase<ThingDef>.AllDefs.Where(def =>
+                def.category == ThingCategory.Plant
+            )
+        )
+        {
+            var harvestedThingDef = plantDef.plant.harvestedThingDef;
+            if (harvestedThingDef == null || boundAccessors.ContainsKey(harvestedThingDef))
+            {
+                continue;
+            }
+            boundAccessors.Add(harvestedThingDef, GetAccessorFor(harvestedThingDef));
+            bounds.Add(harvestedThingDef, boundAccessors[harvestedThingDef].BoundValueRaw);
+            boundLowerBuffers.Add(harvestedThingDef, null);
+            boundUpperBuffers.Add(harvestedThingDef, null);
+        }
+        _filteredHarvestedThingDefs = null;
+    }
 
     /// <inheritdoc/>
     public override void PreOpen()
@@ -36,7 +80,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         tabs.Clear();
         tabs.Add(
             new TabRecord(
-                "FarmingHysteresis.GlobalHysteresisBounds".Translate(),
+                "FarmingHysteresis.HysteresisBounds".Translate(),
                 delegate
                 {
                     currentTab = HysteresisTab.HysteresisValues;
@@ -49,34 +93,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         //     currentTab = HysteresisTab.SomethingElse;
         // }, () => currentTab == HysteresisTab.SomethingElse));
 
-        globalBoundAccessors.Clear();
-        globalBoundLowerBuffers.Clear();
-        globalBoundUpperBuffers.Clear();
-        globalBounds.Clear();
-        foreach (
-            var plantDef in DefDatabase<ThingDef>.AllDefs.Where(def =>
-                def.category == ThingCategory.Plant
-            )
-        )
-        {
-            var harvestedThingDef = plantDef.plant.harvestedThingDef;
-            if (harvestedThingDef == null || globalBoundAccessors.ContainsKey(harvestedThingDef))
-            {
-                continue;
-            }
-            globalBoundAccessors.Add(
-                harvestedThingDef,
-                FarmingHysteresisMapComponent
-                    .For(Find.CurrentMap)
-                    .GetGlobalBoundedValueAccessorFor(harvestedThingDef)
-            );
-            globalBounds.Add(
-                harvestedThingDef,
-                globalBoundAccessors[harvestedThingDef].BoundValueRaw
-            );
-            globalBoundLowerBuffers.Add(harvestedThingDef, null);
-            globalBoundUpperBuffers.Add(harvestedThingDef, null);
-        }
+        RebuildBoundsList();
     }
 
     /// <inheritdoc/>
@@ -84,6 +101,32 @@ public class MainTabWindow_Hysteresis : MainTabWindow
     {
         var rect2 = inRect;
         rect2.yMin += 45f;
+
+        Rect sourceSelectorRect = new(rect2.x, rect2.y - 40f, 200f, 30f);
+        if (Widgets.ButtonText(sourceSelectorRect, BoundsSourceUi.Label(selectedSource)))
+        {
+            List<FloatMenuOption> options =
+            [
+                new(
+                    BoundsSourceUi.Label(BoundsSource.Map),
+                    () =>
+                    {
+                        selectedSource = BoundsSource.Map;
+                        RebuildBoundsList();
+                    }
+                ),
+                new(
+                    BoundsSourceUi.Label(BoundsSource.Game),
+                    () =>
+                    {
+                        selectedSource = BoundsSource.Game;
+                        RebuildBoundsList();
+                    }
+                ),
+            ];
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+
         _ = TabDrawer.DrawTabs(rect2, tabs);
         switch (currentTab)
         {
@@ -108,7 +151,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
     {
         _filteredHarvestedThingDefs =
         [
-            .. globalBoundAccessors.Keys.Where(h =>
+            .. boundAccessors.Keys.Where(h =>
 #if v1_3 || v1_4 || v1_5
                 h.label.Contains(_quickSearch.filter.Text)
 #else
@@ -142,8 +185,8 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         var num = 0f;
         foreach (var harvestedThingDef in _filteredHarvestedThingDefs!)
         {
-            var value = globalBounds[harvestedThingDef].Lower;
-            var buffer = globalBoundLowerBuffers[harvestedThingDef];
+            var value = bounds[harvestedThingDef].Lower;
+            var buffer = boundLowerBuffers[harvestedThingDef];
 
             GUI.color = new Color(1f, 1f, 1f, 0.2f);
             Widgets.DrawLineHorizontal(0f, num, viewRect.width);
@@ -234,8 +277,8 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         var lowerBoundRect = new Rect(prevRect.xMax, rowY, 250f, PLANT_ROW_HEIGHT);
         var listingStandard = new Listing_Standard();
         listingStandard.Begin(lowerBoundRect);
-        ref var value = ref globalBounds[harvestDef].Lower;
-        var buffer = globalBoundLowerBuffers[harvestDef];
+        ref var value = ref bounds[harvestDef].Lower;
+        var buffer = boundLowerBuffers[harvestDef];
         _ = listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
         listingStandard.End();
@@ -260,8 +303,8 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         );
         var listingStandard = new Listing_Standard();
         listingStandard.Begin(upperBoundRect);
-        ref var value = ref globalBounds[harvestDef].Upper;
-        var buffer = globalBoundUpperBuffers[harvestDef];
+        ref var value = ref bounds[harvestDef].Upper;
+        var buffer = boundUpperBuffers[harvestDef];
         _ = listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
         listingStandard.End();

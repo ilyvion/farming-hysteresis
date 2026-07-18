@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A third "Game" bounds option, alongside the existing "Self" and "Map" ones. Growing zones and hydroponics basins set to "Game" share their hysteresis bounds with every other grower of the same crop across your _entire_ save, not just the map they're on — so the bounds now survive traveling between maps, including via Odyssey gravships. Resolves [#26](https://github.com/ilyvion/farming-hysteresis/issues/26).
+- The old "global" bounds option has been renamed "Map" to make clear it's shared per-map, not across your whole save. Existing zones and basins using it are carried over automatically; no action needed.
+- The bounds-source setting is now a single button that opens a menu with all three choices (Self / Map / Game), replacing the old on/off checkbox.
+
+### Fixed
+
+- Growing zones and hydroponics basins using "Map" bounds now always check against the bounds of the map they're actually on, instead of whichever map you currently have open.
+
 ## [0.9.2] - 2025-07-20
 
 ### Fixed

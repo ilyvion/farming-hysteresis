@@ -30,7 +30,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
     private BoundValues _bounds;
 
     public LatchMode latchMode;
-    public bool useGlobalValues;
+    public BoundsSource boundsSource;
 
     public FarmingHysteresisData(IPlantToGrowSettable plantGrower)
     {
@@ -41,7 +41,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound,
             Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound,
         };
-        useGlobalValues = FarmingHysteresisMod.Settings.UseGlobalValuesByDefault;
+        boundsSource = FarmingHysteresisMod.Settings.DefaultBoundsSource;
         latchMode = LatchMode.Unknown;
     }
 
@@ -95,12 +95,26 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 #pragma warning restore 612
         }
 #endif
-        Scribe_Values.Look(
-            ref useGlobalValues,
-            "farmingHysteresisUseGlobalValues",
-            FarmingHysteresisMod.Settings.UseGlobalValuesByDefault,
-            true
-        );
+        string? oldUseGlobalValues = null;
+        if (Scribe.mode == LoadSaveMode.LoadingVars)
+        {
+            Scribe_Values.Look(ref oldUseGlobalValues, "farmingHysteresisUseGlobalValues");
+        }
+        if (oldUseGlobalValues != null)
+        {
+            boundsSource = BoundsSourceMigration.FromOldUseGlobalValues(
+                oldUseGlobalValues == "True"
+            );
+        }
+        else
+        {
+            Scribe_Values.Look(
+                ref boundsSource,
+                "farmingHysteresisBoundsSource",
+                FarmingHysteresisMod.Settings.DefaultBoundsSource,
+                true
+            );
+        }
 
 #if v1_3 || v1_4
         void TransferOldBounds()
@@ -125,33 +139,55 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 
     private IBoundedValueAccessor GetBoundedValueAccessor()
     {
-        IBoundedValueAccessor values;
-        if (!useGlobalValues)
+        if (boundsSource == BoundsSource.Self)
         {
-            values = this;
+            return SelectAccessor(BoundsSource.Self, this, null, null);
         }
-        else
+
+        if (!_plantGrowerWeakReference.TryGetTarget(out var plantGrower))
         {
-            if (_plantGrowerWeakReference.TryGetTarget(out var zone))
-            {
-                var (harvestedThingDef, _) = zone.PlantHarvestInfo();
-                if (harvestedThingDef == null)
-                {
-                    throw new InvalidOperationException(
-                        "This should not happen. Code: FHD-GBVA-PI"
-                    );
-                }
-                values = FarmingHysteresisMapComponent
-                    .For(Find.CurrentMap)
-                    .GetGlobalBoundedValueAccessorFor(harvestedThingDef);
-            }
-            else
-            {
-                throw new InvalidOperationException("This should not happen. Code: FHD-GBVA-ZWR");
-            }
+            throw new InvalidOperationException("This should not happen. Code: FHD-GBVA-ZWR");
         }
-        return values;
+
+        var (harvestedThingDefOrNull, _) = plantGrower.PlantHarvestInfo();
+        var harvestedThingDef =
+            harvestedThingDefOrNull
+            ?? throw new InvalidOperationException("This should not happen. Code: FHD-GBVA-PI");
+
+        return SelectAccessor(
+            boundsSource,
+            this,
+            () =>
+                FarmingHysteresisMapComponent
+                    .For(plantGrower.Map)
+                    .GetMapBoundedValueAccessorFor(harvestedThingDef),
+            () =>
+                FarmingHysteresisGameComponent
+                    .For(Current.Game)
+                    .GetGameBoundedValueAccessorFor(harvestedThingDef)
+        );
     }
+
+    /// <summary>
+    /// Picks the accessor for <paramref name="boundsSource"/> out of the already-resolved
+    /// <paramref name="self"/> accessor and the lazily-resolved <paramref name="map"/>/
+    /// <paramref name="game"/> accessor factories. Extracted from
+    /// <see cref="GetBoundedValueAccessor"/> so the tier-selection logic can be unit tested
+    /// without a live <see cref="Map"/>/<see cref="Game"/>.
+    /// </summary>
+    internal static IBoundedValueAccessor SelectAccessor(
+        BoundsSource boundsSource,
+        IBoundedValueAccessor self,
+        Func<IBoundedValueAccessor>? map,
+        Func<IBoundedValueAccessor>? game
+    ) =>
+        boundsSource switch
+        {
+            BoundsSource.Self => self,
+            BoundsSource.Map => map!(),
+            BoundsSource.Game => game!(),
+            _ => throw new InvalidOperationException($"Uncovered BoundsSource: {boundsSource}."),
+        };
 
     public int LowerBound
     {

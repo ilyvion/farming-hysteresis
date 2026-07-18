@@ -11,7 +11,7 @@ internal class ITab_Hysteresis : ITab
     private string? _upperBoundBuffer;
     private int _lowerBound;
     private int _upperBound;
-    private bool _useGlobalValues;
+    private BoundsSource _boundsSource;
 
     public ITab_Hysteresis()
     {
@@ -49,7 +49,7 @@ internal class ITab_Hysteresis : ITab
                 _upperBound = data.UpperBound;
                 _upperBoundBuffer = null;
             }
-            _useGlobalValues = data.useGlobalValues;
+            _boundsSource = data.boundsSource;
         }
     }
 
@@ -77,17 +77,37 @@ internal class ITab_Hysteresis : ITab
         listingStandard.GapLine(ProductRowPadding);
         listingStandard.Gap(5f);
 
-        listingStandard.CheckboxLabeled(
-            "FarmingHysteresis.UseGlobalBoundsLabel".Translate(),
-            ref _useGlobalValues
-        );
-        if (data.useGlobalValues != _useGlobalValues)
+#if v1_3
+        if (
+            listingStandard.ButtonTextLabeled(
+                "FarmingHysteresis.BoundsSourceLabel".Translate(),
+                BoundsSourceUi.Label(_boundsSource)
+            )
+        )
+#else
+        if (
+            listingStandard.ButtonTextLabeledPct(
+                "FarmingHysteresis.BoundsSourceLabel".Translate(),
+                BoundsSourceUi.Label(_boundsSource),
+                0.6f,
+                TextAnchor.MiddleLeft
+            )
+        )
+#endif
         {
-            data.useGlobalValues = _useGlobalValues;
-            _lowerBound = data.LowerBound;
-            _upperBound = data.UpperBound;
-            _lowerBoundBuffer = null;
-            _upperBoundBuffer = null;
+            BoundsSourceUi.OpenFloatMenu(
+                data,
+                plantToGrowSettable,
+                harvestedThingDef,
+                onSwitched: () =>
+                {
+                    _boundsSource = data.boundsSource;
+                    _lowerBound = data.LowerBound;
+                    _upperBound = data.UpperBound;
+                    _lowerBoundBuffer = null;
+                    _upperBoundBuffer = null;
+                }
+            );
         }
 
         var plant = plantToGrowSettable.GetPlantDefToGrow();

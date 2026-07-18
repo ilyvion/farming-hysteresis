@@ -11,7 +11,7 @@ public class Settings : ModSettings
     private int _defaultHysteresisLowerBound = Constants.DefaultHysteresisLowerBound;
     private int _defaultHysteresisUpperBound = Constants.DefaultHysteresisUpperBound;
     private bool _enabledByDefault = true;
-    private bool _useGlobalValuesByDefault = true;
+    private BoundsSource _defaultBoundsSource = BoundsSource.Map;
     private bool _countAllOnMap;
     private HysteresisMode _hysteresisMode = HysteresisMode.Sowing;
     private bool _showOldCommands;
@@ -46,12 +46,12 @@ public class Settings : ModSettings
     }
 
     /// <summary>
-    /// Gets whether newly created hysteresis controls use the map-global bounds by default.
+    /// Gets the <see cref="BoundsSource"/> newly created hysteresis controls use by default.
     /// </summary>
-    public bool UseGlobalValuesByDefault
+    internal BoundsSource DefaultBoundsSource
     {
-        get => _useGlobalValuesByDefault;
-        internal set => _useGlobalValuesByDefault = value;
+        get => _defaultBoundsSource;
+        set => _defaultBoundsSource = value;
     }
 
     /// <summary>
@@ -128,7 +128,19 @@ public class Settings : ModSettings
             Constants.DefaultHysteresisUpperBound
         );
         Scribe_Values.Look(ref _enabledByDefault, "enabledByDefault", true);
-        Scribe_Values.Look(ref _useGlobalValuesByDefault, "useGlobalValuesByDefault", true);
+
+        string? oldUseGlobalValuesByDefault = null;
+        Scribe_Values.Look(ref oldUseGlobalValuesByDefault, "useGlobalValuesByDefault");
+        if (oldUseGlobalValuesByDefault != null)
+        {
+            _defaultBoundsSource = BoundsSourceMigration.FromOldUseGlobalValues(
+                oldUseGlobalValuesByDefault == "True"
+            );
+        }
+        else
+        {
+            Scribe_Values.Look(ref _defaultBoundsSource, "defaultBoundsSource", BoundsSource.Map);
+        }
         Scribe_Values.Look(ref _countAllOnMap, "countAllOnMap", false);
         Scribe_Values.Look(ref _hysteresisMode, "hysteresisMode", HysteresisMode.Sowing);
         Scribe_Values.Look(ref _showOldCommands, "showOldCommands", false);
@@ -149,10 +161,41 @@ public class Settings : ModSettings
             "FarmingHysteresis.EnabledByDefault".Translate(),
             ref _enabledByDefault
         );
-        listingStandard.CheckboxLabeled(
-            "FarmingHysteresis.UseGlobalValuesByDefault".Translate(),
-            ref _useGlobalValuesByDefault
-        );
+#if v1_3
+        if (
+            listingStandard.ButtonTextLabeled(
+                "FarmingHysteresis.DefaultBoundsSource".Translate(),
+                BoundsSourceUi.Label(_defaultBoundsSource)
+            )
+        )
+#else
+        if (
+            listingStandard.ButtonTextLabeledPct(
+                "FarmingHysteresis.DefaultBoundsSource".Translate(),
+                BoundsSourceUi.Label(_defaultBoundsSource),
+                0.6f,
+                TextAnchor.MiddleLeft
+            )
+        )
+#endif
+        {
+            List<FloatMenuOption> boundsSourceOptions =
+            [
+                new FloatMenuOption(
+                    BoundsSourceUi.Label(BoundsSource.Self),
+                    () => _defaultBoundsSource = BoundsSource.Self
+                ),
+                new FloatMenuOption(
+                    BoundsSourceUi.Label(BoundsSource.Map),
+                    () => _defaultBoundsSource = BoundsSource.Map
+                ),
+                new FloatMenuOption(
+                    BoundsSourceUi.Label(BoundsSource.Game),
+                    () => _defaultBoundsSource = BoundsSource.Game
+                ),
+            ];
+            Find.WindowStack.Add(new FloatMenu(boundsSourceOptions));
+        }
 
         // Calculate where the CountAllOnMap checkbox will go
         var textHeight = Text.CalcHeight(
