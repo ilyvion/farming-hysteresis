@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <ColonyManagerRedux.ManagerDef>
+        <defName>CM_FarmingHysteresisManager</defName>
+        <order>650</order>
+        <managerJobClass>FarmingHysteresis.ColonyManagerRedux.ManagerJob_FarmingHysteresis</managerJobClass>
+        <managerSettingsClass>FarmingHysteresis.ColonyManagerRedux.ManagerSettings_FarmingHysteresis</managerSettingsClass>
+        <managerTabClass>FarmingHysteresis.ColonyManagerRedux.ManagerTab_FarmingHysteresis</managerTabClass>
+        <iconPath>UI/Icons/FarmingHysteresis_CMR_Farming</iconPath>
+        <label>farming hysteresis</label>
+    </ColonyManagerRedux.ManagerDef>
+</Defs>

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>FarmingHysteresis.ColonyManagerRedux</RootNamespace>
+        <AssemblyName>FarmingHysteresis.ColonyManagerRedux</AssemblyName>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <OutputPath>../../Integrations/ColonyManagerRedux/$(RimWorldVersion)/Assemblies</OutputPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FarmingHysteresis\FarmingHysteresis.csproj">
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
+        <ProjectReference Include="..\..\..\colony-manager-redux\Source\ColonyManagerRedux\ColonyManagerRedux.csproj">
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
+    </ItemGroup>
+</Project>

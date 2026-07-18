@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LanguageData>
+    <FarmingHysteresis.CMR.TakeOverControl>Take over Farming Hysteresis control</FarmingHysteresis.CMR.TakeOverControl>
+    <FarmingHysteresis.CMR.TakeOverControlTip>When enabled, Colony Manager Redux takes over deciding when to enable/disable sowing and harvesting, mod-wide, in place of Farming Hysteresis's own always-on control. Growers not covered by any Farming Hysteresis manager job are left uncontrolled while this is on.</FarmingHysteresis.CMR.TakeOverControlTip>
+</LanguageData>

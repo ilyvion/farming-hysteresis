@@ -39,5 +39,8 @@
         <li>ilyvion.Laboratory</li>
         <!-- Sowing/harvesting control only works correctly if we're after Smart Farming -->
         <li>Owlchemist.SmartFarming</li>
+        <!-- The Colony Manager Redux integration subclasses its ManagerJob/ManagerSettings/
+             ManagerTab, so its assembly must load after CMR's -->
+        <li>ilyvion.colonymanagerredux</li>
     </loadAfter>
 </ModMetaData>

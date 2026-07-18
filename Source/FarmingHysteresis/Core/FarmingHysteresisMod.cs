@@ -1,4 +1,5 @@
 [assembly: InternalsVisibleTo("FarmingHysteresis.VanillaPlantsExpandedMorePlants")]
+[assembly: InternalsVisibleTo("FarmingHysteresis.ColonyManagerRedux")]
 
 namespace FarmingHysteresis;
 

@@ -13,10 +13,14 @@
         <li>Common</li>
         <li>1.5</li>
         <li IfModActive="VanillaExpanded.VPlantsEMore">Integrations/VanillaPlantsExpandedMorePlants/1.5</li>
+        <li IfModActive="ilyvion.colonymanagerredux">Integrations/ColonyManagerRedux/Common</li>
+        <li IfModActive="ilyvion.colonymanagerredux">Integrations/ColonyManagerRedux/1.5</li>
     </v1.5>
     <v1.6>
         <li>Common</li>
         <li>1.6</li>
         <li IfModActive="VanillaExpanded.VPlantsEMore">Integrations/VanillaPlantsExpandedMorePlants/1.6</li>
+        <li IfModActive="ilyvion.colonymanagerredux">Integrations/ColonyManagerRedux/Common</li>
+        <li IfModActive="ilyvion.colonymanagerredux">Integrations/ColonyManagerRedux/1.6</li>
     </v1.6>
 </loadFolders>
