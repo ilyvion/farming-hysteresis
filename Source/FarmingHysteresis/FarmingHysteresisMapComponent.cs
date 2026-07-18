@@ -1,6 +1,3 @@
-using FarmingHysteresis.Defs;
-using FarmingHysteresis.Extensions;
-
 namespace FarmingHysteresis;
 
 internal class MapThingDefBoundValueAccessor(
@@ -113,18 +110,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
             return;
         }
 
-        foreach (
-            var plantGrower in DefDatabase<FarmingHysteresisControlDef>.AllDefs.SelectMany(d =>
-                d.Worker.GetControlledPlantGrowers(map)
-            )
-        )
-        {
-            var data = plantGrower.GetFarmingHysteresisData();
-            if (data.Enabled)
-            {
-                data.UpdateLatchModeAndHandling(plantGrower);
-            }
-        }
+        FarmingHysteresisMod.HysteresisController.Tick(map);
     }
 
     /// <inheritdoc/>

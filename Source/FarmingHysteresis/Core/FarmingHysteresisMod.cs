@@ -53,6 +53,14 @@ public class FarmingHysteresisMod : IlyvionMod
     /// </summary>
     public static Settings Settings => Instance.GetSettings<Settings>();
 
+    /// <summary>
+    /// Gets the currently active hysteresis controller. Defaults to the mod's own always-on
+    /// engine (<see cref="DefaultHysteresisController"/>); may be swapped out by an external
+    /// integration, e.g. Colony Manager Redux.
+    /// </summary>
+    public static IHysteresisController HysteresisController { get; internal set; } =
+        DefaultHysteresisController.Instance;
+
     /// <inheritdoc/>
     public override void DoSettingsWindowContents(Rect inRect) =>
         Settings.DoSettingsWindowContents(inRect);

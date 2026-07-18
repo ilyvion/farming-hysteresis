@@ -47,6 +47,11 @@ internal class GetGizmosPatcher
     )
         where T : IPlantToGrowSettable
     {
+        if (!FarmingHysteresisMod.HysteresisController.OwnsGrowerUi(plantToGrowSettable))
+        {
+            return;
+        }
+
         var data = getHysteresisData(plantToGrowSettable);
         var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow()?.plant.harvestedThingDef;
 
