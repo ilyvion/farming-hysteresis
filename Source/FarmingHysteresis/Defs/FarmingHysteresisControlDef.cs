@@ -24,6 +24,16 @@ public class FarmingHysteresisControlDef : Def
     > plantGrowerControlFields = new();
 #pragma warning restore IDE0028 // Simplify collection initialization
 
+    /// <summary>
+    /// Gets every plant grower on <paramref name="map"/>, across all registered
+    /// <see cref="FarmingHysteresisControlDef"/>s.
+    /// </summary>
+    /// <param name="map">The map to search.</param>
+    public static IEnumerable<IPlantToGrowSettable> AllControlledPlantGrowers(Map map) =>
+        DefDatabase<FarmingHysteresisControlDef>.AllDefs.SelectMany(d =>
+            d.Worker.GetControlledPlantGrowers(map)
+        );
+
     /// <summary>The <see cref="FarmingHysteresisControlWorker"/> subclass to instantiate for this def.</summary>
     public Type workerClass = typeof(FarmingHysteresisControlWorker);
 

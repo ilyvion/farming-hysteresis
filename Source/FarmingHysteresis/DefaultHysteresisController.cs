@@ -16,11 +16,7 @@ internal sealed class DefaultHysteresisController : IHysteresisController
 
     public void Tick(Map map)
     {
-        foreach (
-            var plantGrower in DefDatabase<FarmingHysteresisControlDef>.AllDefs.SelectMany(d =>
-                d.Worker.GetControlledPlantGrowers(map)
-            )
-        )
+        foreach (var plantGrower in FarmingHysteresisControlDef.AllControlledPlantGrowers(map))
         {
             var data = plantGrower.GetFarmingHysteresisData();
             if (data.Enabled)

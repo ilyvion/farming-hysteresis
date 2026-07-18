@@ -3,4 +3,14 @@
 <LanguageData>
     <FarmingHysteresis.CMR.TakeOverControl>Take over Farming Hysteresis control</FarmingHysteresis.CMR.TakeOverControl>
     <FarmingHysteresis.CMR.TakeOverControlTip>When enabled, Colony Manager Redux takes over deciding when to enable/disable sowing and harvesting, mod-wide, in place of Farming Hysteresis's own always-on control. Growers not covered by any Farming Hysteresis manager job are left uncontrolled while this is on.</FarmingHysteresis.CMR.TakeOverControlTip>
+
+    <FarmingHysteresis.CMR.GrowerScope>Grower scope</FarmingHysteresis.CMR.GrowerScope>
+    <FarmingHysteresis.CMR.GrowerScope.All>All</FarmingHysteresis.CMR.GrowerScope.All>
+    <FarmingHysteresis.CMR.GrowerScope.All.Tip>Every eligible grower on the map not already claimed by another Farming Hysteresis job is managed by this job.</FarmingHysteresis.CMR.GrowerScope.All.Tip>
+    <FarmingHysteresis.CMR.GrowerScope.Area>Area</FarmingHysteresis.CMR.GrowerScope.Area>
+    <FarmingHysteresis.CMR.GrowerScope.Area.Tip>Only growers within (or outside, if inverted) a chosen area are managed by this job.</FarmingHysteresis.CMR.GrowerScope.Area.Tip>
+    <FarmingHysteresis.CMR.GrowerScope.Specific>Specific</FarmingHysteresis.CMR.GrowerScope.Specific>
+    <FarmingHysteresis.CMR.GrowerScope.Specific.Tip>Only the growers you explicitly select are managed by this job.</FarmingHysteresis.CMR.GrowerScope.Specific.Tip>
+    <FarmingHysteresis.CMR.GrowerScope.NoEligibleGrowers>No eligible growers found on this map yet.</FarmingHysteresis.CMR.GrowerScope.NoEligibleGrowers>
+    <FarmingHysteresis.CMR.GrowerScope.ManagedByOtherJob>Already managed by another Farming Hysteresis job ({0}). A grower can only be controlled by one job at a time.</FarmingHysteresis.CMR.GrowerScope.ManagedByOtherJob>
 </LanguageData>
