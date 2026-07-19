@@ -1,0 +1,27 @@
+using ColonyManagerRedux;
+
+namespace FarmingHysteresis.ColonyManagerRedux;
+
+#pragma warning disable CS8618, CA2211
+
+/// <summary>
+/// This integration's own history chapter defs (see <c>Docs/CMRIntegrationRework.md</c>, Step
+/// 3) - CMR's own <see cref="ManagerJobHistoryChapterDef"/> instances (<c>CM_HistoryStock</c>
+/// etc.) live in its core mod's own <c>Common/Defs</c> and could in principle be reused, but its
+/// <c>ManagerJobHistoryChapterDefOf</c> lookup class is <c>internal</c> to
+/// <c>ColonyManagerRedux.Managers</c>, which this integration never references (see Design
+/// decision 4/CMR API grounding) - so this integration needs its own defs and its own
+/// <c>DefOf</c> lookup class, resolved by defName like any other third-party mod would.
+/// </summary>
+[DefOf]
+internal static class ManagerJobHistoryChapterDefOf
+{
+    public static ManagerJobHistoryChapterDef FH_HistoryStock;
+    public static ManagerJobHistoryChapterDef FH_HistoryLower;
+    public static ManagerJobHistoryChapterDef FH_HistoryUpper;
+
+    static ManagerJobHistoryChapterDefOf()
+    {
+        DefOfHelper.EnsureInitializedInCtor(typeof(ManagerJobHistoryChapterDefOf));
+    }
+}

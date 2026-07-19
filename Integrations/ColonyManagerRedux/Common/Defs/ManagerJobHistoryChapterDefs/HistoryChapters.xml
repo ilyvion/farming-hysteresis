@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <ColonyManagerRedux.ManagerJobHistoryChapterDef>
+        <defName>FH_HistoryStock</defName>
+        <historyLabel Class="ColonyManagerRedux.TranslationHistoryLabel">
+            <translationKey>FarmingHysteresis.CMR.History.Stock</translationKey>
+        </historyLabel>
+        <color>(1, 1, 1)</color>
+    </ColonyManagerRedux.ManagerJobHistoryChapterDef>
+    <ColonyManagerRedux.ManagerJobHistoryChapterDef>
+        <defName>FH_HistoryLower</defName>
+        <historyLabel Class="ColonyManagerRedux.TranslationHistoryLabel">
+            <translationKey>FarmingHysteresis.CMR.History.Lower</translationKey>
+        </historyLabel>
+        <color>(.5, .5, .5)</color>
+    </ColonyManagerRedux.ManagerJobHistoryChapterDef>
+    <ColonyManagerRedux.ManagerJobHistoryChapterDef>
+        <defName>FH_HistoryUpper</defName>
+        <historyLabel Class="ColonyManagerRedux.TranslationHistoryLabel">
+            <translationKey>FarmingHysteresis.CMR.History.Upper</translationKey>
+        </historyLabel>
+        <color>(.75, .75, .75)</color>
+    </ColonyManagerRedux.ManagerJobHistoryChapterDef>
+</Defs>

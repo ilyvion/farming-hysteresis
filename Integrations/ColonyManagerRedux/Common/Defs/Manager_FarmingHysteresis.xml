@@ -8,5 +8,15 @@
         <managerTabClass>FarmingHysteresis.ColonyManagerRedux.ManagerTab_FarmingHysteresis</managerTabClass>
         <iconPath>UI/Icons/FarmingHysteresis_CMR_Farming</iconPath>
         <label>farming hysteresis</label>
+        <jobComps>
+            <li Class="ColonyManagerRedux.CompProperties_ManagerJobHistory">
+                <workerClass>FarmingHysteresis.ColonyManagerRedux.ManagerJob_FarmingHysteresis+History</workerClass>
+                <chapters>
+                    <li>FH_HistoryStock</li>
+                    <li>FH_HistoryLower</li>
+                    <li>FH_HistoryUpper</li>
+                </chapters>
+            </li>
+        </jobComps>
     </ColonyManagerRedux.ManagerDef>
 </Defs>

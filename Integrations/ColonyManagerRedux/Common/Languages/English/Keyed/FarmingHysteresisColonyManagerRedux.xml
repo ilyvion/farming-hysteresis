@@ -33,6 +33,10 @@
     <FarmingHysteresis.CMR.Migration.PendingNotice>This save is still using Farming Hysteresis's old always-on control rather than Colony Manager Redux. Migrating now will create a job per target plant found among currently-enabled growers, using the most common bounds among each group.</FarmingHysteresis.CMR.Migration.PendingNotice>
     <FarmingHysteresis.CMR.Migration.MigrateNow>Migrate now</FarmingHysteresis.CMR.Migration.MigrateNow>
 
+    <FarmingHysteresis.CMR.History.Stock>stock</FarmingHysteresis.CMR.History.Stock>
+    <FarmingHysteresis.CMR.History.Lower>lower bound</FarmingHysteresis.CMR.History.Lower>
+    <FarmingHysteresis.CMR.History.Upper>upper bound</FarmingHysteresis.CMR.History.Upper>
+
     <FarmingHysteresis.CMR.Logs.LatchState>{0}</FarmingHysteresis.CMR.Logs.LatchState>
     <FarmingHysteresis.CMR.Logs.GrowerPlantSet>{0}: now set to grow {1}</FarmingHysteresis.CMR.Logs.GrowerPlantSet>
     <FarmingHysteresis.CMR.Logs.GrowerStateChanged>{0}: {1}</FarmingHysteresis.CMR.Logs.GrowerStateChanged>

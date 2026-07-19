@@ -34,6 +34,66 @@ internal sealed class ManagerJob_FarmingHysteresis
         public ThingDef TargetPlantDef { get; } = targetPlantDef;
     }
 
+    /// <summary>
+    /// Charts <see cref="Trigger_Hysteresis.TrackedThingCount"/> alongside its two bounds (see
+    /// <c>Docs/CMRIntegrationRework.md</c>, Step 3) as three independent flat/varying lines -
+    /// "stock", "lower bound", and "upper bound" - each chapter's "count" is simply that value
+    /// each tick. None of them use CMR's target-line mechanism.
+    /// </summary>
+    public sealed class History : HistoryWorker<ManagerJob_FarmingHysteresis>
+    {
+        /// <summary>
+        /// Pure per-chapter count selection behind
+        /// <see cref="GetCountForHistoryChapterCoroutine"/>, split out so it's unit-testable
+        /// without a live <see cref="ManagerJob_FarmingHysteresis"/>/coroutine.
+        /// </summary>
+        internal static int SelectCount(
+            ManagerJobHistoryChapterDef chapterDef,
+            int trackedThingCount,
+            int lower,
+            int upper
+        ) =>
+            chapterDef == ManagerJobHistoryChapterDefOf.FH_HistoryStock ? trackedThingCount
+            : chapterDef == ManagerJobHistoryChapterDefOf.FH_HistoryLower ? lower
+            : upper;
+
+        /// <inheritdoc/>
+        public override Coroutine GetCountForHistoryChapterCoroutine(
+            ManagerJob_FarmingHysteresis managerJob,
+            int tick,
+            ManagerJobHistoryChapterDef chapterDef,
+            Boxed<int> count
+        )
+        {
+            // Forces a fresh recompute if the cache has expired, same reasoning as
+            // Trigger_Hysteresis.StatusTooltip - the graph shouldn't lag behind bounds the
+            // player just edited.
+            _ = managerJob.HysteresisTrigger.State;
+
+            count.Value = SelectCount(
+                chapterDef,
+                managerJob.HysteresisTrigger.TrackedThingCount,
+                managerJob.HysteresisTrigger.Lower,
+                managerJob.HysteresisTrigger.Upper
+            );
+            yield break;
+        }
+
+        /// <inheritdoc/>
+        public override Coroutine GetTargetForHistoryChapterCoroutine(
+            ManagerJob_FarmingHysteresis managerJob,
+            int tick,
+            ManagerJobHistoryChapterDef chapterDef,
+            Boxed<int> target
+        )
+        {
+            // None of this job's chapters use a target line - all three (stock/lower/upper)
+            // are already plain value series, so there's nothing left for a target to add.
+            target.Value = 0;
+            yield break;
+        }
+    }
+
     public ManagerJob_FarmingHysteresis(Manager manager)
         : base(manager)
     {

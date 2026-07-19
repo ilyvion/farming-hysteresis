@@ -127,3 +127,50 @@ internal static class GrowerClaimResolutionTests
         Assert.ThatCollection(laterJobManaged).Does.Contain("zoneC");
     }
 }
+
+// Regression guard for ManagerJob_FarmingHysteresis.History's per-chapter selection logic (see
+// Docs/CMRIntegrationRework.md, Step 3) - stock, lower bound, and upper bound are each their own
+// flat/varying chapter, and none of them ever draw a target line.
+[HotSwappable]
+[TestSuite]
+internal static class ManagerJobFarmingHysteresisHistoryTests
+{
+    [Test]
+    public static void StockChapterCountIsTheTrackedThingCount() =>
+        Assert
+            .That(
+                ManagerJob_FarmingHysteresis.History.SelectCount(
+                    ManagerJobHistoryChapterDefOf.FH_HistoryStock,
+                    trackedThingCount: 42,
+                    lower: 10,
+                    upper: 20
+                )
+            )
+            .Is.EqualTo(42);
+
+    [Test]
+    public static void LowerChapterCountIsTheLowerBound() =>
+        Assert
+            .That(
+                ManagerJob_FarmingHysteresis.History.SelectCount(
+                    ManagerJobHistoryChapterDefOf.FH_HistoryLower,
+                    trackedThingCount: 42,
+                    lower: 10,
+                    upper: 20
+                )
+            )
+            .Is.EqualTo(10);
+
+    [Test]
+    public static void UpperChapterCountIsTheUpperBound() =>
+        Assert
+            .That(
+                ManagerJob_FarmingHysteresis.History.SelectCount(
+                    ManagerJobHistoryChapterDefOf.FH_HistoryUpper,
+                    trackedThingCount: 42,
+                    lower: 10,
+                    upper: 20
+                )
+            )
+            .Is.EqualTo(20);
+}
