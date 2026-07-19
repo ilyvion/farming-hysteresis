@@ -74,7 +74,7 @@ internal static class RimWorld_VersionUpdateDialogMaker_CreateVersionUpdateDialo
 
 internal class NewModRequirement : Dialog_MessageBox
 {
-    public override Vector2 InitialSize => new(640f, 150f);
+    public override Vector2 InitialSize => new(640f, 200f);
 
     internal NewModRequirement(
         string text,

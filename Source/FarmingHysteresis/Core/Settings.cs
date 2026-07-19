@@ -17,6 +17,7 @@ public class Settings : ModSettings
     private bool _showOldCommands;
     private bool _showHysteresisMainTab = true;
     private bool _showIlyvionLaboratoryWarning = true;
+    private bool _showColonyManagerReduxSuggestion = true;
 
     /// <summary>
     /// Gets the default lower bound for newly created hysteresis controls.
@@ -112,6 +113,15 @@ public class Settings : ModSettings
         set => _showIlyvionLaboratoryWarning = value;
     }
 
+    /// <summary>
+    /// Gets or sets whether the Colony Manager Redux suggestion should be shown.
+    /// </summary>
+    public bool ShowColonyManagerReduxSuggestion
+    {
+        get => _showColonyManagerReduxSuggestion;
+        set => _showColonyManagerReduxSuggestion = value;
+    }
+
     /// <inheritdoc/>
     public override void ExposeData()
     {
@@ -146,6 +156,11 @@ public class Settings : ModSettings
         Scribe_Values.Look(ref _showOldCommands, "showOldCommands", false);
         Scribe_Values.Look(ref _showHysteresisMainTab, "showHysteresisMainTab", true);
         Scribe_Values.Look(ref _showIlyvionLaboratoryWarning, "showIlyvionLaboratoryWarning", true);
+        Scribe_Values.Look(
+            ref _showColonyManagerReduxSuggestion,
+            "showColonyManagerReduxSuggestion",
+            true
+        );
     }
 
     /// <summary>

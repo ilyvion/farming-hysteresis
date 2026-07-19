@@ -29,6 +29,20 @@
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
         </ProjectReference>
+        <!--
+            Not used directly - only needed so this project has its own direct edge to mark
+            Private=false on. Without it, MSBuild computes copy-local per direct reference in
+            *this* project only, so the intermediate FarmingHysteresis.ColonyManagerRedux
+            project's own Private=false on its edge to this doesn't suppress the transitive
+            copy here; ColonyManagerRedux.dll/.pdb/.xml would otherwise land in this project's
+            output folder (Integrations/ColonyManagerRedux/<version>/Assemblies) on every build,
+            defeating the point of that folder being gated behind Colony Manager Redux actually
+            being installed.
+        -->
+        <ProjectReference Include="..\..\..\colony-manager-redux\Source\ColonyManagerRedux\ColonyManagerRedux.csproj">
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
         <ProjectReference Include="$(ProjectDependenciesBasePath)\RimTest\Source\RimTestRedux\RimTestRedux.csproj">
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
