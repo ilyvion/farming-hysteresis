@@ -199,6 +199,54 @@ internal static class SyncFilterToSingleDefTests
     }
 }
 
+// Regression guard for the generalization behind Step 6's dual-crop tracking modes (see
+// Docs/CMRIntegrationRework.md) - SyncFilterToSingleDef is now a one-def special case of this.
+[HotSwappable]
+[TestSuite]
+internal static class SyncFilterToDefsTests
+{
+    [Test]
+    public static void AllowsEveryGivenDef()
+    {
+        var hops = new ThingDef();
+        var beer = new ThingDef();
+        var filter = new ThingFilter();
+
+        SyncFilterToDefs(filter, [hops, beer]);
+
+        Assert.ThatCollection(filter.AllowedThingDefs).Has.Count(2);
+        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(hops);
+        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(beer);
+    }
+
+    [Test]
+    public static void ReplacesWhateverWasPreviouslyAllowed()
+    {
+        var hops = new ThingDef();
+        var beer = new ThingDef();
+        var filter = new ThingFilter();
+        SyncFilterToDefs(filter, [hops]);
+
+        SyncFilterToDefs(filter, [beer]);
+
+        Assert.ThatCollection(filter.AllowedThingDefs).Has.Count(1);
+        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(beer);
+        Assert.ThatCollection(filter.AllowedThingDefs).Does.Not.Contain(hops);
+    }
+
+    [Test]
+    public static void ClearsToDisallowAllWhenDefsIsEmpty()
+    {
+        var hops = new ThingDef();
+        var filter = new ThingFilter();
+        SyncFilterToDefs(filter, [hops]);
+
+        SyncFilterToDefs(filter, []);
+
+        Assert.ThatCollection(filter.AllowedThingDefs).Is.Empty();
+    }
+}
+
 // Regression guard for Trigger_Hysteresis's crop-rotation advance decision (see
 // Docs/CMRIntegrationRework.md, Step 5 - resolves #6): only a fresh transition into
 // AboveUpperBound should advance the rotation, and only when there's more than one crop to

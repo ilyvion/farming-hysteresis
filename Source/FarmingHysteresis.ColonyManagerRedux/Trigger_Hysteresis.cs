@@ -218,10 +218,21 @@ internal sealed class Trigger_Hysteresis : Trigger
     /// <see langword="null"/>). Split out as a static method taking a bare <see cref="ThingFilter"/>
     /// so it's unit-testable without a live job/trigger.
     /// </summary>
-    internal static void SyncFilterToSingleDef(ThingFilter filter, ThingDef? def)
+    internal static void SyncFilterToSingleDef(ThingFilter filter, ThingDef? def) =>
+        SyncFilterToDefs(filter, def != null ? [def] : []);
+
+    /// <summary>
+    /// Pure "seed once" helper generalizing <see cref="SyncFilterToSingleDef"/> to an arbitrary
+    /// set of defs - resets <paramref name="filter"/> to allow only <paramref name="defs"/> (a
+    /// crop rotation entry uses this to track its primary harvested product, a resolved secondary
+    /// product, or both - see <see cref="CropRotationEntry.SyncTrackedFilterToTargetPlant"/> and
+    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 6). Split out as a static method taking a bare
+    /// <see cref="ThingFilter"/> so it's unit-testable without a live job/trigger.
+    /// </summary>
+    internal static void SyncFilterToDefs(ThingFilter filter, IEnumerable<ThingDef> defs)
     {
         filter.SetDisallowAll();
-        if (def != null)
+        foreach (var def in defs)
         {
             filter.SetAllow(def, true);
         }
@@ -643,6 +654,15 @@ internal sealed class Trigger_Hysteresis : Trigger
     }
 
     /// <summary>
+    /// Above this many allowed defs, <see cref="DrawTrackedProductRow(ThingFilter, Vector2, float)"/>
+    /// falls back to <see cref="DescribeTrackedFilter"/>'s condensed "N kinds of items" summary
+    /// instead of listing every def - a dual-crop entry tracking "Both" (2 defs) or a small
+    /// hand-picked selection reads much better spelled out, but an arbitrary player-built filter
+    /// covering dozens of defs would just be a wall of icon rows.
+    /// </summary>
+    private const int MaxExplicitlyListedProducts = 5;
+
+    /// <summary>
     /// The tracked-product row: icon+label when <see cref="TrackedThingFilter"/> allows exactly
     /// one def (the common case - following the target plant, or a player's own single-def
     /// choice), or a plain summary label otherwise (see <see cref="DescribeTrackedFilter"/>) -
@@ -656,15 +676,22 @@ internal sealed class Trigger_Hysteresis : Trigger
     /// Pure-parameter version of the tracked-product row, split out so
     /// <c>ManagerTab_FarmingHysteresis</c> can draw each rotation entry's own
     /// <see cref="CropRotationEntry.TrackedThingFilter"/> the same way this trigger draws its
-    /// active entry's - icon+label when the filter allows exactly one def, or a plain summary
-    /// label otherwise (see <see cref="DescribeTrackedFilter"/>).
+    /// active entry's - icon+label for each allowed def when there are
+    /// <see cref="MaxExplicitlyListedProducts"/> or fewer (e.g. a dual-crop entry's primary and
+    /// secondary product, listed one on top of the other), or a plain summary label otherwise
+    /// (see <see cref="DescribeTrackedFilter"/>).
     /// </summary>
     internal static float DrawTrackedProductRow(ThingFilter filter, Vector2 pos, float width)
     {
         var allowedDefs = filter.AllowedThingDefs.ToList();
-        if (allowedDefs.Count == 1)
+        if (allowedDefs.Count is >= 1 and <= MaxExplicitlyListedProducts)
         {
-            return DrawProductRow(allowedDefs[0], pos, width);
+            var start = pos;
+            foreach (var def in allowedDefs)
+            {
+                pos.y += DrawProductRow(def, pos, width);
+            }
+            return pos.y - start.y;
         }
 
         var rowHeight = ProductIconSize + (2 * ProductRowPadding);

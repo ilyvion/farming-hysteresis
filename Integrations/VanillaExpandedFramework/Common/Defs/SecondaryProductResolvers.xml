@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Defs>
+    <FarmingHysteresis.Defs.SecondaryProductResolverDef>
+        <defName>FH_DualCropSecondaryProductResolver</defName>
+        <resolverClass>FarmingHysteresis.VanillaExpandedFramework.Defs.DualCropSecondaryProductResolverWorker</resolverClass>
+    </FarmingHysteresis.Defs.SecondaryProductResolverDef>
+</Defs>

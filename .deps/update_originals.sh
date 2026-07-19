@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+echo "This is no longer necessary, the originals are symlinks now"
+exit 1
+
 RIMWORLD_STEAM_WORKSHOP_FOLDER_PATH="$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam/steamapps/workshop/content/294100"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

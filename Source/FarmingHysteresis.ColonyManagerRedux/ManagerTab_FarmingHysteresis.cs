@@ -143,7 +143,10 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         DrawRotationModeSelector(job, ref pos, width);
         DrawSwitchModeSelector(job, ref pos, width);
 
-        var validTargetPlants = job.ValidTargetPlants.ToList();
+        // Ordered by label, matching vanilla's own plant-picker menus (e.g. the zone "add plant"
+        // FloatMenu) - ValidTargetPlants itself comes back in DefDatabase/whatever-order-the-mods-
+        // loaded-in order, which reads as random to a player scanning a long list.
+        var validTargetPlants = job.ValidTargetPlants.OrderBy(d => d.label, StringComparer.OrdinalIgnoreCase).ToList();
         if (validTargetPlants.Count == 0 && job.RotationEntries.Count == 0)
         {
             var message = "FarmingHysteresis.CMR.TargetPlant.NoneAvailable".Translate();
@@ -301,12 +304,18 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     }
 
     private static float RotationEntryHeight =>
-        // Picker row + tracked-product row share the same icon+label shape/size.
-        (2 * (TargetPlantIconSize + (2 * TargetPlantRowPadding)))
+        // Picker row + tracked-product row(s) share the same icon+label shape/size. The
+        // tracked-product row can now list up to Trigger_Hysteresis.MaxExplicitlyListedProducts
+        // defs stacked on top of each other (e.g. a dual-crop entry's primary and secondary
+        // product) rather than always exactly one - "3" covers the picker row plus the common
+        // dual-crop case (2 tracked rows); an entry tracking more than that undercounts here,
+        // same approximation level already accepted below for the latch state line - this only
+        // affects DrawRotationEntries' cull-skip advancement (Widgets_Section.CanCull), not what
+        // actually gets drawn.
+        (3 * (TargetPlantIconSize + (2 * TargetPlantRowPadding)))
         // Bounds (2 rows of label+field each) + storage amount + latch state + configure button.
         // The latch state line can wrap onto a second line depending on translated text/width -
-        // this only affects DrawRotationEntries' cull-skip advancement (Widgets_Section.CanCull),
-        // same approximation level already used elsewhere in this file for label rows.
+        // same approximation caveat as above.
         + (7 * ListEntryHeight)
         + Margin;
 
@@ -501,18 +510,96 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         Widgets.Label(new Rect(pos.x, pos.y, width, latchHeight), latchDescription);
         pos.y += latchHeight;
 
+        DrawConfigureTrackedButtonRow(job, entry, pos, width);
+        pos.y += ListEntryHeight;
+
+        pos.y += Margin;
+
+        return pos.y - start.y;
+    }
+
+    private const float UntrackedProductHintIconSize = ListEntryHeight - 4f;
+
+    /// <summary>
+    /// "Configure tracked items…" button, shrunk to make room for a hint icon (only shown while
+    /// <see cref="DescribeUntrackedProductHint"/> has something to say) rather than the earlier
+    /// design of a whole extra label row underneath - direct player feedback was that a full,
+    /// non-dismissable line of text every time a dual-crop entry defaults to
+    /// <see cref="DualCropTrackingMode.PrimaryOnly"/> felt too aggressive. Hovering the icon shows
+    /// the same explanation as a tooltip instead.
+    /// </summary>
+    private static void DrawConfigureTrackedButtonRow(
+        ManagerJob_FarmingHysteresis job,
+        CropRotationEntry entry,
+        Vector2 pos,
+        float width
+    )
+    {
         var buttonRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+
+        var hint = DescribeUntrackedProductHint(entry);
+        if (hint != null)
+        {
+            var iconRect = new Rect(
+                buttonRect.xMax - UntrackedProductHintIconSize,
+                buttonRect.y + ((buttonRect.height - UntrackedProductHintIconSize) / 2f),
+                UntrackedProductHintIconSize,
+                UntrackedProductHintIconSize
+            );
+            buttonRect.width -= UntrackedProductHintIconSize + Margin;
+
+            GUI.DrawTexture(iconRect, TexButton.Info);
+            TooltipHandler.TipRegion(iconRect, hint);
+        }
+
         if (Widgets.ButtonText(buttonRect, "FarmingHysteresis.CMR.Trigger.ConfigureTracked".Translate()))
         {
             Find.WindowStack.Add(
                 new WindowTriggerHysteresisDetails(entry, job.Manager) { closeOnClickedOutside = true, draggable = true }
             );
         }
-        pos.y += ListEntryHeight;
+    }
 
-        pos.y += Margin;
+    /// <summary>
+    /// Whether this entry's crop has a resolvable secondary product (see
+    /// <see cref="SecondaryProductResolvers"/>, Step 6) that its current
+    /// <see cref="DualCropTrackingMode"/> isn't tracking, and if so, the tooltip text describing
+    /// it - without this, a player who never opens "Configure tracked items…" (most players, per
+    /// direct feedback) would have no way to even learn the dual-crop feature exists, since
+    /// <see cref="DualCropTrackingMode.PrimaryOnly"/> is deliberately the default for save
+    /// compatibility. Symmetric with <see cref="DualCropTrackingMode.SecondaryOnly"/> - a crop
+    /// tracked secondary-only is just as "missing" its primary product as one tracked
+    /// primary-only is missing its secondary. Returns <see langword="null"/> once the player has
+    /// already acted on it (switched to <see cref="DualCropTrackingMode.Both"/>) or detached the
+    /// filter from the target plant entirely.
+    /// </summary>
+    private static string? DescribeUntrackedProductHint(CropRotationEntry entry)
+    {
+        if (!entry.TrackedFilterFollowsTargetPlant || entry.Mode == DualCropTrackingMode.Both)
+        {
+            return null;
+        }
 
-        return pos.y - start.y;
+        var secondaryDefs = SecondaryProductResolvers.ResolveFor(entry.PlantDef).ToList();
+        if (secondaryDefs.Count == 0)
+        {
+            return null;
+        }
+
+        if (entry.Mode == DualCropTrackingMode.PrimaryOnly)
+        {
+            var secondaryLabels = string.Join(
+                ", ",
+                secondaryDefs.Select(d => d.LabelCap.Resolve().Colorize(ColoredText.TipSectionTitleColor))
+            );
+            return "FarmingHysteresis.CMR.CropRotation.SecondaryProductHint".Translate(secondaryLabels);
+        }
+
+        return entry.PlantDef?.plant.harvestedThingDef is { } primary
+            ? "FarmingHysteresis.CMR.CropRotation.PrimaryProductHint".Translate(
+                primary.LabelCap.Resolve().Colorize(ColoredText.TipSectionTitleColor)
+            )
+            : null;
     }
 
     private static float DrawAddCropButton(

@@ -50,7 +50,15 @@
     <FarmingHysteresis.CMR.Trigger.FollowTargetPlant>Follow crop</FarmingHysteresis.CMR.Trigger.FollowTargetPlant>
     <FarmingHysteresis.CMR.Trigger.FollowTargetPlant.Tip>When enabled, this rotation entry tracks whatever it harvests from the crop it's set to grow, and switches automatically whenever that crop changes. Disable this to track something else entirely (e.g. sow Hops based on Beer stock, not Hops).</FarmingHysteresis.CMR.Trigger.FollowTargetPlant.Tip>
     <FarmingHysteresis.CMR.Trigger.FollowingTargetPlant>Currently tracking whatever this entry's own crop produces. Disable "Follow crop" above to track something else instead.</FarmingHysteresis.CMR.Trigger.FollowingTargetPlant>
-    <FarmingHysteresis.CMR.LatchModeDesc.Unknown>Unknown: The manager hasn't worked on this job yet.</FarmingHysteresis.CMR.LatchModeDesc.Unknown>
+    <FarmingHysteresis.CMR.DualCropTrackingMode.PrimaryOnly>Primary only</FarmingHysteresis.CMR.DualCropTrackingMode.PrimaryOnly>
+    <FarmingHysteresis.CMR.DualCropTrackingMode.PrimaryOnly.Tip>Track only this crop's normal harvested product, ignoring its secondary output.</FarmingHysteresis.CMR.DualCropTrackingMode.PrimaryOnly.Tip>
+    <FarmingHysteresis.CMR.DualCropTrackingMode.SecondaryOnly>Secondary only</FarmingHysteresis.CMR.DualCropTrackingMode.SecondaryOnly>
+    <FarmingHysteresis.CMR.DualCropTrackingMode.SecondaryOnly.Tip>Track only this crop's secondary (dual-crop) output, ignoring its normal harvested product.</FarmingHysteresis.CMR.DualCropTrackingMode.SecondaryOnly.Tip>
+    <FarmingHysteresis.CMR.DualCropTrackingMode.Both>Both</FarmingHysteresis.CMR.DualCropTrackingMode.Both>
+    <FarmingHysteresis.CMR.DualCropTrackingMode.Both.Tip>Track this crop's normal harvested product and its secondary (dual-crop) output together, summed as one stock count.</FarmingHysteresis.CMR.DualCropTrackingMode.Both.Tip>
+    <FarmingHysteresis.CMR.CropRotation.SecondaryProductHint>This crop also yields {0}, which isn't tracked yet - click this button to configure it.</FarmingHysteresis.CMR.CropRotation.SecondaryProductHint>
+    <FarmingHysteresis.CMR.CropRotation.PrimaryProductHint>This crop's usual product, {0}, isn't tracked while only its secondary output is - click this button to configure it.</FarmingHysteresis.CMR.CropRotation.PrimaryProductHint>
+    <FarmingHysteresis.CMR.LatchModeDesc.Unknown>Unknown. The manager hasn't worked on this job yet.</FarmingHysteresis.CMR.LatchModeDesc.Unknown>
 
     <FarmingHysteresis.CMR.Migration.Title>Migrate Farming Hysteresis to Colony Manager Redux?</FarmingHysteresis.CMR.Migration.Title>
     <FarmingHysteresis.CMR.Migration.Prompt>Farming Hysteresis now defaults to being controlled through Colony Manager Redux instead of its own always-on sowing/harvesting toggle, and this save already has growers configured under the old system. Migrate them to Colony Manager Redux jobs now (grouped by target plant, using each group's most common bounds), or keep using the old system for now? You can migrate later from the farming hysteresis manager tab if you decline at this time.</FarmingHysteresis.CMR.Migration.Prompt>

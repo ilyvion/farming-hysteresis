@@ -42,5 +42,8 @@
         <!-- The Colony Manager Redux integration subclasses its ManagerJob/ManagerSettings/
              ManagerTab, so its assembly must load after CMR's -->
         <li>ilyvion.colonymanagerredux</li>
+        <!-- The Vanilla Expanded Framework dual-crop integration references VEF's
+             DualCropExtension type, so its assembly must load after VEF's -->
+        <li>OskarPotocki.VanillaFactionsExpanded.Core</li>
     </loadAfter>
 </ModMetaData>

@@ -44,6 +44,11 @@ internal sealed class WindowTriggerHysteresisDetails(CropRotationEntry entry, Ma
 
         if (followsTargetPlant)
         {
+            if (_entry.HasResolvableSecondaryProduct)
+            {
+                DrawDualCropTrackingModeSelector(ref pos, width);
+            }
+
             var message = "FarmingHysteresis.CMR.Trigger.FollowingTargetPlant".Translate();
             var messageHeight = Text.CalcHeight(message, width);
             Widgets.Label(new Rect(pos.x, pos.y, width, messageHeight), message);
@@ -92,5 +97,38 @@ internal sealed class WindowTriggerHysteresisDetails(CropRotationEntry entry, Ma
             true
         );
         _entry.CountAllOnMap = countAllOnMap;
+    }
+
+    /// <summary>
+    /// Only shown while <see cref="CropRotationEntry.HasResolvableSecondaryProduct"/> is true (see
+    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 6). Unlike
+    /// <see cref="ManagerTab_FarmingHysteresis.DrawRotationModeSelector"/>/
+    /// <see cref="ManagerTab_FarmingHysteresis.DrawSwitchModeSelector"/> (which share this same
+    /// per-cell toggle-row shape but only ever have 2 values, drawn across the main tab's much
+    /// wider column), <see cref="DualCropTrackingMode"/> has 3 values and this window is only
+    /// 300px wide (see <see cref="InitialSize"/>) - three cells side by side left no room for
+    /// "Primary only"/"Secondary only"/"Both" plus their checkmarks, so labels overlapped garbled
+    /// into their neighboring cell. One full-width toggle per row avoids that entirely.
+    /// </summary>
+    private void DrawDualCropTrackingModeSelector(ref Vector2 pos, float width)
+    {
+        foreach (var mode in (DualCropTrackingMode[])Enum.GetValues(typeof(DualCropTrackingMode)))
+        {
+            var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            Utilities.DrawToggle(
+                rowRect,
+                $"FarmingHysteresis.CMR.DualCropTrackingMode.{mode}".Translate(),
+                $"FarmingHysteresis.CMR.DualCropTrackingMode.{mode}.Tip".Translate(),
+                _entry.Mode == mode,
+                () =>
+                {
+                    _entry.Mode = mode;
+                    _entry.SyncTrackedFilterToTargetPlant();
+                },
+                () => { },
+                wrap: false
+            );
+            pos.y += ListEntryHeight;
+        }
     }
 }

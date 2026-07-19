@@ -1,4 +1,22 @@
+using FarmingHysteresis.Defs;
+
 namespace FarmingHysteresis.ColonyManagerRedux;
+
+/// <summary>
+/// Which of a crop's harvested products (see <see cref="SecondaryProductResolvers"/>, e.g.
+/// Vanilla Expanded Framework's dual-crop mechanic - <c>Docs/CMRIntegrationRework.md</c>'s Step 6)
+/// <see cref="CropRotationEntry.SyncTrackedFilterToTargetPlant"/> auto-tracks. Only meaningful
+/// while <see cref="CropRotationEntry.TrackedFilterFollowsTargetPlant"/> is on and the crop
+/// actually has a resolvable secondary product (see
+/// <see cref="CropRotationEntry.HasResolvableSecondaryProduct"/>) - an ordinary crop with no
+/// secondary product is always tracked by primary product alone regardless of this value.
+/// </summary>
+internal enum DualCropTrackingMode
+{
+    PrimaryOnly,
+    SecondaryOnly,
+    Both,
+}
 
 /// <summary>
 /// A single step in <see cref="ManagerJob_FarmingHysteresis.RotationEntries"/> — a crop to grow,
@@ -101,8 +119,43 @@ internal sealed class CropRotationEntry : IExposable
     public bool CountAllOnMap;
 
     /// <summary>
+    /// Which of this entry's harvested products (see <see cref="DualCropTrackingMode"/>) to
+    /// auto-track. Defaults to <see cref="DualCropTrackingMode.PrimaryOnly"/> so every existing
+    /// save keeps behaving exactly as before this field existed with zero behavior change.
+    /// </summary>
+    public DualCropTrackingMode Mode = DualCropTrackingMode.PrimaryOnly;
+
+    /// <summary>
+    /// Whether this entry's <see cref="PlantDef"/> has any resolvable secondary product (see
+    /// <see cref="SecondaryProductResolvers"/>) — used by the UI to decide whether the
+    /// <see cref="Mode"/> selector is worth showing at all. An ordinary crop with no such product
+    /// never shows it, and <see cref="Mode"/> is inert for such an entry regardless of its scribed
+    /// value.
+    /// </summary>
+    internal bool HasResolvableSecondaryProduct => SecondaryProductResolvers.ResolveFor(PlantDef).Any();
+
+    /// <summary>
+    /// Pure dispatch behind <see cref="SyncTrackedFilterToTargetPlant"/> - which defs
+    /// <paramref name="mode"/> resolves to, given this entry's own primary/secondary products.
+    /// Split out as a static method so it's unit-testable without a live <see cref="PlantDef"/>/
+    /// mod-extension lookup.
+    /// </summary>
+    internal static IEnumerable<ThingDef> ComputeTrackedDefs(
+        DualCropTrackingMode mode,
+        ThingDef? primary,
+        IEnumerable<ThingDef> secondary
+    ) =>
+        mode switch
+        {
+            DualCropTrackingMode.PrimaryOnly => primary != null ? [primary] : [],
+            DualCropTrackingMode.SecondaryOnly => secondary,
+            DualCropTrackingMode.Both => primary != null ? secondary.Append(primary) : secondary,
+            _ => throw new InvalidOperationException($"Uncovered {nameof(DualCropTrackingMode)}: {mode}."),
+        };
+
+    /// <summary>
     /// Re-seeds <see cref="TrackedThingFilter"/> to allow only this entry's own
-    /// <see cref="PlantDef"/>'s harvested product — no-ops unless
+    /// <see cref="PlantDef"/>'s harvested product(s), per <see cref="Mode"/> — no-ops unless
     /// <see cref="TrackedFilterFollowsTargetPlant"/> is on.
     /// </summary>
     internal void SyncTrackedFilterToTargetPlant()
@@ -112,7 +165,9 @@ internal sealed class CropRotationEntry : IExposable
             return;
         }
 
-        Trigger_Hysteresis.SyncFilterToSingleDef(trackedThingFilter, PlantDef?.plant.harvestedThingDef);
+        var primary = PlantDef?.plant.harvestedThingDef;
+        var secondary = SecondaryProductResolvers.ResolveFor(PlantDef);
+        Trigger_Hysteresis.SyncFilterToDefs(trackedThingFilter, ComputeTrackedDefs(Mode, primary, secondary));
     }
 
     /// <summary>
@@ -136,6 +191,7 @@ internal sealed class CropRotationEntry : IExposable
         Scribe_Values.Look(ref TrackedFilterFollowsTargetPlant, "trackedFilterFollowsTargetPlant", true);
         Scribe_Deep.Look(ref trackedThingFilter, "trackedThingFilter", (object)NoOpSettingsChangedCallback);
         Scribe_Values.Look(ref CountAllOnMap, "countAllOnMap");
+        Scribe_Values.Look(ref Mode, "dualCropTrackingMode", DualCropTrackingMode.PrimaryOnly);
 
         if (Scribe.mode == LoadSaveMode.Saving)
         {
