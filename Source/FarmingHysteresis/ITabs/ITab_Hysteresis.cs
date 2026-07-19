@@ -216,10 +216,7 @@ internal class ITab_Hysteresis : ITab
     {
         get
         {
-            if (
-                SelObject is IPlantToGrowSettable plantGrower
-                && !FarmingHysteresisMod.HysteresisController.OwnsGrowerUi(plantGrower)
-            )
+            if (!FarmingHysteresisMod.HysteresisController.ShowGrowerUi)
             {
                 return true;
             }

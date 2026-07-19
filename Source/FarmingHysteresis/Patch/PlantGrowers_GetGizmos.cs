@@ -47,7 +47,7 @@ internal class GetGizmosPatcher
     )
         where T : IPlantToGrowSettable
     {
-        if (!FarmingHysteresisMod.HysteresisController.OwnsGrowerUi(plantToGrowSettable))
+        if (!FarmingHysteresisMod.HysteresisController.ShowGrowerUi)
         {
             return;
         }

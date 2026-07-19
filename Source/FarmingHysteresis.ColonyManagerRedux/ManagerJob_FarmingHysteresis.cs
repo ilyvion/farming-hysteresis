@@ -44,6 +44,29 @@ internal sealed class ManagerJob_FarmingHysteresis
 
     public override bool IsValid => base.IsValid && Trigger != null;
 
+    /// <summary>
+    /// Pure decision logic behind <see cref="IsManaged"/>, split out so the "both must hold"
+    /// rule is unit-testable without a live <c>Manager</c>/job instance.
+    /// </summary>
+    internal static bool ComputeIsManaged(bool baseIsManaged, bool ownsJobExecution) =>
+        baseIsManaged && ownsJobExecution;
+
+    /// <summary>
+    /// Gates <see cref="JobTracker"/> from ever selecting this job as <c>NextJob</c> (and thus
+    /// from ever invoking <see cref="GatherJobDataCoroutine"/>/<see cref="ExecuteJobDataCoroutine"/>)
+    /// while CMR isn't actually the active controller - i.e. while "take over Farming Hysteresis
+    /// control" is off, or a per-save <see cref="CmrMigrationGate"/> is still suppressing it. Without
+    /// this, an existing job would keep pushing plant/sow/harvest state onto its growers even while
+    /// the old always-on engine (<see cref="DefaultHysteresisController"/>) is simultaneously
+    /// managing the same growers - exactly the "mix" Design decision 2 rules out. The job's own
+    /// config (scope, target plant, bounds) is untouched either way; it simply goes dormant.
+    /// </summary>
+    public override bool IsManaged =>
+        ComputeIsManaged(
+            base.IsManaged,
+            FarmingHysteresisMod.HysteresisController is CmrHysteresisController
+        );
+
     public GrowerAssignmentMode AssignmentMode = GrowerAssignmentMode.All;
     public Area? GrowerArea;
     public bool InvertGrowerArea;
@@ -95,7 +118,8 @@ internal sealed class ManagerJob_FarmingHysteresis
     public bool IsGrowerInScope(IPlantToGrowSettable grower) =>
         IsGrowerInScope(
             AssignmentMode,
-            grower.Cells.Any(cell => GrowerArea?.ActiveCells.Contains(cell) ?? false) != InvertGrowerArea
+            grower.Cells.Any(cell => GrowerArea?.ActiveCells.Contains(cell) ?? false)
+                != InvertGrowerArea
                 && GrowerArea != null,
             grower switch
             {
@@ -113,9 +137,7 @@ internal sealed class ManagerJob_FarmingHysteresis
     /// <c>ManagerTab_FarmingHysteresis.DrawSpecificGrowers</c>).
     /// </summary>
     public IEnumerable<IPlantToGrowSettable> ScopeEligiblePlantGrowers =>
-        FarmingHysteresisControlDef
-            .AllControlledPlantGrowers(Manager.map)
-            .Where(IsGrowerInScope);
+        FarmingHysteresisControlDef.AllControlledPlantGrowers(Manager.map).Where(IsGrowerInScope);
 
     /// <summary>
     /// This job's actual controlled growers: <see cref="ScopeEligiblePlantGrowers"/> minus any
@@ -135,7 +157,9 @@ internal sealed class ManagerJob_FarmingHysteresis
                 .ToHashSet();
             return
             [
-                .. ScopeEligiblePlantGrowers.Where(grower => !claimedByEarlierJobs.Contains(grower)),
+                .. ScopeEligiblePlantGrowers.Where(grower =>
+                    !claimedByEarlierJobs.Contains(grower)
+                ),
             ];
         }
     }
@@ -199,9 +223,7 @@ internal sealed class ManagerJob_FarmingHysteresis
                 yield break;
             }
 
-            foreach (
-                var plantDef in PlantUtility.ValidPlantTypesForGrowers([.. growers])
-            )
+            foreach (var plantDef in PlantUtility.ValidPlantTypesForGrowers([.. growers]))
             {
                 if (
                     IsValidTargetPlantCandidate(
@@ -252,7 +274,9 @@ internal sealed class ManagerJob_FarmingHysteresis
         var enabled = HysteresisTrigger.State;
 
         JobState = ManagerJobState.Active;
-        jobLog.AddDetail("FarmingHysteresis.CMR.Logs.LatchState".Translate(HysteresisTrigger.StatusTooltip));
+        jobLog.AddDetail(
+            "FarmingHysteresis.CMR.Logs.LatchState".Translate(HysteresisTrigger.StatusTooltip)
+        );
 
         data.Value = new WorkData(growers, enabled, targetPlantDef);
     }

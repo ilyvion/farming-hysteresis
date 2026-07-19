@@ -26,7 +26,7 @@ internal sealed class DefaultHysteresisController : IHysteresisController
         }
     }
 
-    public bool OwnsGrowerUi(IPlantToGrowSettable plantGrower) => true;
+    public bool ShowGrowerUi => true;
 
-    public bool OwnsMainTab => true;
+    public bool ShowMainTab => true;
 }

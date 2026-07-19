@@ -8,7 +8,7 @@ public class MainButtonWorker_Hysteresis : MainButtonWorker_ToggleTab
     /// <inheritdoc/>
     public override bool Visible =>
         FarmingHysteresisMod.Settings.ShowHysteresisMainTab
-        && FarmingHysteresisMod.HysteresisController.OwnsMainTab;
+        && FarmingHysteresisMod.HysteresisController.ShowMainTab;
 }
 
 /// <summary>

@@ -20,14 +20,13 @@ public interface IHysteresisController
 
     /// <summary>
     /// Whether the default per-grower hysteresis UI (the enable/disable gizmo and
-    /// <c>ITab_Hysteresis</c>) should render for <paramref name="plantGrower"/>.
+    /// <c>ITab_Hysteresis</c>) should render.
     /// </summary>
-    /// <param name="plantGrower">The plant grower being inspected.</param>
-    bool OwnsGrowerUi(IPlantToGrowSettable plantGrower);
+    bool ShowGrowerUi { get; }
 
     /// <summary>
     /// Whether the map/game-tier main tab (<c>MainTabWindow_Hysteresis</c>/
     /// <c>MainButtonWorker_Hysteresis</c>) should be shown at all.
     /// </summary>
-    bool OwnsMainTab { get; }
+    bool ShowMainTab { get; }
 }

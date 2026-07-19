@@ -67,3 +67,21 @@ internal static class CmrMigrationGateStatusTests
         Assert.That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.Migrated)).Is.False();
     }
 }
+
+// Regression guard for the "never a mix" invariant (see Docs/CMRIntegrationRework.md's "Job
+// execution respects takeover state" section): a Farming Hysteresis job must never be allowed to
+// act on its growers while CMR isn't genuinely the active controller, even if the job itself
+// would otherwise be managed.
+[HotSwappable]
+[TestSuite]
+internal static class ManagerJobFarmingHysteresisIsManagedTests
+{
+    [Test]
+    public static void ManagedOnlyWhenBaseManagedAndCmrIsActiveController()
+    {
+        Assert.That(ManagerJob_FarmingHysteresis.ComputeIsManaged(true, true)).Is.True();
+        Assert.That(ManagerJob_FarmingHysteresis.ComputeIsManaged(true, false)).Is.False();
+        Assert.That(ManagerJob_FarmingHysteresis.ComputeIsManaged(false, true)).Is.False();
+        Assert.That(ManagerJob_FarmingHysteresis.ComputeIsManaged(false, false)).Is.False();
+    }
+}
