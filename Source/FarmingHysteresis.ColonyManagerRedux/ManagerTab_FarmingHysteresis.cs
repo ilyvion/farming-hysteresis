@@ -54,14 +54,6 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         );
         DrawSection(
             "FarmingHysteresis.Job",
-            "GrowerScope",
-            ref position,
-            width,
-            DrawGrowerScope,
-            "FarmingHysteresis.CMR.GrowerScope".Translate()
-        );
-        DrawSection(
-            "FarmingHysteresis.Job",
             "TargetPlant",
             ref position,
             width,
@@ -75,6 +67,16 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             width,
             DrawTriggerConfig,
             "FarmingHysteresis.CMR.Trigger".Translate()
+        );
+        // Grower scope's zone list can grow arbitrarily long (one row per growing zone in the
+        // game), so it's placed last to avoid pushing the shorter, fixed-height sections below it.
+        DrawSection(
+            "FarmingHysteresis.Job",
+            "GrowerScope",
+            ref position,
+            width,
+            DrawGrowerScope,
+            "FarmingHysteresis.CMR.GrowerScope".Translate()
         );
         Widgets_Section.EndSectionColumn("FarmingHysteresis.Job", position);
 
