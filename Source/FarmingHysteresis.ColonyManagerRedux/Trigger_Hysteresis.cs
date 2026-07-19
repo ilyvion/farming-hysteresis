@@ -1,5 +1,6 @@
 using ColonyManagerRedux;
 using FarmingHysteresis.Extensions;
+using static ColonyManagerRedux.Constants;
 
 namespace FarmingHysteresis.ColonyManagerRedux;
 
@@ -38,7 +39,12 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// grower/job. See <c>Source/FarmingHysteresis/FarmingHysteresisData.cs</c> for the
     /// original.
     /// </summary>
-    internal static LatchMode ComputeNextLatchMode(LatchMode current, int count, int lower, int upper) =>
+    internal static LatchMode ComputeNextLatchMode(
+        LatchMode current,
+        int count,
+        int lower,
+        int upper
+    ) =>
         count < lower ? LatchMode.BelowLowerBound
         : count > upper ? LatchMode.AboveUpperBound
         : current switch
@@ -105,6 +111,93 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
                     Upper
                 );
         }
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// Mirrors <see cref="Trigger_Threshold.DrawVerticalProgressBars"/>, but this trigger has
+    /// two thresholds instead of one - the base bar (scaled/filled against <see cref="Upper"/>,
+    /// same as <c>Trigger_Threshold</c> scales against its single target) draws the upper-bound
+    /// mark for free, then <see cref="DrawBoundMark"/> adds the missing lower-bound mark on top.
+    /// </remarks>
+    public override void DrawVerticalProgressBars(Rect progressRect, bool active)
+    {
+        progressRect.xMin += progressRect.width - 10;
+        DrawVerticalProgressBar(
+            progressRect,
+            TrackedThingCount,
+            Upper,
+            StatusTooltip,
+            active,
+            Resources.BarBackgroundActiveTexture
+        );
+        DrawBoundMark(progressRect, Lower, Upper, TrackedThingCount, vertical: true);
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>See <see cref="DrawVerticalProgressBars"/>.</remarks>
+    public override void DrawHorizontalProgressBars(Rect progressRect, bool active)
+    {
+        progressRect.height = SmallIconSize;
+        DrawHorizontalProgressBar(
+            progressRect,
+            TrackedThingCount,
+            Upper,
+            StatusTooltip,
+            active,
+            Resources.BarBackgroundActiveTexture
+        );
+        DrawBoundMark(progressRect, Lower, Upper, TrackedThingCount, vertical: false);
+    }
+
+    /// <summary>
+    /// Draws the extra bound-mark line the base <c>DrawVerticalProgressBar</c>/
+    /// <c>DrawHorizontalProgressBar</c> helpers don't already draw for us (they only mark
+    /// <paramref name="maxValue"/>, which the caller already used as the bar's own scale/target).
+    /// </summary>
+    private static void DrawBoundMark(
+        Rect progressRect,
+        float value,
+        float maxValue,
+        float currentValue,
+        bool vertical
+    )
+    {
+        var barRect = progressRect.ContractedBy(2f);
+        var barLength = vertical ? barRect.height : barRect.width;
+        var markPosition = ComputeMarkPosition(value, maxValue, currentValue, barLength);
+
+        if (vertical)
+        {
+            var markHeight = barRect.yMin + (barRect.height - markPosition);
+            Widgets.DrawLineHorizontal(progressRect.xMin, markHeight, progressRect.width);
+        }
+        else
+        {
+            var markWidth = barRect.xMin + markPosition;
+            Widgets.DrawLineVertical(markWidth, progressRect.yMin, progressRect.height);
+        }
+    }
+
+    /// <summary>
+    /// Pure position math behind <see cref="DrawBoundMark"/> - reimplements
+    /// <c>Trigger.ComputeProgressBarMetrics</c>'s max/unit scaling locally, since that method is
+    /// <see langword="internal"/> to CMR's core assembly and not visible here, and must stay in
+    /// sync with the scale the base <c>DrawVerticalProgressBar</c>/<c>DrawHorizontalProgressBar</c>
+    /// helpers use so both bound marks land on the same bar. Split out (rather than left inline
+    /// in <see cref="DrawBoundMark"/>) so this scaling math is unit-testable without a live
+    /// <c>Rect</c>/IMGUI draw call.
+    /// </summary>
+    internal static float ComputeMarkPosition(
+        float value,
+        float maxValue,
+        float currentValue,
+        float barLength
+    )
+    {
+        var max = Math.Max(Math.Max((int)(maxValue * 1.2f), maxValue + 1), currentValue);
+        var unit = barLength / max;
+        return value * unit;
     }
 
     /// <inheritdoc/>
@@ -287,8 +380,16 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     {
         base.ExposeData();
 
-        Scribe_Values.Look(ref Lower, "lower", FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound);
-        Scribe_Values.Look(ref Upper, "upper", FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound);
+        Scribe_Values.Look(
+            ref Lower,
+            "lower",
+            FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
+        );
+        Scribe_Values.Look(
+            ref Upper,
+            "upper",
+            FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound
+        );
         var latchMode = LatchModeValue;
         Scribe_Values.Look(ref latchMode, "latchMode", LatchMode.Unknown);
         LatchModeValue = latchMode;
