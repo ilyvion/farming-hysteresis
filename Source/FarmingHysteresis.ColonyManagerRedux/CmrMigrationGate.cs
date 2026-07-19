@@ -13,31 +13,52 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 /// </summary>
 internal static class CmrMigrationGate
 {
+    /// <summary>
+    /// Pure decision behind <see cref="HandleGameLoaded"/>: whether this save needs a fresh
+    /// migration gate opened - only when nothing's been decided for it yet, takeover is actually
+    /// on, and there's old-style setup that would otherwise get silently stranded. Split out so
+    /// it's unit-testable without a live <see cref="Game"/>/<see cref="Find.Maps"/>.
+    /// </summary>
+    internal static bool ShouldBeginMigrationGate(
+        CmrMigrationGateStatus currentStatus,
+        bool takeoverHysteresisControl,
+        bool hasLegacyHysteresisDataConfigured
+    ) =>
+        currentStatus == CmrMigrationGateStatus.NotGated
+        && takeoverHysteresisControl
+        && hasLegacyHysteresisDataConfigured;
+
+    /// <summary>
+    /// <see cref="FarmingHysteresisMod.HysteresisController"/> is a static field that otherwise
+    /// only gets refreshed when the mod settings themselves are (re-)scribed (process start, or
+    /// the settings tab being written) - neither of which happens when the player merely returns
+    /// to the main menu and loads a different (or the same) save within the same running
+    /// process. Without unconditionally re-syncing it here, it keeps whatever value the *previous*
+    /// save session left it at, regardless of this save's own <see cref="CmrMigrationGameComponent"/>
+    /// status or the current global takeover setting - e.g. a save with nothing to migrate (so
+    /// <see cref="ShouldBeginMigrationGate"/> is false) previously left the controller on
+    /// <see cref="CmrHysteresisController"/> would stay stuck on it forever, even after the player
+    /// turns "take over Farming Hysteresis control" off, until they happened to toggle the mod
+    /// setting again (which calls <see cref="ManagerSettings_FarmingHysteresis.ApplyControllerState"/>
+    /// as a side effect of the toggle itself).
+    /// </summary>
     internal static void HandleGameLoaded()
     {
         var gate = CmrMigrationGameComponent.For(Current.Game);
-        if (gate.Status != CmrMigrationGateStatus.NotGated)
-        {
-            // Already resolved (or already awaiting an answer from a previous session) -
-            // nothing to (re-)decide, just make sure the controller reflects it.
-            ManagerSettings_FarmingHysteresis.Instance?.ApplyControllerState();
-            return;
-        }
 
         if (
-            ManagerSettings_FarmingHysteresis.Instance?.TakeOverHysteresisControl != true
-            || !HasLegacyHysteresisDataConfigured()
+            ShouldBeginMigrationGate(
+                gate.Status,
+                ManagerSettings_FarmingHysteresis.Instance?.TakeOverHysteresisControl == true,
+                HasLegacyHysteresisDataConfigured()
+            )
         )
         {
-            // Either takeover isn't even on, or there's no old-style setup to lose - a fresh
-            // save simply starts under CMR takeover per the default, no gate needed.
-            return;
+            gate.Status = CmrMigrationGateStatus.AwaitingChoice;
+            LongEventHandler.ExecuteWhenFinished(ShowMigrationDialog);
         }
 
-        gate.Status = CmrMigrationGateStatus.AwaitingChoice;
-        ManagerSettings_FarmingHysteresis.Instance.ApplyControllerState();
-
-        LongEventHandler.ExecuteWhenFinished(ShowMigrationDialog);
+        ManagerSettings_FarmingHysteresis.Instance?.ApplyControllerState();
     }
 
     private static bool HasLegacyHysteresisDataConfigured() =>

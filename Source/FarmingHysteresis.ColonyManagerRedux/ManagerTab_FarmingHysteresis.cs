@@ -18,6 +18,20 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     /// </summary>
     protected override bool DoMainContentWhenNothingSelected => IsMigrationPending;
 
+    /// <summary>
+    /// Flags a job as dormant, in both this tab's own job list and CMR's overview tab (both call
+    /// this - see <c>ManagerTab.DrawLocalListEntry</c>/<c>ManagerTab_Overview</c>'s row drawing),
+    /// whenever it's committed to <see cref="JobTracker"/> but CMR isn't currently the active
+    /// hysteresis controller (see <see cref="ManagerJob_FarmingHysteresis.IsManaged"/>) - either
+    /// because "take over Farming Hysteresis control" is off in mod settings, or a per-save
+    /// <see cref="CmrMigrationGate"/> is still suppressing it. Without this, such a job looked
+    /// identical to a normally-running one even though it's no longer touching any growers.
+    /// </summary>
+    public override string GetSubLabel(ManagerJob job) =>
+        job is ManagerJob_FarmingHysteresis { IsCommittedToTracker: true, IsManaged: false }
+            ? "FarmingHysteresis.CMR.JobDormantTakeoverOff".Translate() + " - " + base.GetSubLabel(job)
+            : base.GetSubLabel(job);
+
     private static bool IsMigrationPending =>
         CmrMigrationGameComponent.CurrentStatus
             is CmrMigrationGateStatus.AwaitingChoice

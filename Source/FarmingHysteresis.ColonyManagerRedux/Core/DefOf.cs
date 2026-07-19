@@ -25,3 +25,20 @@ internal static class ManagerJobHistoryChapterDefOf
         DefOfHelper.EnsureInitializedInCtor(typeof(ManagerJobHistoryChapterDefOf));
     }
 }
+
+/// <summary>
+/// This integration's own <see cref="ManagerDef"/> - resolved by defName like any other
+/// third-party mod would, same reasoning as <see cref="ManagerJobHistoryChapterDefOf"/>. Used by
+/// <see cref="ManagerSettings_FarmingHysteresis.Instance"/> to always look up the current,
+/// authoritative settings object rather than caching a reference that can go stale.
+/// </summary>
+[DefOf]
+internal static class ManagerDefOf
+{
+    public static ManagerDef CM_FarmingHysteresisManager;
+
+    static ManagerDefOf()
+    {
+        DefOfHelper.EnsureInitializedInCtor(typeof(ManagerDefOf));
+    }
+}

@@ -18,17 +18,30 @@ internal sealed class ManagerSettings_FarmingHysteresis : ManagerSettings
     public bool TakeOverHysteresisControl = true;
 
     /// <summary>
-    /// The single instance CMR creates for this mod's <c>ManagerDef</c> (there's only ever one).
-    /// Cached here in <see cref="PostMake"/> so <see cref="CmrMigrationGate"/> can reach the
-    /// setting/apply the controller without needing a <c>ManagerDef</c> lookup of its own.
+    /// Resolves the single, authoritative instance CMR holds for this mod's <c>ManagerDef</c>
+    /// (there's only ever one) - looked up fresh every time rather than cached in a static field
+    /// set from <see cref="PostMake"/>, because <c>ColonyManagerRedux.Settings</c>'s constructor
+    /// eagerly creates one throwaway instance per <c>ManagerDef</c> (calling <see cref="PostMake"/>
+    /// on it, with this class's field defaults) purely to have *something* in the list before its
+    /// own <c>ExposeData</c> runs; deep-scribe deserialization then replaces that list entry with
+    /// a brand new, separately-constructed object carrying the actual persisted settings, but
+    /// never calls <see cref="PostMake"/> on it. A static field only ever set from
+    /// <see cref="PostMake"/> would therefore keep pointing at the discarded, default-valued
+    /// throwaway object forever - exactly the bug this replaced (see this session's
+    /// investigation via the temporary debug logging previously added to
+    /// <see cref="ApplyControllerState"/>): <see cref="CmrMigrationGate.HandleGameLoaded"/> kept
+    /// reading a stale <see cref="TakeOverHysteresisControl"/>default of <see langword="true"/>
+    /// on every game load, no matter what the player had actually set in the mod options tab
+    /// (which, unlike <see cref="CmrMigrationGate"/>, was already operating on the real object -
+    /// this is why manually re-toggling the option in-game always "fixed" it: that path never
+    /// went through this stale reference to begin with).
     /// </summary>
-    internal static ManagerSettings_FarmingHysteresis? Instance { get; private set; }
+    internal static ManagerSettings_FarmingHysteresis? Instance =>
+        ColonyManagerReduxMod.Settings.ManagerSettingsFor<ManagerSettings_FarmingHysteresis>(
+            ManagerDefOf.CM_FarmingHysteresisManager
+        );
 
-    public override void PostMake()
-    {
-        Instance = this;
-        ApplyControllerState();
-    }
+    public override void PostMake() => ApplyControllerState();
 
     public override void DoTabContents(Rect rect)
     {

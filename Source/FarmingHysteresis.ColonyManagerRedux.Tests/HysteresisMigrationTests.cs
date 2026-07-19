@@ -68,6 +68,67 @@ internal static class CmrMigrationGateStatusTests
     }
 }
 
+// Regression guard for a bug where FarmingHysteresisMod.HysteresisController could get stuck on
+// CmrHysteresisController across a main-menu-and-reload cycle: CmrMigrationGate.HandleGameLoaded
+// used to only resync the controller inside the two branches that actually needed to act (already
+// gated, or beginning a fresh gate), so a save with nothing to migrate - the exact case where
+// ShouldBeginMigrationGate is false - never resynced the controller to the current "take over
+// Farming Hysteresis control" setting at all on load.
+[HotSwappable]
+[TestSuite]
+internal static class ShouldBeginMigrationGateTests
+{
+    [Test]
+    public static void BeginsGateOnlyWhenNotGatedAndTakeoverOnAndLegacyDataExists() =>
+        Assert.That(
+            CmrMigrationGate.ShouldBeginMigrationGate(
+                CmrMigrationGateStatus.NotGated,
+                takeoverHysteresisControl: true,
+                hasLegacyHysteresisDataConfigured: true
+            )
+        ).Is.True();
+
+    [Test]
+    public static void DoesNotBeginGateWhenTakeoverIsOff() =>
+        Assert.That(
+            CmrMigrationGate.ShouldBeginMigrationGate(
+                CmrMigrationGateStatus.NotGated,
+                takeoverHysteresisControl: false,
+                hasLegacyHysteresisDataConfigured: true
+            )
+        ).Is.False();
+
+    [Test]
+    public static void DoesNotBeginGateWhenThereIsNoLegacyData() =>
+        Assert.That(
+            CmrMigrationGate.ShouldBeginMigrationGate(
+                CmrMigrationGateStatus.NotGated,
+                takeoverHysteresisControl: true,
+                hasLegacyHysteresisDataConfigured: false
+            )
+        ).Is.False();
+
+    [Test]
+    public static void DoesNotBeginGateWhenAlreadyGated()
+    {
+        foreach (var status in new[]
+        {
+            CmrMigrationGateStatus.AwaitingChoice,
+            CmrMigrationGateStatus.Declined,
+            CmrMigrationGateStatus.Migrated,
+        })
+        {
+            Assert.That(
+                CmrMigrationGate.ShouldBeginMigrationGate(
+                    status,
+                    takeoverHysteresisControl: true,
+                    hasLegacyHysteresisDataConfigured: true
+                )
+            ).Is.False();
+        }
+    }
+}
+
 // Regression guard for the "never a mix" invariant (see Docs/CMRIntegrationRework.md's "Job
 // execution respects takeover state" section): a Farming Hysteresis job must never be allowed to
 // act on its growers while CMR isn't genuinely the active controller, even if the job itself
