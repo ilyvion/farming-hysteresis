@@ -172,6 +172,82 @@ public class Settings : ModSettings
         Listing_Standard listingStandard = new();
         listingStandard.Begin(inRect);
 
+#if v1_3
+        if (
+            listingStandard.ButtonTextLabeled(
+                "FarmingHysteresis.HysteresisMode".Translate(),
+                "FarmingHysteresis.Control".Translate(_hysteresisMode.AsString())
+            )
+        )
+        {
+#else
+        if (
+            listingStandard.ButtonTextLabeledPct(
+                "FarmingHysteresis.HysteresisMode".Translate(),
+                "FarmingHysteresis.Control".Translate(_hysteresisMode.AsString()),
+                0.6f,
+                TextAnchor.MiddleLeft
+            )
+        )
+        {
+#endif
+            List<FloatMenuOption> list =
+            [
+                new FloatMenuOption(
+                    "FarmingHysteresis.Control".Translate("FarmingHysteresis.Sowing".Translate()),
+                    () => _hysteresisMode = HysteresisMode.Sowing
+                ),
+                new FloatMenuOption(
+                    "FarmingHysteresis.Control".Translate(
+                        "FarmingHysteresis.Harvesting".Translate()
+                    ),
+                    () => _hysteresisMode = HysteresisMode.Harvesting
+                ),
+                new FloatMenuOption(
+                    "FarmingHysteresis.Control".Translate(
+                        "FarmingHysteresis.SowingAndHarvesting".Translate()
+                    ),
+                    () => _hysteresisMode = HysteresisMode.SowingAndHarvesting
+                ),
+            ];
+            Find.WindowStack.Add(new FloatMenu(list));
+        }
+
+        listingStandard.Label("FarmingHysteresis.DefaultLowerBound".Translate());
+        listingStandard.IntEntry(
+            ref _defaultHysteresisLowerBound,
+            ref _defaultHysteresisLowerBoundBuffer
+        );
+
+        listingStandard.Label("FarmingHysteresis.DefaultUpperBound".Translate());
+        listingStandard.IntEntry(
+            ref _defaultHysteresisUpperBound,
+            ref _defaultHysteresisUpperBoundBuffer
+        );
+
+        // The settings below only affect the mod's own older per-grower engine/UI, which Colony
+        // Manager Redux (once it's taken over control) replaces entirely - grey them out rather
+        // than hiding them outright so the player isn't left wondering where a setting went.
+        listingStandard.GapLine();
+        var cmrActive = !FarmingHysteresisMod.HysteresisController.ShowGrowerUi;
+        var previousFont = Text.Font;
+        Text.Font = GameFont.Tiny;
+        GUI.color = Color.grey;
+        listingStandard.Label(
+            "FarmingHysteresis.OnlyAppliesWithoutCmr".Translate(),
+            -1f,
+            (
+                cmrActive
+                    ? "FarmingHysteresis.OnlyAppliesWithoutCmrTooltip.Active"
+                    : "FarmingHysteresis.OnlyAppliesWithoutCmrTooltip.Inactive"
+            ).Translate()
+        );
+        GUI.color = Color.white;
+        Text.Font = previousFont;
+
+        var previousGuiEnabled = GUI.enabled;
+        GUI.enabled = !cmrActive;
+
         listingStandard.CheckboxLabeled(
             "FarmingHysteresis.EnabledByDefault".Translate(),
             ref _enabledByDefault
@@ -233,7 +309,7 @@ public class Settings : ModSettings
         // Render expensive icon inline in CountAllOnMap checkbox row
         var iconRect = new Rect(inRect.xMax - 16f - 32f, 0f, 16f, 16f).CenteredOnYIn(textRect);
         TooltipHandler.TipRegion(iconRect, "FarmingHysteresis.Expensive.Tooltip".Translate());
-        GUI.color = _countAllOnMap ? Resources.Orange : Color.grey;
+        GUI.color = (_countAllOnMap && !cmrActive) ? Resources.Orange : Color.grey;
         GUI.DrawTexture(iconRect, Resources.Stopwatch);
         GUI.color = Color.white;
 
@@ -248,58 +324,7 @@ public class Settings : ModSettings
             "FarmingHysteresis.ShowHysteresisMainTabTooltip".Translate()
         );
 
-#if v1_3
-        if (
-            listingStandard.ButtonTextLabeled(
-                "FarmingHysteresis.HysteresisMode".Translate(),
-                "FarmingHysteresis.Control".Translate(_hysteresisMode.AsString())
-            )
-        )
-        {
-#else
-        if (
-            listingStandard.ButtonTextLabeledPct(
-                "FarmingHysteresis.HysteresisMode".Translate(),
-                "FarmingHysteresis.Control".Translate(_hysteresisMode.AsString()),
-                0.6f,
-                TextAnchor.MiddleLeft
-            )
-        )
-        {
-#endif
-            List<FloatMenuOption> list =
-            [
-                new FloatMenuOption(
-                    "FarmingHysteresis.Control".Translate("FarmingHysteresis.Sowing".Translate()),
-                    () => _hysteresisMode = HysteresisMode.Sowing
-                ),
-                new FloatMenuOption(
-                    "FarmingHysteresis.Control".Translate(
-                        "FarmingHysteresis.Harvesting".Translate()
-                    ),
-                    () => _hysteresisMode = HysteresisMode.Harvesting
-                ),
-                new FloatMenuOption(
-                    "FarmingHysteresis.Control".Translate(
-                        "FarmingHysteresis.SowingAndHarvesting".Translate()
-                    ),
-                    () => _hysteresisMode = HysteresisMode.SowingAndHarvesting
-                ),
-            ];
-            Find.WindowStack.Add(new FloatMenu(list));
-        }
-
-        listingStandard.Label("FarmingHysteresis.DefaultLowerBound".Translate());
-        listingStandard.IntEntry(
-            ref _defaultHysteresisLowerBound,
-            ref _defaultHysteresisLowerBoundBuffer
-        );
-
-        listingStandard.Label("FarmingHysteresis.DefaultUpperBound".Translate());
-        listingStandard.IntEntry(
-            ref _defaultHysteresisUpperBound,
-            ref _defaultHysteresisUpperBoundBuffer
-        );
+        GUI.enabled = previousGuiEnabled;
 
         listingStandard.End();
     }

@@ -27,6 +27,9 @@
     <FarmingHysteresis.ShowOldCommandsTooltip>In version 0.6, the mod switched from using command buttons to a dialog for configuring hysteresis parameters. Enable this setting to also show the old command buttons.</FarmingHysteresis.ShowOldCommandsTooltip>
     <FarmingHysteresis.ShowHysteresisMainTab>Show hysteresis tab</FarmingHysteresis.ShowHysteresisMainTab>
     <FarmingHysteresis.ShowHysteresisMainTabTooltip>Disabling this setting hides the Hysteresis tab from the game.\n\nWhile it is currently only used as a convenient location to configure map and game-wide hysteresis values in one place, there are plans to add more features to this tab later. Hiding it will thus prevent access to these features and is generally not recommended.</FarmingHysteresis.ShowHysteresisMainTabTooltip>
+    <FarmingHysteresis.OnlyAppliesWithoutCmr>These settings only apply without Colony Manager Redux</FarmingHysteresis.OnlyAppliesWithoutCmr>
+    <FarmingHysteresis.OnlyAppliesWithoutCmrTooltip.Active>Colony Manager Redux has taken over hysteresis control, so these settings, which only affect the mod's own older per-grower UI and engine, currently have no effect.</FarmingHysteresis.OnlyAppliesWithoutCmrTooltip.Active>
+    <FarmingHysteresis.OnlyAppliesWithoutCmrTooltip.Inactive>These settings only affect the mod's own older per-grower UI and engine. They'll stop having any effect if Colony Manager Redux is configured to take over hysteresis control.</FarmingHysteresis.OnlyAppliesWithoutCmrTooltip.Inactive>
 
     <FarmingHysteresis.ConfigureHysteresis>Configure hysteresis parameters</FarmingHysteresis.ConfigureHysteresis>
     <FarmingHysteresis.ConfigureHysteresisDesc>Configure hysteresis parameters such as the upper and lower bounds.</FarmingHysteresis.ConfigureHysteresisDesc>
