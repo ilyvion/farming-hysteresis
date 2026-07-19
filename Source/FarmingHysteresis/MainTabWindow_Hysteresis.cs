@@ -283,6 +283,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         var buffer = boundLowerBuffers[harvestDef];
         _ = listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
+        boundLowerBuffers[harvestDef] = buffer;
         listingStandard.End();
 
         return lowerBoundRect;
@@ -309,6 +310,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         var buffer = boundUpperBuffers[harvestDef];
         _ = listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
+        boundUpperBuffers[harvestDef] = buffer;
         listingStandard.End();
 
         return upperBoundRect;
