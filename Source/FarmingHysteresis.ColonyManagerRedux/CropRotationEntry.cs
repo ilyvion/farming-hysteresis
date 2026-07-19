@@ -36,9 +36,7 @@ internal sealed class CropRotationEntry : IExposable
     /// current position in the list, is what
     /// <see cref="ManagerJob_FarmingHysteresis.ActiveEntryId"/> tracks, so the "active" marker
     /// correctly follows this specific crop across reordering/removal of other entries (see
-    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 5 follow-up). 0 is reserved as "never assigned" -
-    /// only possible for an entry loaded from a save predating this field, fixed up in
-    /// <see cref="ManagerJob_FarmingHysteresis.ExposeData"/>'s <c>PostLoadInit</c> pass.
+    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 5 follow-up).
     /// </summary>
     public int Id;
 

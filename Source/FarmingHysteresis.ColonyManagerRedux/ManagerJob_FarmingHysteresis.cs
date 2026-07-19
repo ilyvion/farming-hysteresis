@@ -194,21 +194,6 @@ internal sealed class ManagerJob_FarmingHysteresis
     public HashSet<Building_PlantGrower> SpecificPlantGrowerBuildings = [];
 
     /// <summary>
-    /// Legacy single-target-plant field - kept only so an old save (from before Step 5's crop
-    /// rotation) can be migrated into a single-entry <see cref="RotationEntries"/> list on load
-    /// (see <see cref="ExposeData"/>). No longer settable directly; superseded by
-    /// <see cref="AddRotationEntry"/>/<see cref="RemoveRotationEntry"/>/<see cref="MoveRotationEntry"/>.
-    /// </summary>
-    private ThingDef? _targetPlantDef;
-
-    /// <summary>
-    /// Legacy position-based active-entry field - kept only so a save from before rotation entries
-    /// had stable Ids can be migrated into <see cref="ActiveEntryId"/> on load (see
-    /// <see cref="ExposeData"/>). No longer settable directly.
-    /// </summary>
-    private int _legacyActiveRotationIndex;
-
-    /// <summary>
     /// The ordered crops this job cycles through (see <c>Docs/CMRIntegrationRework.md</c>, Step 5
     /// - resolves #6): the growers it manages are pushed onto <see cref="ActiveEntry"/>'s plant
     /// until that entry's own stock threshold is satisfied (see
@@ -232,7 +217,7 @@ internal sealed class ManagerJob_FarmingHysteresis
     /// </summary>
     public int? ActiveEntryId;
 
-    /// <summary>Per-job counter behind <see cref="AllocateNextEntryId"/> - starts at 1 so 0 stays free as an "unassigned" sentinel for entries loaded from a pre-Id save.</summary>
+    /// <summary>Per-job counter behind <see cref="AllocateNextEntryId"/>.</summary>
     private int _nextEntryId = 1;
 
     /// <summary>Mints a fresh, job-unique <see cref="CropRotationEntry.Id"/>.</summary>
@@ -267,7 +252,7 @@ internal sealed class ManagerJob_FarmingHysteresis
     /// <see cref="ExecuteJobDataCoroutine"/>) - <see cref="ActiveEntry"/>'s plant, or
     /// <see langword="null"/> if the list is empty (nothing configured yet).
     /// </summary>
-    public ThingDef? TargetPlantDef => ActiveEntry?.PlantDef ?? _targetPlantDef;
+    public ThingDef? TargetPlantDef => ActiveEntry?.PlantDef;
 
     /// <summary>
     /// Appends <paramref name="plantDef"/> as a new rotation entry, seeded with the mod's default
@@ -740,13 +725,9 @@ internal sealed class ManagerJob_FarmingHysteresis
 
         Scribe_Values.Look(ref AssignmentMode, "assignmentMode", GrowerAssignmentMode.All);
         Scribe_Values.Look(ref InvertGrowerArea, "invertGrowerArea");
-        Scribe_Defs.Look(ref _targetPlantDef, "targetPlantDef");
         Scribe_Collections.Look(ref RotationEntries, "rotationEntries", LookMode.Deep);
         Scribe_Values.Look(ref ActiveEntryId, "activeEntryId");
         Scribe_Values.Look(ref _nextEntryId, "nextEntryId", 1);
-        // Kept only for one-time migration (below) from before rotation entries had stable Ids -
-        // ActiveEntryId is the only thing read going forward.
-        Scribe_Values.Look(ref _legacyActiveRotationIndex, "activeRotationIndex");
         Scribe_Values.Look(ref SwitchMode, "switchMode", RotationSwitchMode.WaitForGrowthToFinish);
         Scribe_Values.Look(ref Mode, "rotationMode", RotationMode.Priority);
         RotationEntries ??= [];
@@ -791,56 +772,8 @@ internal sealed class ManagerJob_FarmingHysteresis
             foreach (var entry in RotationEntries)
             {
                 // Stockpile references aren't scribable directly - each entry resolves its own
-                // from its scribed label, same reasoning Trigger_Hysteresis's own legacy
-                // fallback uses.
+                // from its scribed label.
                 entry.ResolveStockpileReference(Manager.map);
-
-                // An entry loaded from a save predating CropRotationEntry.Id: 0 is never
-                // allocated by AllocateNextEntryId (which starts at 1), so it's an unambiguous
-                // "never assigned" sentinel here.
-                if (entry.Id == 0)
-                {
-                    entry.Id = AllocateNextEntryId();
-                }
-            }
-
-            // One-time migration from before Step 5's crop rotation existed: an old save has a
-            // legacy _targetPlantDef but no RotationEntries (a new field, empty after load).
-            // HysteresisTrigger.Lower/Upper/TrackedThingFilter/etc. still fall back to their own
-            // legacy fields at this point (RotationEntries is still empty), so this reads exactly
-            // the bounds/tracked-item state the save already had - see Trigger_Hysteresis.Lower's
-            // own doc comment.
-            if (RotationEntries.Count == 0 && _targetPlantDef != null)
-            {
-                var migratedEntry = new CropRotationEntry
-                {
-                    Id = AllocateNextEntryId(),
-                    Lower = HysteresisTrigger.Lower,
-                    Upper = HysteresisTrigger.Upper,
-                    TrackedFilterFollowsTargetPlant =
-                        HysteresisTrigger.TrackedFilterFollowsTargetPlant,
-                    CountAllOnMap = HysteresisTrigger.CountAllOnMap,
-                    Stockpile = HysteresisTrigger.Stockpile,
-                };
-                migratedEntry.TrackedThingFilter.CopyAllowancesFrom(
-                    HysteresisTrigger.TrackedThingFilter
-                );
-                // Set last: if TrackedFilterFollowsTargetPlant is on, this resyncs the just-copied
-                // filter to the single target plant def, which is already what it held anyway.
-                migratedEntry.PlantDef = _targetPlantDef;
-                RotationEntries.Add(migratedEntry);
-                ActiveEntryId = migratedEntry.Id;
-            }
-
-            // One-time migration from before rotation entries had stable Ids: a save already
-            // using crop rotation (this session's earlier Step 5 follow-up) has RotationEntries
-            // and a legacy position-based _legacyActiveRotationIndex, but no ActiveEntryId yet.
-            // Runs after the block above, which only applies to saves that predate rotation
-            // entirely and already sets ActiveEntryId directly.
-            if (ActiveEntryId == null && RotationEntries.Count > 0)
-            {
-                var index = Math.Clamp(_legacyActiveRotationIndex, 0, RotationEntries.Count - 1);
-                ActiveEntryId = RotationEntries[index].Id;
             }
         }
     }
