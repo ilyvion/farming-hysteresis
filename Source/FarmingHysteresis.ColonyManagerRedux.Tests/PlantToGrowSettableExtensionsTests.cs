@@ -13,13 +13,19 @@ internal static class PlantToGrowSettableExtensionsComputeAllowTests
     [Test]
     public static void SowFollowsStateWheneverSowingIsControlled()
     {
-        Assert.That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: true)).Is.True();
-        Assert.That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: false)).Is.False();
+        Assert
+            .That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: true))
+            .Is.True();
+        Assert
+            .That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: false))
+            .Is.False();
     }
 
     [Test]
     public static void SowIsAlwaysAllowedWhenSowingIsUncontrolled() =>
-        Assert.That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: false, state: false)).Is.True();
+        Assert
+            .That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: false, state: false))
+            .Is.True();
 
     [Test]
     public static void HarvestFollowsStateWheneverHarvestingIsControlledAndNotForced()

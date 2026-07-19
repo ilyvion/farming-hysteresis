@@ -11,7 +11,9 @@ namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 internal static class SelectMostCommonBoundsTests
 {
     private static int FailIfCalled(int min, int max) =>
-        throw new InvalidOperationException("Tie-break picker should not be called for a clear winner.");
+        throw new InvalidOperationException(
+            "Tie-break picker should not be called for a clear winner."
+        );
 
     private static int PickSecond(int min, int max) => 1;
 
@@ -56,15 +58,23 @@ internal static class CmrMigrationGateStatusTests
     [Test]
     public static void AwaitingChoiceAndDeclinedSuppressTakeover()
     {
-        Assert.That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.AwaitingChoice)).Is.True();
-        Assert.That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.Declined)).Is.True();
+        Assert
+            .That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.AwaitingChoice))
+            .Is.True();
+        Assert
+            .That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.Declined))
+            .Is.True();
     }
 
     [Test]
     public static void NotGatedAndMigratedDoNotSuppressTakeover()
     {
-        Assert.That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.NotGated)).Is.False();
-        Assert.That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.Migrated)).Is.False();
+        Assert
+            .That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.NotGated))
+            .Is.False();
+        Assert
+            .That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.Migrated))
+            .Is.False();
     }
 }
 
@@ -80,51 +90,61 @@ internal static class ShouldBeginMigrationGateTests
 {
     [Test]
     public static void BeginsGateOnlyWhenNotGatedAndTakeoverOnAndLegacyDataExists() =>
-        Assert.That(
-            CmrMigrationGate.ShouldBeginMigrationGate(
-                CmrMigrationGateStatus.NotGated,
-                takeoverHysteresisControl: true,
-                hasLegacyHysteresisDataConfigured: true
+        Assert
+            .That(
+                CmrMigrationGate.ShouldBeginMigrationGate(
+                    CmrMigrationGateStatus.NotGated,
+                    takeoverHysteresisControl: true,
+                    hasLegacyHysteresisDataConfigured: true
+                )
             )
-        ).Is.True();
+            .Is.True();
 
     [Test]
     public static void DoesNotBeginGateWhenTakeoverIsOff() =>
-        Assert.That(
-            CmrMigrationGate.ShouldBeginMigrationGate(
-                CmrMigrationGateStatus.NotGated,
-                takeoverHysteresisControl: false,
-                hasLegacyHysteresisDataConfigured: true
+        Assert
+            .That(
+                CmrMigrationGate.ShouldBeginMigrationGate(
+                    CmrMigrationGateStatus.NotGated,
+                    takeoverHysteresisControl: false,
+                    hasLegacyHysteresisDataConfigured: true
+                )
             )
-        ).Is.False();
+            .Is.False();
 
     [Test]
     public static void DoesNotBeginGateWhenThereIsNoLegacyData() =>
-        Assert.That(
-            CmrMigrationGate.ShouldBeginMigrationGate(
-                CmrMigrationGateStatus.NotGated,
-                takeoverHysteresisControl: true,
-                hasLegacyHysteresisDataConfigured: false
+        Assert
+            .That(
+                CmrMigrationGate.ShouldBeginMigrationGate(
+                    CmrMigrationGateStatus.NotGated,
+                    takeoverHysteresisControl: true,
+                    hasLegacyHysteresisDataConfigured: false
+                )
             )
-        ).Is.False();
+            .Is.False();
 
     [Test]
     public static void DoesNotBeginGateWhenAlreadyGated()
     {
-        foreach (var status in new[]
+        foreach (
+            var status in new[]
+            {
+                CmrMigrationGateStatus.AwaitingChoice,
+                CmrMigrationGateStatus.Declined,
+                CmrMigrationGateStatus.Migrated,
+            }
+        )
         {
-            CmrMigrationGateStatus.AwaitingChoice,
-            CmrMigrationGateStatus.Declined,
-            CmrMigrationGateStatus.Migrated,
-        })
-        {
-            Assert.That(
-                CmrMigrationGate.ShouldBeginMigrationGate(
-                    status,
-                    takeoverHysteresisControl: true,
-                    hasLegacyHysteresisDataConfigured: true
+            Assert
+                .That(
+                    CmrMigrationGate.ShouldBeginMigrationGate(
+                        status,
+                        takeoverHysteresisControl: true,
+                        hasLegacyHysteresisDataConfigured: true
+                    )
                 )
-            ).Is.False();
+                .Is.False();
         }
     }
 }

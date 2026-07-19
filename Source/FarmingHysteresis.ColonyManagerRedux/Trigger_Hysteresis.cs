@@ -120,7 +120,8 @@ internal sealed class Trigger_Hysteresis : Trigger
         }
     }
 
-    public static ThingFilter ParentFilter { get; } = ThingFilter.CreateOnlyEverStorableThingFilter();
+    public static ThingFilter ParentFilter { get; } =
+        ThingFilter.CreateOnlyEverStorableThingFilter();
 
     // Legacy fallback state, used only while HysteresisJob has no rotation entries yet (an old
     // save not yet migrated - see ManagerJob_FarmingHysteresis.ExposeData). Once per-entry tracked
@@ -145,7 +146,8 @@ internal sealed class Trigger_Hysteresis : Trigger
     /// <see cref="Lower"/>. Kept distinct from <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>
     /// per Step 4 - see this class's own doc comment.
     /// </summary>
-    public ThingFilter TrackedThingFilter => ActiveEntry?.TrackedThingFilter ?? _legacyTrackedThingFilter;
+    public ThingFilter TrackedThingFilter =>
+        ActiveEntry?.TrackedThingFilter ?? _legacyTrackedThingFilter;
 
     /// <summary>
     /// <see cref="ThingFilter"/>'s settings-changed callback is bound at construction time (a
@@ -165,7 +167,8 @@ internal sealed class Trigger_Hysteresis : Trigger
     /// </summary>
     public bool TrackedFilterFollowsTargetPlant
     {
-        get => ActiveEntry?.TrackedFilterFollowsTargetPlant ?? _legacyTrackedFilterFollowsTargetPlant;
+        get =>
+            ActiveEntry?.TrackedFilterFollowsTargetPlant ?? _legacyTrackedFilterFollowsTargetPlant;
         set
         {
             if (ActiveEntry is { } entry)
@@ -258,7 +261,10 @@ internal sealed class Trigger_Hysteresis : Trigger
             return;
         }
 
-        SyncFilterToSingleDef(_legacyTrackedThingFilter, HysteresisJob.TargetPlantDef?.plant.harvestedThingDef);
+        SyncFilterToSingleDef(
+            _legacyTrackedThingFilter,
+            HysteresisJob.TargetPlantDef?.plant.harvestedThingDef
+        );
     }
 
     public ManagerJob_FarmingHysteresis HysteresisJob => (ManagerJob_FarmingHysteresis)Job;
@@ -301,7 +307,10 @@ internal sealed class Trigger_Hysteresis : Trigger
         LatchMode previous,
         LatchMode current,
         int rotationEntryCount
-    ) => rotationEntryCount > 1 && previous != LatchMode.AboveUpperBound && current == LatchMode.AboveUpperBound;
+    ) =>
+        rotationEntryCount > 1
+        && previous != LatchMode.AboveUpperBound
+        && current == LatchMode.AboveUpperBound;
 
     /// <summary>
     /// The gather phase's pure verdict on this cycle's latch/rotation update - counts things (a
@@ -315,7 +324,11 @@ internal sealed class Trigger_Hysteresis : Trigger
     /// </summary>
     internal readonly struct CycleUpdate
     {
-        public required IReadOnlyList<(int Id, int Count, LatchMode Latch)> EntryUpdates { get; init; }
+        public required IReadOnlyList<(
+            int Id,
+            int Count,
+            LatchMode Latch
+        )> EntryUpdates { get; init; }
         public required int? NewActiveEntryId { get; init; }
         public required int? LegacyCount { get; init; }
         public required LatchMode? LegacyLatch { get; init; }
@@ -346,7 +359,11 @@ internal sealed class Trigger_Hysteresis : Trigger
             // before ManagerJob_FarmingHysteresis.ExposeData's PostLoadInit migration has had a
             // chance to run - falls back to this trigger's own legacy Lower/Upper/TrackedThingFilter
             // etc., which already resolve to the legacy fields correctly since ActiveEntry is null.
-            var legacyCount = HysteresisJob.Manager.map.CountProducts(TrackedThingFilter, Stockpile, CountAllOnMap);
+            var legacyCount = HysteresisJob.Manager.map.CountProducts(
+                TrackedThingFilter,
+                Stockpile,
+                CountAllOnMap
+            );
             return new CycleUpdate
             {
                 EntryUpdates = [],
@@ -428,7 +445,8 @@ internal sealed class Trigger_Hysteresis : Trigger
     /// <see cref="ApplyCycleUpdate"/>) - reading this never recomputes or advances anything.
     /// </summary>
     /// <inheritdoc/>
-    public override bool State => LatchModeValue is LatchMode.BelowLowerBound or LatchMode.BetweenBoundsEnabled;
+    public override bool State =>
+        LatchModeValue is LatchMode.BelowLowerBound or LatchMode.BetweenBoundsEnabled;
 
     /// <summary>
     /// A short human-readable description of <paramref name="latchMode"/> - the same
@@ -506,7 +524,9 @@ internal sealed class Trigger_Hysteresis : Trigger
         {
             0 => "FarmingHysteresis.CMR.Trigger.TrackedSummary.None".Translate(),
             1 => allowedDefs[0].label,
-            _ => "FarmingHysteresis.CMR.Trigger.TrackedSummary.Multiple".Translate(allowedDefs.Count),
+            _ => "FarmingHysteresis.CMR.Trigger.TrackedSummary.Multiple".Translate(
+                allowedDefs.Count
+            ),
         };
     }
 
@@ -645,12 +665,7 @@ internal sealed class Trigger_Hysteresis : Trigger
             "FarmingHysteresis.InStorage".Translate(TrackedCountNoun, TrackedThingCount)
         );
 
-        DrawWrappedLabel(
-            ref cur,
-            width,
-            entryHeight,
-            DescribeLatchMode(LatchModeValue)
-        );
+        DrawWrappedLabel(ref cur, width, entryHeight, DescribeLatchMode(LatchModeValue));
     }
 
     /// <summary>
@@ -793,7 +808,11 @@ internal sealed class Trigger_Hysteresis : Trigger
         // directly into the legacy fields (not through the delegating properties above), since
         // those would write into the active entry instead once one exists - the active entry's own
         // state is scribed separately, via CropRotationEntry.ExposeData.
-        Scribe_Values.Look(ref _legacyTrackedFilterFollowsTargetPlant, "trackedFilterFollowsTargetPlant", true);
+        Scribe_Values.Look(
+            ref _legacyTrackedFilterFollowsTargetPlant,
+            "trackedFilterFollowsTargetPlant",
+            true
+        );
 
         Scribe_Deep.Look(
             ref _legacyTrackedThingFilter,

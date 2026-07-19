@@ -96,7 +96,8 @@ internal sealed class ManagerSettings_FarmingHysteresis : ManagerSettings
     /// </summary>
     internal void ApplyControllerState() =>
         FarmingHysteresisMod.HysteresisController =
-            TakeOverHysteresisControl && !CmrMigrationGameComponent.IsCurrentSaveSuppressingTakeover()
+            TakeOverHysteresisControl
+            && !CmrMigrationGameComponent.IsCurrentSaveSuppressingTakeover()
                 ? CmrHysteresisController.Instance
                 : DefaultHysteresisController.Instance;
 }

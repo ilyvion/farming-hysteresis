@@ -26,6 +26,8 @@ internal static class Resources
     /// Design decision 4), the path is guaranteed to already be in the shared content pool -
     /// no need to duplicate the asset.
     /// </summary>
-    public static readonly Texture2D ArrowUp = ContentFinder<Texture2D>.Get("UI/Buttons/CMR_ArrowUp"),
+    public static readonly Texture2D ArrowUp = ContentFinder<Texture2D>.Get(
+            "UI/Buttons/CMR_ArrowUp"
+        ),
         ArrowDown = ContentFinder<Texture2D>.Get("UI/Buttons/CMR_ArrowDown");
 }

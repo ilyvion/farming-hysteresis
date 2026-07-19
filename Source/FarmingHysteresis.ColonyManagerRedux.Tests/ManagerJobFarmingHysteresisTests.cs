@@ -300,7 +300,11 @@ internal static class ComputePriorityActiveEntryIdTests
         Assert
             .That(
                 ComputePriorityActiveEntryId(
-                    [(1, LatchMode.AboveUpperBound), (2, LatchMode.BelowLowerBound), (3, LatchMode.BelowLowerBound)],
+                    [
+                        (1, LatchMode.AboveUpperBound),
+                        (2, LatchMode.BelowLowerBound),
+                        (3, LatchMode.BelowLowerBound),
+                    ],
                     previousActiveEntryId: 3
                 )
             )

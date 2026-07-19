@@ -34,7 +34,10 @@ internal static class PlantToGrowSettableExtensions
     {
         var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow()?.plant.harvestedThingDef;
         return harvestedThingDef != null
-            ? (harvestedThingDef, plantToGrowSettable.Map.CountOfHarvestedThingDef(harvestedThingDef))
+            ? (
+                harvestedThingDef,
+                plantToGrowSettable.Map.CountOfHarvestedThingDef(harvestedThingDef)
+            )
             : (null, 0);
     }
 
@@ -69,7 +72,10 @@ internal static class PlantToGrowSettableExtensions
     {
         var def = GetControlDefForPlantGrower(plantGrower, nameof(SetHysteresisControlState));
 
-        def.SetAllowSow(plantGrower, ComputeAllowSow(FarmingHysteresisMod.Settings.ControlSowing, state));
+        def.SetAllowSow(
+            plantGrower,
+            ComputeAllowSow(FarmingHysteresisMod.Settings.ControlSowing, state)
+        );
         def.SetAllowHarvest(
             plantGrower,
             ComputeAllowHarvest(
@@ -84,8 +90,11 @@ internal static class PlantToGrowSettableExtensions
     internal static bool ComputeAllowSow(bool controlSowing, bool state) => !controlSowing || state;
 
     /// <summary>Pure decision logic behind <see cref="SetHysteresisControlState"/>'s harvest gating.</summary>
-    internal static bool ComputeAllowHarvest(bool controlHarvesting, bool state, bool forceHarvestEnabled) =>
-        forceHarvestEnabled || !controlHarvesting || state;
+    internal static bool ComputeAllowHarvest(
+        bool controlHarvesting,
+        bool state,
+        bool forceHarvestEnabled
+    ) => forceHarvestEnabled || !controlHarvesting || state;
 
     private static void ThrowError(IPlantToGrowSettable plantGrower, string method) =>
         throw new InvalidOperationException(

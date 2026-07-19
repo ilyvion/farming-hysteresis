@@ -260,10 +260,14 @@ internal static class ShouldAdvanceRotationTests
     public static void DoesNotAdvanceWithoutMultipleRotationEntries()
     {
         Assert
-            .That(ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 0))
+            .That(
+                ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 0)
+            )
             .Is.False();
         Assert
-            .That(ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 1))
+            .That(
+                ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 1)
+            )
             .Is.False();
     }
 
@@ -271,7 +275,9 @@ internal static class ShouldAdvanceRotationTests
     public static void AdvancesOnFreshTransitionIntoAboveUpperBoundWithMultipleEntries()
     {
         Assert
-            .That(ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 2))
+            .That(
+                ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 2)
+            )
             .Is.True();
         Assert
             .That(ShouldAdvanceRotation(BelowLowerBound, AboveUpperBound, rotationEntryCount: 2))
@@ -288,6 +294,8 @@ internal static class ShouldAdvanceRotationTests
     [Test]
     public static void DoesNotAdvanceWhenNotAboveUpperBound() =>
         Assert
-            .That(ShouldAdvanceRotation(BelowLowerBound, BetweenBoundsEnabled, rotationEntryCount: 2))
+            .That(
+                ShouldAdvanceRotation(BelowLowerBound, BetweenBoundsEnabled, rotationEntryCount: 2)
+            )
             .Is.False();
 }

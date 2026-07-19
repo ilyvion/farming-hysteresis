@@ -12,7 +12,8 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 /// differs per crop; <see cref="CropRotationEntry.Lower"/>/<see cref="CropRotationEntry.Upper"/>
 /// bounds stay where they are, in the crop rotation list itself.
 /// </summary>
-internal sealed class WindowTriggerHysteresisDetails(CropRotationEntry entry, Manager manager) : Window
+internal sealed class WindowTriggerHysteresisDetails(CropRotationEntry entry, Manager manager)
+    : Window
 {
     private readonly CropRotationEntry _entry = entry;
     private readonly Manager _manager = manager;
@@ -58,16 +59,19 @@ internal sealed class WindowTriggerHysteresisDetails(CropRotationEntry entry, Ma
         var zoneRectRows = Math.Min(
             (int)
                 Math.Ceiling(
-                    (double)(
-                        _manager.map.zoneManager.AllZones.OfType<Zone_Stockpile>().Count()
-                        + 1
-                    ) / StockpileGUI.StockPilesPerRow
+                    (double)(_manager.map.zoneManager.AllZones.OfType<Zone_Stockpile>().Count() + 1)
+                        / StockpileGUI.StockPilesPerRow
                 ),
             3
         );
         var zoneRectHeight = zoneRectRows * ListEntryHeight;
 
-        var filterRect = new Rect(pos.x, pos.y, width, inRect.yMax - pos.y - zoneRectHeight - Margin);
+        var filterRect = new Rect(
+            pos.x,
+            pos.y,
+            width,
+            inRect.yMax - pos.y - zoneRectHeight - Margin
+        );
         var zoneRect = new Rect(filterRect.xMin, filterRect.yMax + Margin, width, zoneRectHeight);
 
         ThingFilterUI.DoThingFilterConfigWindow(
@@ -84,10 +88,20 @@ internal sealed class WindowTriggerHysteresisDetails(CropRotationEntry entry, Ma
         }
 
         var stockpile = _entry.Stockpile;
-        _ = StockpileGUI.DoStockpileSelectors(zoneRect.position, zoneRect.width, ref stockpile, _manager);
+        _ = StockpileGUI.DoStockpileSelectors(
+            zoneRect.position,
+            zoneRect.width,
+            ref stockpile,
+            _manager
+        );
         _entry.Stockpile = stockpile;
 
-        var countAllOnMapRect = new Rect(zoneRect.xMin, zoneRect.yMax + Margin, width, ListEntryHeight);
+        var countAllOnMapRect = new Rect(
+            zoneRect.xMin,
+            zoneRect.yMax + Margin,
+            width,
+            ListEntryHeight
+        );
         var countAllOnMap = _entry.CountAllOnMap;
         Utilities.DrawToggle(
             countAllOnMapRect,

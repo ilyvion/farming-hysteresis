@@ -132,7 +132,8 @@ internal sealed class CropRotationEntry : IExposable
     /// never shows it, and <see cref="Mode"/> is inert for such an entry regardless of its scribed
     /// value.
     /// </summary>
-    internal bool HasResolvableSecondaryProduct => SecondaryProductResolvers.ResolveFor(PlantDef).Any();
+    internal bool HasResolvableSecondaryProduct =>
+        SecondaryProductResolvers.ResolveFor(PlantDef).Any();
 
     /// <summary>
     /// Pure dispatch behind <see cref="SyncTrackedFilterToTargetPlant"/> - which defs
@@ -150,7 +151,9 @@ internal sealed class CropRotationEntry : IExposable
             DualCropTrackingMode.PrimaryOnly => primary != null ? [primary] : [],
             DualCropTrackingMode.SecondaryOnly => secondary,
             DualCropTrackingMode.Both => primary != null ? secondary.Append(primary) : secondary,
-            _ => throw new InvalidOperationException($"Uncovered {nameof(DualCropTrackingMode)}: {mode}."),
+            _ => throw new InvalidOperationException(
+                $"Uncovered {nameof(DualCropTrackingMode)}: {mode}."
+            ),
         };
 
     /// <summary>
@@ -167,7 +170,10 @@ internal sealed class CropRotationEntry : IExposable
 
         var primary = PlantDef?.plant.harvestedThingDef;
         var secondary = SecondaryProductResolvers.ResolveFor(PlantDef);
-        Trigger_Hysteresis.SyncFilterToDefs(trackedThingFilter, ComputeTrackedDefs(Mode, primary, secondary));
+        Trigger_Hysteresis.SyncFilterToDefs(
+            trackedThingFilter,
+            ComputeTrackedDefs(Mode, primary, secondary)
+        );
     }
 
     /// <summary>
@@ -178,18 +184,35 @@ internal sealed class CropRotationEntry : IExposable
     /// </summary>
     internal void ResolveStockpileReference(Map map) =>
         Stockpile =
-            map.zoneManager.AllZones.FirstOrDefault(z => z is Zone_Stockpile && z.label == _stockpileScribe)
-            as Zone_Stockpile;
+            map.zoneManager.AllZones.FirstOrDefault(z =>
+                z is Zone_Stockpile && z.label == _stockpileScribe
+            ) as Zone_Stockpile;
 
     public void ExposeData()
     {
         Scribe_Values.Look(ref Id, "id");
         Scribe_Defs.Look(ref _plantDef, "plantDef");
-        Scribe_Values.Look(ref Lower, "lower", FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound);
-        Scribe_Values.Look(ref Upper, "upper", FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound);
+        Scribe_Values.Look(
+            ref Lower,
+            "lower",
+            FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
+        );
+        Scribe_Values.Look(
+            ref Upper,
+            "upper",
+            FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound
+        );
         Scribe_Values.Look(ref LatchModeValue, "latchMode", LatchMode.Unknown);
-        Scribe_Values.Look(ref TrackedFilterFollowsTargetPlant, "trackedFilterFollowsTargetPlant", true);
-        Scribe_Deep.Look(ref trackedThingFilter, "trackedThingFilter", (object)NoOpSettingsChangedCallback);
+        Scribe_Values.Look(
+            ref TrackedFilterFollowsTargetPlant,
+            "trackedFilterFollowsTargetPlant",
+            true
+        );
+        Scribe_Deep.Look(
+            ref trackedThingFilter,
+            "trackedThingFilter",
+            (object)NoOpSettingsChangedCallback
+        );
         Scribe_Values.Look(ref CountAllOnMap, "countAllOnMap");
         Scribe_Values.Look(ref Mode, "dualCropTrackingMode", DualCropTrackingMode.PrimaryOnly);
 

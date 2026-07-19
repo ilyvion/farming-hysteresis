@@ -29,7 +29,9 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     /// </summary>
     public override string GetSubLabel(ManagerJob job) =>
         job is ManagerJob_FarmingHysteresis { IsCommittedToTracker: true, IsManaged: false }
-            ? "FarmingHysteresis.CMR.JobDormantTakeoverOff".Translate() + " - " + base.GetSubLabel(job)
+            ? "FarmingHysteresis.CMR.JobDormantTakeoverOff".Translate()
+                + " - "
+                + base.GetSubLabel(job)
             : base.GetSubLabel(job);
 
     private static bool IsMigrationPending =>
@@ -136,7 +138,11 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     /// next one, cycling. Replaces the old single "Target plant" section; a job with exactly one
     /// entry behaves exactly like this integration's original one-crop-per-job design.
     /// </summary>
-    private static float DrawCropRotation(ManagerJob_FarmingHysteresis job, Vector2 pos, float width)
+    private static float DrawCropRotation(
+        ManagerJob_FarmingHysteresis job,
+        Vector2 pos,
+        float width
+    )
     {
         var start = pos;
 
@@ -146,7 +152,9 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         // Ordered by label, matching vanilla's own plant-picker menus (e.g. the zone "add plant"
         // FloatMenu) - ValidTargetPlants itself comes back in DefDatabase/whatever-order-the-mods-
         // loaded-in order, which reads as random to a player scanning a long list.
-        var validTargetPlants = job.ValidTargetPlants.OrderBy(d => d.label, StringComparer.OrdinalIgnoreCase).ToList();
+        var validTargetPlants = job
+            .ValidTargetPlants.OrderBy(d => d.label, StringComparer.OrdinalIgnoreCase)
+            .ToList();
         if (validTargetPlants.Count == 0 && job.RotationEntries.Count == 0)
         {
             var message = "FarmingHysteresis.CMR.TargetPlant.NoneAvailable".Translate();
@@ -254,14 +262,36 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             var top = i == 0;
             var bottom = i == entries.Count - 1;
 
-            var rowRect = new Rect(pos.x, pos.y, width, TargetPlantIconSize + (2 * TargetPlantRowPadding));
+            var rowRect = new Rect(
+                pos.x,
+                pos.y,
+                width,
+                TargetPlantIconSize + (2 * TargetPlantRowPadding)
+            );
             var buttonsWidth = (3 * ReorderButtonSize) + (2 * Margin);
-            var pickerRect = new Rect(rowRect.x, rowRect.y, rowRect.width - buttonsWidth - Margin, rowRect.height);
+            var pickerRect = new Rect(
+                rowRect.x,
+                rowRect.y,
+                rowRect.width - buttonsWidth - Margin,
+                rowRect.height
+            );
 
-            DrawRotationEntryPickerRow(job, entry, validTargetPlants, pickerRect, i, isActive: entry.Id == job.ActiveEntryId);
+            DrawRotationEntryPickerRow(
+                job,
+                entry,
+                validTargetPlants,
+                pickerRect,
+                i,
+                isActive: entry.Id == job.ActiveEntryId
+            );
 
             var buttonY = rowRect.y + ((rowRect.height - ReorderButtonSize) / 2);
-            var upRect = new Rect(pickerRect.xMax + Margin, buttonY, ReorderButtonSize, ReorderButtonSize);
+            var upRect = new Rect(
+                pickerRect.xMax + Margin,
+                buttonY,
+                ReorderButtonSize,
+                ReorderButtonSize
+            );
             var downRect = new Rect(upRect.xMax, buttonY, ReorderButtonSize, ReorderButtonSize);
             var deleteRect = new Rect(downRect.xMax, buttonY, ReorderButtonSize, ReorderButtonSize);
 
@@ -284,7 +314,10 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             {
                 removeIndex = capturedIndex;
             }
-            TooltipHandler.TipRegion(deleteRect, "FarmingHysteresis.CMR.CropRotation.Remove".Translate());
+            TooltipHandler.TipRegion(
+                deleteRect,
+                "FarmingHysteresis.CMR.CropRotation.Remove".Translate()
+            );
 
             pos.y = rowRect.yMax;
             pos.y += DrawRotationEntryBounds(job, entry, pos, width);
@@ -395,7 +428,9 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         if (Widgets.ButtonInvisible(rowRect, doMouseoverSound: false))
         {
             var options = validTargetPlants
-                .Where(candidate => candidate == plantDef || !job.RotationEntries.Any(e => e.PlantDef == candidate))
+                .Where(candidate =>
+                    candidate == plantDef || !job.RotationEntries.Any(e => e.PlantDef == candidate)
+                )
                 .Select(candidate => new FloatMenuOption(
                     candidate.LabelCap,
                     () => entry.PlantDef = candidate,
@@ -406,7 +441,12 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
                     null,
                     null,
                     29f,
-                    rect => Widgets.InfoCardButton(rect.x + 5f, rect.y + ((rect.height - 24f) / 2f), candidate)
+                    rect =>
+                        Widgets.InfoCardButton(
+                            rect.x + 5f,
+                            rect.y + ((rect.height - 24f) / 2f),
+                            candidate
+                        )
                 ))
                 .ToList();
             Find.WindowStack.Add(new FloatMenu(options));
@@ -427,18 +467,22 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     )
     {
         var start = pos;
-        var tip = entry.PlantDef == null
-            ? null
-            : (TipSignal?)
-                "FarmingHysteresis.CMR.CropRotation.BoundsTip".Translate(
-                    entry.PlantDef.label,
-                    FarmingHysteresisMod.Settings.HysteresisMode.AsString(),
-                    job.RotationEntries.Count > 1
-                        ? "FarmingHysteresis.CMR.CropRotation.BoundsTip.NextCrop".Translate()
-                        : "FarmingHysteresis.CMR.CropRotation.BoundsTip.Stop".Translate()
-                );
+        var tip =
+            entry.PlantDef == null
+                ? null
+                : (TipSignal?)
+                    "FarmingHysteresis.CMR.CropRotation.BoundsTip".Translate(
+                        entry.PlantDef.label,
+                        FarmingHysteresisMod.Settings.HysteresisMode.AsString(),
+                        job.RotationEntries.Count > 1
+                            ? "FarmingHysteresis.CMR.CropRotation.BoundsTip.NextCrop".Translate()
+                            : "FarmingHysteresis.CMR.CropRotation.BoundsTip.Stop".Translate()
+                    );
 
-        Widgets.Label(new Rect(pos.x, pos.y, width, ListEntryHeight), "FarmingHysteresis.CMR.Trigger.Lower".Translate());
+        Widgets.Label(
+            new Rect(pos.x, pos.y, width, ListEntryHeight),
+            "FarmingHysteresis.CMR.Trigger.Lower".Translate()
+        );
         pos.y += ListEntryHeight;
         var lowerRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
         Widgets.IntEntry(lowerRect, ref entry.Lower, ref entry.LowerBuffer);
@@ -448,7 +492,10 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         }
         pos.y += ListEntryHeight;
 
-        Widgets.Label(new Rect(pos.x, pos.y, width, ListEntryHeight), "FarmingHysteresis.CMR.Trigger.Upper".Translate());
+        Widgets.Label(
+            new Rect(pos.x, pos.y, width, ListEntryHeight),
+            "FarmingHysteresis.CMR.Trigger.Upper".Translate()
+        );
         pos.y += ListEntryHeight;
         var upperRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
         Widgets.IntEntry(upperRect, ref entry.Upper, ref entry.UpperBuffer);
@@ -493,7 +540,11 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
 
         pos.y += Trigger_Hysteresis.DrawTrackedProductRow(entry.TrackedThingFilter, pos, width);
 
-        var count = job.Manager.map.CountProducts(entry.TrackedThingFilter, entry.Stockpile, entry.CountAllOnMap);
+        var count = job.Manager.map.CountProducts(
+            entry.TrackedThingFilter,
+            entry.Stockpile,
+            entry.CountAllOnMap
+        );
         var noun = Trigger_Hysteresis.DescribeTrackedCountNoun(entry.TrackedThingFilter);
         var storageRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
         Widgets.Label(storageRect, "FarmingHysteresis.InStorage".Translate(noun, count));
@@ -552,10 +603,19 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             TooltipHandler.TipRegion(iconRect, hint);
         }
 
-        if (Widgets.ButtonText(buttonRect, "FarmingHysteresis.CMR.Trigger.ConfigureTracked".Translate()))
+        if (
+            Widgets.ButtonText(
+                buttonRect,
+                "FarmingHysteresis.CMR.Trigger.ConfigureTracked".Translate()
+            )
+        )
         {
             Find.WindowStack.Add(
-                new WindowTriggerHysteresisDetails(entry, job.Manager) { closeOnClickedOutside = true, draggable = true }
+                new WindowTriggerHysteresisDetails(entry, job.Manager)
+                {
+                    closeOnClickedOutside = true,
+                    draggable = true,
+                }
             );
         }
     }
@@ -590,9 +650,13 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         {
             var secondaryLabels = string.Join(
                 ", ",
-                secondaryDefs.Select(d => d.LabelCap.Resolve().Colorize(ColoredText.TipSectionTitleColor))
+                secondaryDefs.Select(d =>
+                    d.LabelCap.Resolve().Colorize(ColoredText.TipSectionTitleColor)
+                )
             );
-            return "FarmingHysteresis.CMR.CropRotation.SecondaryProductHint".Translate(secondaryLabels);
+            return "FarmingHysteresis.CMR.CropRotation.SecondaryProductHint".Translate(
+                secondaryLabels
+            );
         }
 
         return entry.PlantDef?.plant.harvestedThingDef is { } primary
@@ -609,14 +673,18 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         float width
     )
     {
-        var addable = validTargetPlants.Where(plantDef => !job.RotationEntries.Any(e => e.PlantDef == plantDef)).ToList();
+        var addable = validTargetPlants
+            .Where(plantDef => !job.RotationEntries.Any(e => e.PlantDef == plantDef))
+            .ToList();
         if (addable.Count == 0)
         {
             return 0f;
         }
 
         var buttonRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-        if (Widgets.ButtonText(buttonRect, "FarmingHysteresis.CMR.CropRotation.AddCrop".Translate()))
+        if (
+            Widgets.ButtonText(buttonRect, "FarmingHysteresis.CMR.CropRotation.AddCrop".Translate())
+        )
         {
             var options = addable
                 .Select(plantDef => new FloatMenuOption(
@@ -629,7 +697,12 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
                     null,
                     null,
                     29f,
-                    rect => Widgets.InfoCardButton(rect.x + 5f, rect.y + ((rect.height - 24f) / 2f), plantDef)
+                    rect =>
+                        Widgets.InfoCardButton(
+                            rect.x + 5f,
+                            rect.y + ((rect.height - 24f) / 2f),
+                            plantDef
+                        )
                 ))
                 .ToList();
             Find.WindowStack.Add(new FloatMenu(options));
@@ -660,7 +733,9 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             ButtonSize.x,
             ButtonSize.y
         );
-        if (Widgets.ButtonText(buttonRect, "FarmingHysteresis.CMR.Migration.MigrateNow".Translate()))
+        if (
+            Widgets.ButtonText(buttonRect, "FarmingHysteresis.CMR.Migration.MigrateNow".Translate())
+        )
         {
             CmrMigrationGate.Migrate();
         }
@@ -741,7 +816,10 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         if (growers.Count == 0)
         {
             var emptyRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
-            Widgets.Label(emptyRect, "FarmingHysteresis.CMR.GrowerScope.NoEligibleGrowers".Translate());
+            Widgets.Label(
+                emptyRect,
+                "FarmingHysteresis.CMR.GrowerScope.NoEligibleGrowers".Translate()
+            );
             return ListEntryHeight;
         }
 
