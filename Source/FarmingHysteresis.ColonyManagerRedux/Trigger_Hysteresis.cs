@@ -824,16 +824,18 @@ internal sealed class Trigger_Hysteresis : Trigger
         // Stockpile isn't referenceable - scribe by label, same as Trigger_Threshold.ExposeData.
         if (Scribe.mode == LoadSaveMode.Saving)
         {
-            _legacyStockpileScribe = _legacyStockpile?.ToString() ?? "null";
+            _legacyStockpileScribe = _legacyStockpile?.ToString();
         }
 
-        Scribe_Values.Look(ref _legacyStockpileScribe, "stockpile", "null");
+        Scribe_Values.Look(ref _legacyStockpileScribe, "stockpile");
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             _legacyStockpile =
-                Job.Manager.map.zoneManager.AllZones.FirstOrDefault(z =>
-                    z is Zone_Stockpile && z.label == _legacyStockpileScribe
-                ) as Zone_Stockpile;
+                _legacyStockpileScribe == null
+                    ? null
+                    : Job.Manager.map.zoneManager.AllZones.FirstOrDefault(z =>
+                        z is Zone_Stockpile && z.label == _legacyStockpileScribe
+                    ) as Zone_Stockpile;
         }
     }
 }

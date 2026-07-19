@@ -257,7 +257,7 @@ internal sealed class ManagerJob_FarmingHysteresis
     /// <summary>
     /// Which rotation semantics (see <see cref="RotationMode"/>) this job uses to pick
     /// <see cref="ActiveEntryId"/> each manager job cycle - defaults to
-    /// <see cref="RotationMode.RoundRobin"/> so an old save (or a save from before this field
+    /// <see cref="RotationMode.Priority"/> so an old save (or a save from before this field
     /// existed) keeps behaving exactly as it did before, with zero behavior change.
     /// </summary>
     public RotationMode Mode = RotationMode.Priority;

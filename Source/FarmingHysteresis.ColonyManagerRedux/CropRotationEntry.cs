@@ -184,9 +184,11 @@ internal sealed class CropRotationEntry : IExposable
     /// </summary>
     internal void ResolveStockpileReference(Map map) =>
         Stockpile =
-            map.zoneManager.AllZones.FirstOrDefault(z =>
-                z is Zone_Stockpile && z.label == _stockpileScribe
-            ) as Zone_Stockpile;
+            _stockpileScribe == null
+                ? null
+                : map.zoneManager.AllZones.FirstOrDefault(z =>
+                    z is Zone_Stockpile && z.label == _stockpileScribe
+                ) as Zone_Stockpile;
 
     public void ExposeData()
     {
@@ -218,8 +220,8 @@ internal sealed class CropRotationEntry : IExposable
 
         if (Scribe.mode == LoadSaveMode.Saving)
         {
-            _stockpileScribe = Stockpile?.ToString() ?? "null";
+            _stockpileScribe = Stockpile?.ToString();
         }
-        Scribe_Values.Look(ref _stockpileScribe, "stockpile", "null");
+        Scribe_Values.Look(ref _stockpileScribe, "stockpile");
     }
 }

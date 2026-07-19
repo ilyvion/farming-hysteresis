@@ -187,9 +187,6 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         var num = 0f;
         foreach (var harvestedThingDef in _filteredHarvestedThingDefs!)
         {
-            var value = bounds[harvestedThingDef].Lower;
-            var buffer = boundLowerBuffers[harvestedThingDef];
-
             GUI.color = new Color(1f, 1f, 1f, 0.2f);
             Widgets.DrawLineHorizontal(0f, num, viewRect.width);
             GUI.color = Color.white;
