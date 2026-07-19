@@ -24,6 +24,15 @@
     <FarmingHysteresis.CMR.Trigger.Status>{0} {1} in stock (bounds: {2} - {3}).</FarmingHysteresis.CMR.Trigger.Status>
     <FarmingHysteresis.CMR.Trigger.NoTargetPlant>No target plant selected yet - choose one in the "Target plant" section above to start gating sow/harvest.</FarmingHysteresis.CMR.Trigger.NoTargetPlant>
 
+    <FarmingHysteresis.CMR.Migration.Title>Migrate Farming Hysteresis to Colony Manager Redux?</FarmingHysteresis.CMR.Migration.Title>
+    <FarmingHysteresis.CMR.Migration.Prompt>Farming Hysteresis now defaults to being controlled through Colony Manager Redux instead of its own always-on sowing/harvesting toggle, and this save already has growers configured under the old system. Migrate them to Colony Manager Redux jobs now (grouped by target plant, using each group's most common bounds), or keep using the old system for now? You can migrate later from the farming hysteresis manager tab if you decline at this time.</FarmingHysteresis.CMR.Migration.Prompt>
+    <FarmingHysteresis.CMR.Migration.Migrate>Migrate now</FarmingHysteresis.CMR.Migration.Migrate>
+    <FarmingHysteresis.CMR.Migration.Decline>Keep old system</FarmingHysteresis.CMR.Migration.Decline>
+    <FarmingHysteresis.CMR.Migration.MigratedMessage>Existing growers have been migrated to Colony Manager Redux jobs, grouped by target plant.</FarmingHysteresis.CMR.Migration.MigratedMessage>
+    <FarmingHysteresis.CMR.Migration.DeclinedMessage>Farming Hysteresis will keep using its old always-on control for this save. You can migrate to Colony Manager Redux at any time from the farming hysteresis manager tab.</FarmingHysteresis.CMR.Migration.DeclinedMessage>
+    <FarmingHysteresis.CMR.Migration.PendingNotice>This save is still using Farming Hysteresis's old always-on control rather than Colony Manager Redux. Migrating now will create a job per target plant found among currently-enabled growers, using the most common bounds among each group.</FarmingHysteresis.CMR.Migration.PendingNotice>
+    <FarmingHysteresis.CMR.Migration.MigrateNow>Migrate now</FarmingHysteresis.CMR.Migration.MigrateNow>
+
     <FarmingHysteresis.CMR.Logs.LatchState>{0}</FarmingHysteresis.CMR.Logs.LatchState>
     <FarmingHysteresis.CMR.Logs.GrowerPlantSet>{0}: now set to grow {1}</FarmingHysteresis.CMR.Logs.GrowerPlantSet>
     <FarmingHysteresis.CMR.Logs.GrowerStateChanged>{0}: {1}</FarmingHysteresis.CMR.Logs.GrowerStateChanged>

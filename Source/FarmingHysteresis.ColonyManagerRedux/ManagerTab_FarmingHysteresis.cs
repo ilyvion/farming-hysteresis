@@ -11,8 +11,26 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     private const float TargetPlantIconSize = 24f;
     private const float TargetPlantRowPadding = 5f;
 
+    /// <summary>
+    /// Whenever the migration gate is still suppressing takeover for this save, show the migrate
+    /// notice even with no job selected - there's nothing useful to configure in the meantime
+    /// (see <see cref="DoMainContent"/>), unlike the base class's default of a blank panel.
+    /// </summary>
+    protected override bool DoMainContentWhenNothingSelected => IsMigrationPending;
+
+    private static bool IsMigrationPending =>
+        CmrMigrationGameComponent.CurrentStatus
+            is CmrMigrationGateStatus.AwaitingChoice
+                or CmrMigrationGateStatus.Declined;
+
     protected override void DoMainContent(Rect rect)
     {
+        if (IsMigrationPending)
+        {
+            DrawMigrationPendingNotice(rect);
+            return;
+        }
+
         Widgets.DrawMenuSection(rect);
 
         Widgets_Section.BeginSectionColumn(rect, "FarmingHysteresis.Job", out var position, out var width);
@@ -152,6 +170,34 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         var start = pos;
         job.HysteresisTrigger.DrawTriggerConfig(ref pos, width, ListEntryHeight);
         return pos.y - start.y;
+    }
+
+    /// <summary>
+    /// Shown in place of the usual job-editing panel while <see cref="CmrMigrationGameComponent"/>
+    /// is still suppressing takeover for this save (dialog not yet answered, or answered "no") -
+    /// configuring jobs wouldn't do anything useful yet since the old always-on engine, not CMR,
+    /// is the one actually controlling growers. Doubles as the on-demand retry the player asked
+    /// for after declining the initial one-time dialog.
+    /// </summary>
+    private static void DrawMigrationPendingNotice(Rect rect)
+    {
+        Widgets.DrawMenuSection(rect);
+
+        var innerRect = rect.ContractedBy(Margin);
+        var message = "FarmingHysteresis.CMR.Migration.PendingNotice".Translate();
+        var messageHeight = Text.CalcHeight(message, innerRect.width);
+        Widgets.Label(new Rect(innerRect.x, innerRect.y, innerRect.width, messageHeight), message);
+
+        var buttonRect = new Rect(
+            innerRect.x,
+            innerRect.y + messageHeight + Margin,
+            ButtonSize.x,
+            ButtonSize.y
+        );
+        if (Widgets.ButtonText(buttonRect, "FarmingHysteresis.CMR.Migration.MigrateNow".Translate()))
+        {
+            CmrMigrationGate.Migrate();
+        }
     }
 
     private static void DrawAssignmentModeSelector(
