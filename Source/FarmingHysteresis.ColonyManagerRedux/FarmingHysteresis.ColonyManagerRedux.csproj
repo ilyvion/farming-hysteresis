@@ -9,6 +9,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <!-- Needed by Window_TriggerHysteresisDetails, mirroring CMR's own
+             Window_TriggerThresholdDetails - RimWorld pads the filter list's bottom by 90px for
+             reasons that don't apply here, so it's undone the same way CMR's own window does. -->
+        <Publicize Include="Assembly-CSharp:Verse.ThingFilterUI.viewHeight" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\FarmingHysteresis\FarmingHysteresis.csproj">
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>

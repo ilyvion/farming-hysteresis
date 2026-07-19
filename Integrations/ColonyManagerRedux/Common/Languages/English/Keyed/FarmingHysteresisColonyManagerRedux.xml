@@ -23,6 +23,13 @@
     <FarmingHysteresis.CMR.Trigger.Upper>Upper bound</FarmingHysteresis.CMR.Trigger.Upper>
     <FarmingHysteresis.CMR.Trigger.Status>{0} {1} in stock (bounds: {2} - {3}).</FarmingHysteresis.CMR.Trigger.Status>
     <FarmingHysteresis.CMR.Trigger.NoTargetPlant>No target plant selected yet - choose one in the "Target plant" section above to start gating sow/harvest.</FarmingHysteresis.CMR.Trigger.NoTargetPlant>
+    <FarmingHysteresis.CMR.Trigger.ConfigureTracked>Configure tracked items&#8230;</FarmingHysteresis.CMR.Trigger.ConfigureTracked>
+    <FarmingHysteresis.CMR.Trigger.TrackedSummary.None>nothing (no items selected)</FarmingHysteresis.CMR.Trigger.TrackedSummary.None>
+    <FarmingHysteresis.CMR.Trigger.TrackedSummary.Multiple>{0} kinds of items</FarmingHysteresis.CMR.Trigger.TrackedSummary.Multiple>
+    <FarmingHysteresis.CMR.Trigger.TrackedCountNoun.Generic>tracked items</FarmingHysteresis.CMR.Trigger.TrackedCountNoun.Generic>
+    <FarmingHysteresis.CMR.Trigger.FollowTargetPlant>Follow target plant</FarmingHysteresis.CMR.Trigger.FollowTargetPlant>
+    <FarmingHysteresis.CMR.Trigger.FollowTargetPlant.Tip>When enabled, this job tracks whatever the "Target plant" section above produces, and switches automatically whenever that changes. Disable this to track something else entirely (e.g. sow Hops based on Beer stock, not Hops).</FarmingHysteresis.CMR.Trigger.FollowTargetPlant.Tip>
+    <FarmingHysteresis.CMR.Trigger.FollowingTargetPlant>Currently tracking whatever the "Target plant" section produces. Disable "Follow target plant" above to track something else instead.</FarmingHysteresis.CMR.Trigger.FollowingTargetPlant>
 
     <FarmingHysteresis.CMR.Migration.Title>Migrate Farming Hysteresis to Colony Manager Redux?</FarmingHysteresis.CMR.Migration.Title>
     <FarmingHysteresis.CMR.Migration.Prompt>Farming Hysteresis now defaults to being controlled through Colony Manager Redux instead of its own always-on sowing/harvesting toggle, and this save already has growers configured under the old system. Migrate them to Colony Manager Redux jobs now (grouped by target plant, using each group's most common bounds), or keep using the old system for now? You can migrate later from the farming hysteresis manager tab if you decline at this time.</FarmingHysteresis.CMR.Migration.Prompt>

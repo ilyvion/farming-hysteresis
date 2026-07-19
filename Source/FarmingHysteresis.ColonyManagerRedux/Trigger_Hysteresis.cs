@@ -1,5 +1,4 @@
 using ColonyManagerRedux;
-using FarmingHysteresis.Extensions;
 using static ColonyManagerRedux.Constants;
 
 namespace FarmingHysteresis.ColonyManagerRedux;
@@ -7,14 +6,18 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 /// <summary>
 /// This job's own upper/lower bound pair and latch state — the CMR-side replacement for
 /// <see cref="FarmingHysteresisData"/>'s per-grower bookkeeping (see
-/// <c>Docs/CMRIntegrationRework.md</c>, "Why <c>Trigger_Threshold</c> doesn't fit"). Unlike the
-/// default engine, where every grower tracks its own harvested product independently, this
-/// trigger tracks the stock of the job's own <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>
-/// directly — the job pushes that one plant onto every grower it manages (see
-/// <c>ManagerJob_FarmingHysteresis.ExecuteJobDataCoroutine</c>), so there's exactly one def to
-/// track, not a guess at which grower's current selection to follow.
+/// <c>Docs/CMRIntegrationRework.md</c>, "Why <c>Trigger_Threshold</c> doesn't fit"). The
+/// tracked product is configured independently of what the job's growers actually harvest (see
+/// <c>Docs/CMRIntegrationRework.md</c>, Step 4 — resolves #16, e.g. sowing Hops based on Beer
+/// stock) via <see cref="TrackedThingFilter"/>, the same <see cref="ThingFilter"/>-based shape
+/// CMR's own <see cref="Trigger_Threshold"/> uses, reusing its public
+/// <c>Utilities.CountProducts</c>/<c>Utilities.CountProductsCoroutine</c> helpers
+/// instead of this mod's own per-grower counting. By default (<see cref="TrackedFilterFollowsTargetPlant"/>)
+/// the filter tracks whatever <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> the job
+/// pushes onto every grower it manages — matching this integration's original, simpler behavior
+/// verbatim — until a player explicitly detaches it to track something else instead.
 /// </summary>
-internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
+internal sealed class Trigger_Hysteresis : Trigger
 {
     private const float ProductIconSize = 24f;
     private const float ProductRowPadding = 5f;
@@ -24,6 +27,82 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
 
     internal LatchMode LatchModeValue { get; private set; } = LatchMode.Unknown;
     internal int TrackedThingCount { get; private set; }
+
+    public ThingFilter ParentFilter { get; private set; } = ThingFilter.CreateOnlyEverStorableThingFilter();
+
+    private ThingFilter trackedThingFilter;
+
+    public Trigger_Hysteresis(ManagerJob job)
+        : base(job)
+    {
+        trackedThingFilter = new ThingFilter(TrackedThingFilter_SettingsChanged);
+        trackedThingFilter.SetDisallowAll();
+    }
+
+    /// <summary>
+    /// The filter this trigger actually counts against (see <see cref="RecomputeState"/>). Kept
+    /// distinct from <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> per Step 4 — see
+    /// this class's own doc comment.
+    /// </summary>
+    public ThingFilter TrackedThingFilter => trackedThingFilter;
+
+    private void TrackedThingFilter_SettingsChanged() => _cachedState.Invalidate();
+
+    /// <summary>
+    /// Whether <see cref="TrackedThingFilter"/> is kept in sync with
+    /// <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> (see
+    /// <see cref="SyncTrackedFilterToTargetPlant"/>) rather than left to the player's own
+    /// choice. Defaults to <see langword="true"/> so a freshly created job behaves exactly like
+    /// this integration did before Step 4 — tracking whatever plant the job pushes onto its
+    /// growers — until a player explicitly detaches it via <c>WindowTriggerHysteresisDetails</c>.
+    /// </summary>
+    public bool TrackedFilterFollowsTargetPlant { get; set; } = true;
+
+    private Zone_Stockpile? stockpile;
+
+    /// <summary>Restricts <see cref="TrackedThingFilter"/> counting to a single stockpile, mirroring <see cref="Trigger_Threshold.Stockpile"/>.</summary>
+    public Zone_Stockpile? Stockpile
+    {
+        get => stockpile;
+        set => stockpile = value;
+    }
+
+    public ref Zone_Stockpile? StockpileRef => ref stockpile;
+
+    private string? _stockpileScribe;
+
+    public bool CountAllOnMap;
+
+    /// <summary>
+    /// Pure "seed once" helper behind <see cref="SyncTrackedFilterToTargetPlant"/> - resets
+    /// <paramref name="filter"/> to allow only <paramref name="def"/> (or nothing, if
+    /// <see langword="null"/>). Split out as a static method taking a bare <see cref="ThingFilter"/>
+    /// so it's unit-testable without a live job/trigger.
+    /// </summary>
+    internal static void SyncFilterToSingleDef(ThingFilter filter, ThingDef? def)
+    {
+        filter.SetDisallowAll();
+        if (def != null)
+        {
+            filter.SetAllow(def, true);
+        }
+    }
+
+    /// <summary>
+    /// Called from <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>'s setter whenever
+    /// the job's target plant actually changes. No-ops unless
+    /// <see cref="TrackedFilterFollowsTargetPlant"/> is on - the job doesn't need to know that
+    /// detail itself.
+    /// </summary>
+    internal void SyncTrackedFilterToTargetPlant()
+    {
+        if (!TrackedFilterFollowsTargetPlant)
+        {
+            return;
+        }
+
+        SyncFilterToSingleDef(trackedThingFilter, HysteresisJob.TargetPlantDef?.plant.harvestedThingDef);
+    }
 
     private readonly CachedValue<bool> _cachedState = new(false);
 
@@ -59,24 +138,12 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
 
     private bool RecomputeState()
     {
-        var targetPlantDef = HysteresisJob.TargetPlantDef;
-        if (targetPlantDef == null)
-        {
-            // No target plant chosen yet - leave latch memory alone (mirrors
-            // FarmingHysteresisData.DisableDueToMissingHarvestedThingDef, which stops
-            // monitoring without forcing a state) rather than guessing.
-            TrackedThingCount = 0;
-            return false;
-        }
-
-        var harvestedThingDef = targetPlantDef.plant.harvestedThingDef;
-        if (harvestedThingDef == null)
-        {
-            TrackedThingCount = 0;
-            return false;
-        }
-
-        var count = HysteresisJob.Manager.map.CountOfHarvestedThingDef(harvestedThingDef);
+        // No more special-casing "no target plant chosen"/"plant has no harvested product" -
+        // see this class's own doc comment (Step 4): TrackedThingFilter is independent of
+        // TargetPlantDef now, and an empty/disallow-all filter (e.g. a brand new job) already
+        // naturally counts 0 via CMR's own CountProducts. Whether the job actually has a plant
+        // to sow is a separate concern, gated in ManagerJob_FarmingHysteresis.GatherJobDataCoroutine.
+        var count = HysteresisJob.Manager.map.CountProducts(TrackedThingFilter, Stockpile, CountAllOnMap);
         TrackedThingCount = count;
 
         LatchModeValue = ComputeNextLatchMode(LatchModeValue, count, Lower, Upper);
@@ -106,10 +173,58 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
                 ? "FarmingHysteresis.CMR.Trigger.NoTargetPlant".Translate()
                 : "FarmingHysteresis.CMR.Trigger.Status".Translate(
                     TrackedThingCount,
-                    targetPlantDef.plant.harvestedThingDef?.label ?? targetPlantDef.label,
+                    TrackedCountNoun,
                     Lower,
                     Upper
                 );
+        }
+    }
+
+    /// <summary>
+    /// A short label describing whatever <see cref="TrackedThingFilter"/> currently allows -
+    /// the single allowed def's own label if there's exactly one (the common case, whether
+    /// following the target plant or a player's own single-def choice), or a translated summary
+    /// otherwise. Used for standalone display (the tracked-product row, the "configure tracked
+    /// items" area) where naming how many kinds are tracked is useful context. For text that
+    /// embeds a count (e.g. "fewer than 1000 {label} in storage"), use
+    /// <see cref="TrackedCountNoun"/> instead - substituting this property there previously
+    /// produced ungrammatical, ambiguous sentences like "fewer than 1000 2 kinds of items in
+    /// storage" (unclear whether that meant per-kind or combined) once more than one def could be
+    /// tracked - see this class's own doc comment, Step 4.
+    /// </summary>
+    private string TrackedLabel
+    {
+        get
+        {
+            var allowedDefs = TrackedThingFilter.AllowedThingDefs.ToList();
+            return allowedDefs.Count switch
+            {
+                0 => "FarmingHysteresis.CMR.Trigger.TrackedSummary.None".Translate(),
+                1 => allowedDefs[0].label,
+                _ => "FarmingHysteresis.CMR.Trigger.TrackedSummary.Multiple".Translate(
+                    allowedDefs.Count
+                ),
+            };
+        }
+    }
+
+    /// <summary>
+    /// A plain, pluralizable noun phrase for <see cref="TrackedThingFilter"/>'s current contents -
+    /// the single allowed def's own label if there's exactly one, or the generic "items" otherwise
+    /// (whether zero or several defs are allowed). Unlike <see cref="TrackedLabel"/>, this always
+    /// reads correctly when substituted into a "{count} {noun} in storage" sentence, and always
+    /// refers unambiguously to <see cref="TrackedThingCount"/>'s combined total rather than a
+    /// per-kind amount - the exact set of tracked defs is what "Configure tracked items…" and the
+    /// tracked-product row are for.
+    /// </summary>
+    private string TrackedCountNoun
+    {
+        get
+        {
+            var allowedDefs = TrackedThingFilter.AllowedThingDefs.ToList();
+            return allowedDefs.Count == 1
+                ? allowedDefs[0].label
+                : "FarmingHysteresis.CMR.Trigger.TrackedCountNoun.Generic".Translate();
         }
     }
 
@@ -213,15 +328,27 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     )
     {
         var targetPlantDef = HysteresisJob.TargetPlantDef;
-        var harvestedThingDef = targetPlantDef?.plant.harvestedThingDef;
 
-        if (targetPlantDef == null || harvestedThingDef == null)
+        if (targetPlantDef == null)
         {
             DrawWrappedLabel(ref cur, width, entryHeight, StatusTooltip);
             return;
         }
 
-        cur.y += DrawProductRow(harvestedThingDef, cur, width);
+        cur.y += DrawTrackedProductRow(cur, width);
+
+        if (
+            Widgets.ButtonText(
+                new Rect(cur.x, cur.y, width, entryHeight),
+                "FarmingHysteresis.CMR.Trigger.ConfigureTracked".Translate()
+            )
+        )
+        {
+            Find.WindowStack.Add(
+                new WindowTriggerHysteresisDetails(this) { closeOnClickedOutside = true, draggable = true }
+            );
+        }
+        cur.y += entryHeight;
 
         DrawBoundEntry(
             ref cur,
@@ -233,7 +360,7 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
             "FarmingHysteresis.LowerBound".Translate(
                 targetPlantDef.label,
                 Lower,
-                harvestedThingDef.label,
+                TrackedCountNoun,
                 FarmingHysteresisMod.Settings.HysteresisMode.AsString()
             )
         );
@@ -248,7 +375,7 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
             "FarmingHysteresis.UpperBound".Translate(
                 targetPlantDef.label,
                 Upper,
-                harvestedThingDef.label,
+                TrackedCountNoun,
                 FarmingHysteresisMod.Settings.HysteresisMode.AsString()
             )
         );
@@ -270,7 +397,7 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
             ref cur,
             width,
             entryHeight,
-            "FarmingHysteresis.InStorage".Translate(harvestedThingDef.label, TrackedThingCount)
+            "FarmingHysteresis.InStorage".Translate(TrackedCountNoun, TrackedThingCount)
         );
 
         DrawWrappedLabel(
@@ -283,6 +410,30 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
                 )
             )
         );
+    }
+
+    /// <summary>
+    /// The tracked-product row: <see cref="DrawProductRow"/>'s icon+label when
+    /// <see cref="TrackedThingFilter"/> allows exactly one def (the common case - following the
+    /// target plant, or a player's own single-def choice), or a plain summary label otherwise
+    /// (see <see cref="TrackedLabel"/>) - the filter can no longer be assumed to always resolve
+    /// to a single def once it's independent of <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>
+    /// (Step 4).
+    /// </summary>
+    private float DrawTrackedProductRow(Vector2 pos, float width)
+    {
+        var allowedDefs = TrackedThingFilter.AllowedThingDefs.ToList();
+        if (allowedDefs.Count == 1)
+        {
+            return DrawProductRow(allowedDefs[0], pos, width);
+        }
+
+        var rowHeight = ProductIconSize + (2 * ProductRowPadding);
+        var rect = new Rect(pos.x, pos.y, width, rowHeight);
+        Text.Anchor = TextAnchor.MiddleLeft;
+        Widgets.Label(rect, TrackedLabel);
+        Text.Anchor = TextAnchor.UpperLeft;
+        return rowHeight;
     }
 
     /// <summary>
@@ -393,5 +544,31 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
         var latchMode = LatchModeValue;
         Scribe_Values.Look(ref latchMode, "latchMode", LatchMode.Unknown);
         LatchModeValue = latchMode;
+
+        var followsTargetPlant = TrackedFilterFollowsTargetPlant;
+        Scribe_Values.Look(ref followsTargetPlant, "trackedFilterFollowsTargetPlant", true);
+        TrackedFilterFollowsTargetPlant = followsTargetPlant;
+
+        Scribe_Deep.Look(
+            ref trackedThingFilter,
+            "trackedThingFilter",
+            (object)TrackedThingFilter_SettingsChanged
+        );
+        Scribe_Values.Look(ref CountAllOnMap, "countAllOnMap");
+
+        // Stockpile isn't referenceable - scribe by label, same as Trigger_Threshold.ExposeData.
+        if (Scribe.mode == LoadSaveMode.Saving)
+        {
+            _stockpileScribe = stockpile?.ToString() ?? "null";
+        }
+
+        Scribe_Values.Look(ref _stockpileScribe, "stockpile", "null");
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            stockpile =
+                Job.Manager.map.zoneManager.AllZones.FirstOrDefault(z =>
+                    z is Zone_Stockpile && z.label == _stockpileScribe
+                ) as Zone_Stockpile;
+        }
     }
 }

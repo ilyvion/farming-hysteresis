@@ -154,13 +154,36 @@ internal sealed class ManagerJob_FarmingHysteresis
     public HashSet<Zone> SpecificGrowingZones = [];
     public HashSet<Building_PlantGrower> SpecificPlantGrowerBuildings = [];
 
+    private ThingDef? _targetPlantDef;
+
     /// <summary>
     /// The single plant this job assigns to every grower it manages (see
     /// <see cref="ExecuteJobDataCoroutine"/>) - analogous to <c>ManagerJob_Production</c> picking
     /// a recipe for the workbenches it manages. Restricted to <see cref="ValidTargetPlants"/> so a
     /// job never ends up demanding a plant one of its growers can't actually grow.
     /// </summary>
-    public ThingDef? TargetPlantDef;
+    /// <remarks>
+    /// Setting this (to a new value, including <see langword="null"/>) also calls
+    /// <see cref="Trigger_Hysteresis.SyncTrackedFilterToTargetPlant"/> (see
+    /// <c>Docs/CMRIntegrationRework.md</c>, Step 4) - the trigger itself decides whether to
+    /// actually resync its tracked filter, based on its own
+    /// <see cref="Trigger_Hysteresis.TrackedFilterFollowsTargetPlant"/> flag, so this job doesn't
+    /// need to know that detail.
+    /// </remarks>
+    public ThingDef? TargetPlantDef
+    {
+        get => _targetPlantDef;
+        set
+        {
+            if (_targetPlantDef == value)
+            {
+                return;
+            }
+
+            _targetPlantDef = value;
+            HysteresisTrigger.SyncTrackedFilterToTargetPlant();
+        }
+    }
 
     private string? _tmpGrowerAreaLabel;
 
@@ -400,7 +423,7 @@ internal sealed class ManagerJob_FarmingHysteresis
 
         Scribe_Values.Look(ref AssignmentMode, "assignmentMode", GrowerAssignmentMode.All);
         Scribe_Values.Look(ref InvertGrowerArea, "invertGrowerArea");
-        Scribe_Defs.Look(ref TargetPlantDef, "targetPlantDef");
+        Scribe_Defs.Look(ref _targetPlantDef, "targetPlantDef");
 
         if (Manager.ScribeSameMapData)
         {

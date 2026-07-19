@@ -151,3 +151,50 @@ internal static class ComputeMarkPositionTests
         Assert.That(markWithOvershoot).Is.LessThan(markWithoutOvershoot);
     }
 }
+
+// Regression guard for Trigger_Hysteresis's "tracked filter follows target plant" seeding (see
+// Docs/CMRIntegrationRework.md, Step 4 - resolves #16): the filter's own ThingFilter mutation
+// logic, tested directly against a bare ThingFilter rather than a live job/trigger/map.
+[HotSwappable]
+[TestSuite]
+internal static class SyncFilterToSingleDefTests
+{
+    [Test]
+    public static void AllowsOnlyTheGivenDef()
+    {
+        var beer = new ThingDef();
+        var filter = new ThingFilter();
+
+        SyncFilterToSingleDef(filter, beer);
+
+        Assert.ThatCollection(filter.AllowedThingDefs).Has.Count(1);
+        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(beer);
+    }
+
+    [Test]
+    public static void ReplacesWhateverWasPreviouslyAllowed()
+    {
+        var hops = new ThingDef();
+        var beer = new ThingDef();
+        var filter = new ThingFilter();
+        SyncFilterToSingleDef(filter, hops);
+
+        SyncFilterToSingleDef(filter, beer);
+
+        Assert.ThatCollection(filter.AllowedThingDefs).Has.Count(1);
+        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(beer);
+        Assert.ThatCollection(filter.AllowedThingDefs).Does.Not.Contain(hops);
+    }
+
+    [Test]
+    public static void ClearsToDisallowAllWhenDefIsNull()
+    {
+        var hops = new ThingDef();
+        var filter = new ThingFilter();
+        SyncFilterToSingleDef(filter, hops);
+
+        SyncFilterToSingleDef(filter, null);
+
+        Assert.ThatCollection(filter.AllowedThingDefs).Is.Empty();
+    }
+}
