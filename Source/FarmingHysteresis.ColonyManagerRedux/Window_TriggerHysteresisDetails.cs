@@ -5,9 +5,8 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 
 /// <summary>
 /// Configures a single <see cref="CropRotationEntry"/>'s own <see cref="CropRotationEntry.TrackedThingFilter"/>
-/// - modeled directly on CMR's own <see cref="WindowTriggerThresholdDetails"/> (see
-/// <c>Docs/CMRIntegrationRework.md</c>, Step 4), minus its <c>Ops</c>/target-count editor. Tracked
-/// items live per rotation entry (see Step 5 follow-up) rather than on the job's
+/// - modeled directly on CMR's own <see cref="WindowTriggerThresholdDetails"/>, minus its
+/// <c>Ops</c>/target-count editor. Tracked items live per rotation entry rather than on the job's
 /// <see cref="Trigger_Hysteresis"/> as a whole, since what determines "this crop is done" often
 /// differs per crop; <see cref="CropRotationEntry.Lower"/>/<see cref="CropRotationEntry.Upper"/>
 /// bounds stay where they are, in the crop rotation list itself.
@@ -114,9 +113,8 @@ internal sealed class WindowTriggerHysteresisDetails(CropRotationEntry entry, Ma
     }
 
     /// <summary>
-    /// Only shown while <see cref="CropRotationEntry.HasResolvableSecondaryProduct"/> is true (see
-    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 6). Unlike
-    /// <see cref="ManagerTab_FarmingHysteresis.DrawRotationModeSelector"/>/
+    /// Only shown while <see cref="CropRotationEntry.HasResolvableSecondaryProduct"/> is true.
+    /// Unlike <see cref="ManagerTab_FarmingHysteresis.DrawRotationModeSelector"/>/
     /// <see cref="ManagerTab_FarmingHysteresis.DrawSwitchModeSelector"/> (which share this same
     /// per-cell toggle-row shape but only ever have 2 values, drawn across the main tab's much
     /// wider column), <see cref="DualCropTrackingMode"/> has 3 values and this window is only

@@ -8,9 +8,8 @@ namespace FarmingHysteresis.Defs;
 /// secondary harvested product (e.g. Vanilla Expanded Framework's dual-crop mechanic) without
 /// this mod's own assemblies ever referencing that third party's types directly - mirrors the
 /// `Type` field + lazy-instantiated worker idiom Colony Manager Redux itself uses for
-/// <c>RecipeProductResolverDef</c> (see <c>Docs/CMRIntegrationRework.md</c>'s "CMR API grounding"
-/// section). `DefDatabase&lt;SecondaryProductResolverDef&gt;.AllDefs` discovery is automatic
-/// across mods with zero registration call needed. Consumed via
+/// <c>RecipeProductResolverDef</c>. `DefDatabase&lt;SecondaryProductResolverDef&gt;.AllDefs`
+/// discovery is automatic across mods with zero registration call needed. Consumed via
 /// <see cref="SecondaryProductResolvers.ResolveFor"/>.
 /// </summary>
 public class SecondaryProductResolverDef : Def

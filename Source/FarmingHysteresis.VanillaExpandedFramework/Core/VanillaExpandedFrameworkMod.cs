@@ -5,9 +5,9 @@ namespace FarmingHysteresis.VanillaExpandedFramework;
 /// Vanilla Expanded Framework. Only ever loads when VEF is active, via <c>LoadFolders.xml</c>'s
 /// <c>IfModActive</c> gating - this mod never needs to check for VEF's presence itself. Unrelated
 /// to, and loads independently of, the Colony Manager Redux integration - the only thing it
-/// contributes is a <see cref="FarmingHysteresis.Defs.SecondaryProductResolverDef"/> instance (see
-/// <c>Docs/CMRIntegrationRework.md</c>, Step 6), which is consumed elsewhere if and only if
-/// something (currently only the CMR integration) asks for it.
+/// contributes is a <see cref="FarmingHysteresis.Defs.SecondaryProductResolverDef"/> instance,
+/// which is consumed elsewhere if and only if something (currently only the CMR integration)
+/// asks for it.
 /// </summary>
 public class VanillaExpandedFrameworkMod : Mod
 {

@@ -1,8 +1,8 @@
 namespace FarmingHysteresis.ColonyManagerRedux;
 
 /// <summary>
-/// Where a save stands on Design decision 2's one-time migration gate (see
-/// <c>Docs/CMRIntegrationRework.md</c>).
+/// Where a save stands on the one-time migration gate that decides whether Colony Manager Redux
+/// takes over Farming Hysteresis control for it.
 /// </summary>
 internal enum CmrMigrationGateStatus
 {

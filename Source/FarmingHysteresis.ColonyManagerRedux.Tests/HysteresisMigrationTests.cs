@@ -3,9 +3,8 @@ using static FarmingHysteresis.ColonyManagerRedux.HysteresisMigration;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
-// Regression guard for the migration gate's "most common bounds win, tie broken randomly" rule
-// (see Docs/CMRIntegrationRework.md, Step 2's "default value and migration" section) - covers the
-// mode-selection/tie-break logic in isolation from the live grower scan it's normally fed by.
+// Covers the migration gate's "most common bounds win, tie broken randomly" mode-selection/
+// tie-break logic in isolation from the live grower scan it's normally fed by.
 [HotSwappable]
 [TestSuite]
 internal static class SelectMostCommonBoundsTests
@@ -149,10 +148,8 @@ internal static class ShouldBeginMigrationGateTests
     }
 }
 
-// Regression guard for the "never a mix" invariant (see Docs/CMRIntegrationRework.md's "Job
-// execution respects takeover state" section): a Farming Hysteresis job must never be allowed to
-// act on its growers while CMR isn't genuinely the active controller, even if the job itself
-// would otherwise be managed.
+// A Farming Hysteresis job must never be allowed to act on its growers while CMR isn't genuinely
+// the active controller, even if the job itself would otherwise be managed.
 [HotSwappable]
 [TestSuite]
 internal static class ManagerJobFarmingHysteresisIsManagedTests

@@ -3,9 +3,8 @@ using static FarmingHysteresis.ColonyManagerRedux.CropRotationEntry;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
-// Regression guard for the dual-crop tracking mode dispatch (see Docs/CMRIntegrationRework.md,
-// Step 6 - resolves #25) - covers how ComputeTrackedDefs resolves a crop rotation entry's
-// primary/secondary product(s) in isolation from any live PlantDef/mod-extension lookup.
+// Covers how ComputeTrackedDefs resolves a crop rotation entry's primary/secondary product(s)
+// in isolation from any live PlantDef/mod-extension lookup.
 [HotSwappable]
 [TestSuite]
 internal static class ComputeTrackedDefsTests

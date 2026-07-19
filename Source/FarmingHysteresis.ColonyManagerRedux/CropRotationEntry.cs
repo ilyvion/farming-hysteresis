@@ -4,7 +4,7 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 
 /// <summary>
 /// Which of a crop's harvested products (see <see cref="SecondaryProductResolvers"/>, e.g.
-/// Vanilla Expanded Framework's dual-crop mechanic - <c>Docs/CMRIntegrationRework.md</c>'s Step 6)
+/// Vanilla Expanded Framework's dual-crop mechanic)
 /// <see cref="CropRotationEntry.SyncTrackedFilterToTargetPlant"/> auto-tracks. Only meaningful
 /// while <see cref="CropRotationEntry.TrackedFilterFollowsTargetPlant"/> is on and the crop
 /// actually has a resolvable secondary product (see
@@ -22,8 +22,7 @@ internal enum DualCropTrackingMode
 /// A single step in <see cref="ManagerJob_FarmingHysteresis.RotationEntries"/> — a crop to grow,
 /// the stock bounds that decide when to move on to the next entry in the rotation, and (since
 /// what determines "this crop is done" will often differ per crop) its own independent tracked
-/// item filter/stockpile/count-all-on-map settings (see <c>Docs/CMRIntegrationRework.md</c>, Step
-/// 5 — resolves #6, and same-session follow-ups). Its own <see cref="Lower"/>/<see cref="Upper"/>/
+/// item filter/stockpile/count-all-on-map settings. Its own <see cref="Lower"/>/<see cref="Upper"/>/
 /// <see cref="TrackedThingFilter"/> etc. only take effect while it's the job's active entry
 /// (<see cref="Trigger_Hysteresis"/>'s equivalent members delegate to whichever entry is active).
 /// </summary>
@@ -35,8 +34,7 @@ internal sealed class CropRotationEntry : IExposable
     /// <see cref="ManagerJob_FarmingHysteresis.AllocateNextEntryId"/>) - this, not this entry's
     /// current position in the list, is what
     /// <see cref="ManagerJob_FarmingHysteresis.ActiveEntryId"/> tracks, so the "active" marker
-    /// correctly follows this specific crop across reordering/removal of other entries (see
-    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 5 follow-up).
+    /// correctly follows this specific crop across reordering/removal of other entries.
     /// </summary>
     public int Id;
 
@@ -67,8 +65,7 @@ internal sealed class CropRotationEntry : IExposable
     /// <see cref="Trigger_Hysteresis.ComputeCycleUpdate"/>) - each crop's hysteresis
     /// is its own, independent memory, so a crop that isn't being actively grown right now still
     /// remembers whether it's latched enabled/disabled the next time it becomes active, rather than
-    /// starting over from <see cref="LatchMode.Unknown"/> (see <c>Docs/CMRIntegrationRework.md</c>'s
-    /// per-job rotation mode follow-up).
+    /// starting over from <see cref="LatchMode.Unknown"/>.
     /// </summary>
     public LatchMode LatchModeValue = LatchMode.Unknown;
 

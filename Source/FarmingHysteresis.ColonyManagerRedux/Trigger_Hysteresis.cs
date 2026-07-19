@@ -5,21 +5,19 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 
 /// <summary>
 /// This job's own upper/lower bound pair and latch state — the CMR-side replacement for
-/// <see cref="FarmingHysteresisData"/>'s per-grower bookkeeping (see
-/// <c>Docs/CMRIntegrationRework.md</c>, "Why <c>Trigger_Threshold</c> doesn't fit"). The
-/// tracked product is configured independently of what the job's growers actually harvest (see
-/// <c>Docs/CMRIntegrationRework.md</c>, Step 4 — resolves #16, e.g. sowing Hops based on Beer
-/// stock) via <see cref="TrackedThingFilter"/>, the same <see cref="ThingFilter"/>-based shape
-/// CMR's own <see cref="Trigger_Threshold"/> uses, reusing its public
+/// <see cref="FarmingHysteresisData"/>'s per-grower bookkeeping. The tracked product is
+/// configured independently of what the job's growers actually harvest (e.g. sowing Hops based
+/// on Beer stock) via <see cref="TrackedThingFilter"/>, the same <see cref="ThingFilter"/>-based
+/// shape CMR's own <see cref="Trigger_Threshold"/> uses, reusing its public
 /// <c>Utilities.CountProducts</c>/<c>Utilities.CountProductsCoroutine</c> helpers instead of this
 /// mod's own per-grower counting. <see cref="TrackedThingFilter"/> and friends
 /// (<see cref="TrackedFilterFollowsTargetPlant"/>, <see cref="Stockpile"/>,
 /// <see cref="CountAllOnMap"/>) all delegate to the job's currently active
 /// <see cref="ManagerJob_FarmingHysteresis.RotationEntries"/> entry, since what determines "this
-/// crop is done" often differs per crop (Step 5 follow-up) - by default
+/// crop is done" often differs per crop - by default
 /// (<see cref="CropRotationEntry.TrackedFilterFollowsTargetPlant"/>) each entry's filter tracks
-/// whatever plant it's set to grow, matching this integration's original, simpler behavior
-/// verbatim, until a player explicitly detaches it to track something else instead.
+/// whatever plant it's set to grow, until a player explicitly detaches it to track something
+/// else instead.
 /// </summary>
 internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
 {
@@ -35,8 +33,7 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     private CropRotationEntry? ActiveEntry => HysteresisJob.ActiveEntry;
 
     /// <summary>
-    /// The active rotation entry's lower bound. Only valid while <see cref="ActiveEntry"/> exists
-    /// - see <c>Docs/CMRIntegrationRework.md</c>, Step 5.
+    /// The active rotation entry's lower bound. Only valid while <see cref="ActiveEntry"/> exists.
     /// </summary>
     public int Lower
     {
@@ -76,8 +73,8 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
 
     /// <summary>
     /// The active rotation entry's tracked items filter. Kept distinct from
-    /// <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> per Step 4 - see this class's own
-    /// doc comment.
+    /// <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> - see this class's own doc
+    /// comment.
     /// </summary>
     public ThingFilter TrackedThingFilter => ActiveEntry!.TrackedThingFilter;
 
@@ -118,9 +115,9 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// Pure "seed once" helper generalizing <see cref="SyncFilterToSingleDef"/> to an arbitrary
     /// set of defs - resets <paramref name="filter"/> to allow only <paramref name="defs"/> (a
     /// crop rotation entry uses this to track its primary harvested product, a resolved secondary
-    /// product, or both - see <see cref="CropRotationEntry.SyncTrackedFilterToTargetPlant"/> and
-    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 6). Split out as a static method taking a bare
-    /// <see cref="ThingFilter"/> so it's unit-testable without a live job/trigger.
+    /// product, or both - see <see cref="CropRotationEntry.SyncTrackedFilterToTargetPlant"/>).
+    /// Split out as a static method taking a bare <see cref="ThingFilter"/> so it's unit-testable
+    /// without a live job/trigger.
     /// </summary>
     internal static void SyncFilterToDefs(ThingFilter filter, IEnumerable<ThingDef> defs)
     {
@@ -165,9 +162,9 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
 
     /// <summary>
     /// Pure decision behind <see cref="ManagerJob_FarmingHysteresis.ComputeRoundRobinActiveEntryId"/>'s
-    /// crop-rotation advance (see <c>Docs/CMRIntegrationRework.md</c>, Step 5 - resolves #6): the active crop's own upper
-    /// bound was just reached (a fresh transition, not merely still sitting there from an earlier
-    /// cycle) and there's actually more than one crop to rotate through. With
+    /// crop-rotation advance: the active crop's own upper bound was just reached (a fresh
+    /// transition, not merely still sitting there from an earlier cycle) and there's actually
+    /// more than one crop to rotate through. With
     /// <paramref name="rotationEntryCount"/> &lt;= 1 this is always <see langword="false"/> -
     /// today's exact single-crop behavior (sit disabled once over <c>Upper</c>, indefinitely) is
     /// unreachable/unaffected.
@@ -206,9 +203,9 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// <see cref="ManagerJob_FarmingHysteresis.ComputeNewActiveEntryId"/>) - <b>without writing any
     /// of it back</b>. Deliberately pure/side-effect-free: this is called from
     /// <see cref="ManagerJob_FarmingHysteresis.GatherJobDataCoroutine"/>, which per the base
-    /// <c>ManagerJob&lt;TWorkData&gt;</c>'s own contract must not change anything in the game (see
-    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 5 follow-up) - the actual write only happens once
-    /// this cycle's result reaches <see cref="ApplyCycleUpdate"/>, from
+    /// <c>ManagerJob&lt;TWorkData&gt;</c>'s own contract must not change anything in the game -
+    /// the actual write only happens once this cycle's result reaches
+    /// <see cref="ApplyCycleUpdate"/>, from
     /// <see cref="ManagerJob_FarmingHysteresis.ExecuteJobDataCoroutine"/>.
     /// </summary>
     internal CycleUpdate ComputeCycleUpdate()
@@ -253,8 +250,7 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// <see cref="ManagerJob_FarmingHysteresis.ExecuteJobDataCoroutine"/> - deliberately NOT wired
     /// to any cached/on-demand read of <see cref="State"/>, so a rotation only ever advances - and
     /// sow/harvest state only ever changes - when a manager pawn actually works this job, not
-    /// merely because a player is watching a progress bar or editing config while paused (see
-    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 5 follow-up).
+    /// merely because a player is watching a progress bar or editing config while paused.
     /// </summary>
     internal void ApplyCycleUpdate(CycleUpdate update)
     {
@@ -462,8 +458,7 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// own UI - <see cref="ManagerTab_FarmingHysteresis"/> draws each rotation entry's own tracked-
     /// product row, storage count, and "Configure tracked items…" button inline in the crop
     /// rotation list (see <c>ManagerTab_FarmingHysteresis.DrawRotationEntryTrackedItems</c>) rather
-    /// than a separate, job-wide trigger section, per <c>Docs/CMRIntegrationRework.md</c>'s Step 5
-    /// follow-up.
+    /// than a separate, job-wide trigger section.
     /// </remarks>
     public override void DrawTriggerConfig(
         ref Vector2 cur,
@@ -510,7 +505,7 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// one def (the common case - following the target plant, or a player's own single-def
     /// choice), or a plain summary label otherwise (see <see cref="DescribeTrackedFilter"/>) -
     /// the filter can no longer be assumed to always resolve to a single def once it's
-    /// independent of <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> (Step 4).
+    /// independent of <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>.
     /// </summary>
     private float DrawTrackedProductRow(Vector2 pos, float width) =>
         DrawTrackedProductRow(TrackedThingFilter, pos, width);

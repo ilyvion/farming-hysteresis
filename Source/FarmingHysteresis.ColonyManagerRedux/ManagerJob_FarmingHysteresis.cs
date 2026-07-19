@@ -19,9 +19,9 @@ internal enum GrowerAssignmentMode
 /// <summary>
 /// Whether switching to the next crop in <see cref="ManagerJob_FarmingHysteresis.RotationEntries"/>
 /// force-clears the outgoing crop's not-yet-ripe leftover plants (losing their yield, for an
-/// instant cutover) or leaves them to mature and harvest normally (see
-/// <c>Docs/CMRIntegrationRework.md</c>, Step 5). Either way, already-ripe leftovers are always
-/// harvested rather than stranded — see <see cref="ManagerJob_FarmingHysteresis.GrowerHasLeftoverPlants"/>.
+/// instant cutover) or leaves them to mature and harvest normally. Either way, already-ripe
+/// leftovers are always harvested rather than stranded — see
+/// <see cref="ManagerJob_FarmingHysteresis.GrowerHasLeftoverPlants"/>.
 /// </summary>
 internal enum RotationSwitchMode
 {
@@ -31,9 +31,8 @@ internal enum RotationSwitchMode
 
 /// <summary>
 /// How <see cref="ManagerJob_FarmingHysteresis.ActiveEntryId"/> is picked each manager job cycle
-/// (see <see cref="Trigger_Hysteresis.ComputeCycleUpdate"/>) - a per-job choice
-/// between the two rotation semantics the player asked for (see
-/// <c>Docs/CMRIntegrationRework.md</c>'s per-job rotation mode follow-up).
+/// (see <see cref="Trigger_Hysteresis.ComputeCycleUpdate"/>) - a per-job choice between the two
+/// rotation semantics the player can pick.
 /// </summary>
 internal enum RotationMode
 {
@@ -76,10 +75,10 @@ internal sealed class ManagerJob_FarmingHysteresis
     }
 
     /// <summary>
-    /// Charts <see cref="Trigger_Hysteresis.TrackedThingCount"/> alongside its two bounds (see
-    /// <c>Docs/CMRIntegrationRework.md</c>, Step 3) as three independent flat/varying lines -
-    /// "stock", "lower bound", and "upper bound" - each chapter's "count" is simply that value
-    /// each tick. None of them use CMR's target-line mechanism.
+    /// Charts <see cref="Trigger_Hysteresis.TrackedThingCount"/> alongside its two bounds as
+    /// three independent flat/varying lines - "stock", "lower bound", and "upper bound" - each
+    /// chapter's "count" is simply that value each tick. None of them use CMR's target-line
+    /// mechanism.
     /// </summary>
     public sealed class History : HistoryWorker<ManagerJob_FarmingHysteresis>
     {
@@ -157,8 +156,9 @@ internal sealed class ManagerJob_FarmingHysteresis
     /// control" is off, or a per-save <see cref="CmrMigrationGate"/> is still suppressing it. Without
     /// this, an existing job would keep pushing plant/sow/harvest state onto its growers even while
     /// the old always-on engine (<see cref="DefaultHysteresisController"/>) is simultaneously
-    /// managing the same growers - exactly the "mix" Design decision 2 rules out. The job's own
-    /// config (scope, target plant, bounds) is untouched either way; it simply goes dormant.
+    /// managing the same growers - two controllers must never act on the same grower at once. The
+    /// job's own config (scope, target plant, bounds) is untouched either way; it simply goes
+    /// dormant.
     /// </summary>
     public override bool IsManaged =>
         ComputeIsManaged(
@@ -194,13 +194,11 @@ internal sealed class ManagerJob_FarmingHysteresis
     public HashSet<Building_PlantGrower> SpecificPlantGrowerBuildings = [];
 
     /// <summary>
-    /// The ordered crops this job cycles through (see <c>Docs/CMRIntegrationRework.md</c>, Step 5
-    /// - resolves #6): the growers it manages are pushed onto <see cref="ActiveEntry"/>'s plant
-    /// until that entry's own stock threshold is satisfied (see
+    /// The ordered crops this job cycles through: the growers it manages are pushed onto
+    /// <see cref="ActiveEntry"/>'s plant until that entry's own stock threshold is satisfied (see
     /// <see cref="Trigger_Hysteresis.ShouldAdvanceRotation"/>), at which point
     /// <see cref="ComputeNewActiveEntryId"/> moves on to the next entry, cycling. A single-entry
-    /// list behaves exactly like this integration's original one-crop-per-job design - nothing to
-    /// ever switch to.
+    /// list behaves like a plain one-crop-per-job setup - nothing to ever switch to.
     /// </summary>
     public List<CropRotationEntry> RotationEntries = [];
 
@@ -209,9 +207,9 @@ internal sealed class ManagerJob_FarmingHysteresis
     /// growers, or <see langword="null"/> if <see cref="RotationEntries"/> is empty. Tracked by
     /// stable identity rather than list position specifically so it survives
     /// <see cref="MoveRotationEntry"/>/<see cref="RemoveRotationEntry"/> reordering other entries
-    /// out from under it - a plain index silently pointed at the wrong crop whenever an earlier
-    /// entry was removed (see <c>Docs/CMRIntegrationRework.md</c>'s Step 5 follow-up). Only ever
-    /// changed by <see cref="Trigger_Hysteresis.ApplyCycleUpdate"/>, called exclusively from
+    /// out from under it - a plain index would silently point at the wrong crop whenever an
+    /// earlier entry was removed. Only ever changed by
+    /// <see cref="Trigger_Hysteresis.ApplyCycleUpdate"/>, called exclusively from
     /// <see cref="ExecuteJobDataCoroutine"/> (an actual manager job cycle) - reordering/removing
     /// entries between cycles never moves this on its own.
     /// </summary>
@@ -270,8 +268,8 @@ internal sealed class ManagerJob_FarmingHysteresis
 
     /// <summary>
     /// Pure decision behind <see cref="RemoveRotationEntry"/>'s active-entry fallback, split out so
-    /// it's unit-testable without a live job (see <c>Docs/CMRIntegrationRework.md</c>'s Step 5
-    /// follow-up): unaffected unless <paramref name="removedEntryId"/> was itself the active one,
+    /// it's unit-testable without a live job: unaffected unless <paramref name="removedEntryId"/>
+    /// was itself the active one,
     /// in which case falls back to whichever id now occupies the same list position (clamped into
     /// <paramref name="remainingEntryIds"/>), or <see langword="null"/> if that's now empty. A
     /// removal that *isn't* the active entry leaves <paramref name="activeEntryId"/> completely
@@ -493,9 +491,9 @@ internal sealed class ManagerJob_FarmingHysteresis
     /// <summary>
     /// Finds the <see cref="ManagerJob_FarmingHysteresis"/> (if any) that currently controls
     /// <paramref name="grower"/> — the first job (in job-tracker order) whose own scope includes
-    /// it. Used both to disable/annotate already-claimed growers in the "Specific" picker and,
-    /// in later Step 2 work, to show a "managed by" indicator anywhere the grower's own UI would
-    /// otherwise let the player toggle hysteresis on it directly.
+    /// it. Used to disable/annotate already-claimed growers in the "Specific" picker, and could
+    /// similarly show a "managed by" indicator anywhere the grower's own UI would otherwise let
+    /// the player toggle hysteresis on it directly.
     /// </summary>
     public static ManagerJob_FarmingHysteresis? FindOwningJob(
         Manager manager,
@@ -615,7 +613,7 @@ internal sealed class ManagerJob_FarmingHysteresis
     /// one per cell) belongs to a crop other than <paramref name="targetPlantDef"/> - i.e. the
     /// grower hasn't fully transitioned to the active rotation entry yet. Split out as a pure
     /// function (fed by a thin live wrapper in <see cref="ExecuteJobDataCoroutine"/>) so it's
-    /// unit-testable without a live map/grower - see <c>Docs/CMRIntegrationRework.md</c>, Step 5.
+    /// unit-testable without a live map/grower.
     /// </summary>
     internal static bool GrowerHasLeftoverPlants(
         IEnumerable<ThingDef?> standingPlantDefs,
@@ -700,7 +698,7 @@ internal sealed class ManagerJob_FarmingHysteresis
 
             // Regardless of switch mode, a leftover plant from a crop this job has already
             // rotated away from must never be stranded unharvested - that would permanently
-            // occupy its cell and stall the rotation (see Docs/CMRIntegrationRework.md, Step 5).
+            // occupy its cell and stall the rotation.
             grower.SetHysteresisControlState(enabled, forceHarvestEnabled: hasLeftoverPlants);
 
             if (grower.GetAllowSow() != beforeSow || grower.GetAllowHarvest() != beforeHarvest)

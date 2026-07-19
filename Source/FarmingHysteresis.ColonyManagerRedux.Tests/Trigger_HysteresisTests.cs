@@ -4,10 +4,8 @@ using static FarmingHysteresis.LatchMode;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
-// Regression guard for Trigger_Hysteresis's latch transition table, ported from
-// FarmingHysteresisData.UpdateLatchModeAndHandling (see Docs/CMRIntegrationRework.md, Step 2)
-// rather than reinvented - these cases mirror the same state machine the default engine has
-// used since before this integration existed.
+// Covers Trigger_Hysteresis's latch transition table, which mirrors the same state machine used
+// by FarmingHysteresisData.UpdateLatchModeAndHandling in the default (non-CMR) engine.
 [HotSwappable]
 [TestSuite]
 internal static class ComputeNextLatchModeTests
@@ -76,11 +74,9 @@ internal static class ComputeNextLatchModeTests
     }
 }
 
-// Regression guard for the lower/upper bound progress bar marks added to
-// Trigger_Hysteresis.DrawVerticalProgressBars/DrawHorizontalProgressBars (see
-// Docs/CMRIntegrationRework.md's "No progress bar drawn yet" follow-up note) - covers the pure
-// scaling math the two mark lines share with the base bar fill, in isolation from the live
-// IMGUI draw calls it's normally fed by.
+// Covers the pure scaling math shared by the lower/upper bound progress bar marks in
+// Trigger_Hysteresis.DrawVerticalProgressBars/DrawHorizontalProgressBars and the base bar fill,
+// in isolation from the live IMGUI draw calls it's normally fed by.
 [HotSwappable]
 [TestSuite]
 internal static class ComputeMarkPositionTests
@@ -152,9 +148,9 @@ internal static class ComputeMarkPositionTests
     }
 }
 
-// Regression guard for Trigger_Hysteresis's "tracked filter follows target plant" seeding (see
-// Docs/CMRIntegrationRework.md, Step 4 - resolves #16): the filter's own ThingFilter mutation
-// logic, tested directly against a bare ThingFilter rather than a live job/trigger/map.
+// Covers Trigger_Hysteresis's "tracked filter follows target plant" seeding - the filter's own
+// ThingFilter mutation logic, tested directly against a bare ThingFilter rather than a live
+// job/trigger/map.
 [HotSwappable]
 [TestSuite]
 internal static class SyncFilterToSingleDefTests
@@ -199,8 +195,8 @@ internal static class SyncFilterToSingleDefTests
     }
 }
 
-// Regression guard for the generalization behind Step 6's dual-crop tracking modes (see
-// Docs/CMRIntegrationRework.md) - SyncFilterToSingleDef is now a one-def special case of this.
+// Covers SyncFilterToDefs, the multi-def generalization that SyncFilterToSingleDef is a one-def
+// special case of.
 [HotSwappable]
 [TestSuite]
 internal static class SyncFilterToDefsTests
@@ -247,11 +243,10 @@ internal static class SyncFilterToDefsTests
     }
 }
 
-// Regression guard for Trigger_Hysteresis's crop-rotation advance decision (see
-// Docs/CMRIntegrationRework.md, Step 5 - resolves #6): only a fresh transition into
+// Covers Trigger_Hysteresis's crop-rotation advance decision: only a fresh transition into
 // AboveUpperBound should advance the rotation, and only when there's more than one crop to
-// rotate through - otherwise this integration's original single-crop behavior (sit disabled
-// once over Upper, indefinitely) must stay unreachable/unaffected.
+// rotate through - otherwise a single-crop job must sit disabled once over Upper, indefinitely,
+// rather than advancing.
 [HotSwappable]
 [TestSuite]
 internal static class ShouldAdvanceRotationTests

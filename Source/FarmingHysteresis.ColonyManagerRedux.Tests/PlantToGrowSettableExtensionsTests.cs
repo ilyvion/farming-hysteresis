@@ -3,9 +3,9 @@ using RimTestRedux;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
-// Regression guard for the crop-rotation "don't strand the outgoing crop" fix (see
-// Docs/CMRIntegrationRework.md, Step 5 - resolves #6): forceHarvestEnabled must keep harvest
-// allowed regardless of ControlHarvesting/state, while sow gating is untouched by it.
+// Regression guard: forceHarvestEnabled must keep harvest allowed regardless of
+// ControlHarvesting/state, while sow gating is untouched by it - this prevents a crop the job
+// has rotated away from getting stranded unharvested.
 [HotSwappable]
 [TestSuite]
 internal static class PlantToGrowSettableExtensionsComputeAllowTests
@@ -62,8 +62,8 @@ internal static class PlantToGrowSettableExtensionsComputeAllowTests
             )
             .Is.True();
 
-    // The exact scenario Step 5 fixes: a crop the job has rotated away from must still get
-    // harvested even though the job's own latch state now says "disabled" for it.
+    // A crop the job has rotated away from must still get harvested even though the job's own
+    // latch state now says "disabled" for it.
     [Test]
     public static void ForceHarvestEnabledOverridesAnOtherwiseDisabledState() =>
         Assert

@@ -4,12 +4,12 @@ using FarmingHysteresis.Extensions;
 namespace FarmingHysteresis.ColonyManagerRedux;
 
 /// <summary>
-/// Design decision 2's one-time migration gate (see <c>Docs/CMRIntegrationRework.md</c>):
-/// reconciles CMR takeover now defaulting to on with saves that already have old-style
-/// (per-grower) hysteresis configured, so the new default can't silently strand an existing
-/// setup. Fires once per save from <see cref="CmrMigrationGameComponent.FinalizeInit"/>; the
-/// player can also retrigger <see cref="Migrate"/> later via the manager tab's migrate button if
-/// they declined (see <c>ManagerTab_FarmingHysteresis</c>).
+/// One-time migration gate reconciling CMR takeover defaulting to on with saves that already
+/// have old-style (per-grower) hysteresis configured, so the new default can't silently strand
+/// an existing setup. Fires once per save from
+/// <see cref="CmrMigrationGameComponent.FinalizeInit"/>; the player can also retrigger
+/// <see cref="Migrate"/> later via the manager tab's migrate button if they declined (see
+/// <c>ManagerTab_FarmingHysteresis</c>).
 /// </summary>
 internal static class CmrMigrationGate
 {

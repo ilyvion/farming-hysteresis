@@ -5,16 +5,14 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 
 /// <summary>
 /// Global (mod-config-scoped, not per-save) settings for the Farming Hysteresis manager job.
-/// Currently holds only the "take over Farming Hysteresis control" toggle; see
-/// <c>Docs/CMRIntegrationRework.md</c> for the ownership model this drives.
+/// Currently holds only the "take over Farming Hysteresis control" toggle.
 /// </summary>
 internal sealed class ManagerSettings_FarmingHysteresis : ManagerSettings
 {
-    // Defaults to on: CMR-driven control is the intended way to use this mod going forward (see
-    // Design decision 2 in Docs/CMRIntegrationRework.md). Saves that already have old-style
-    // bounds configured are protected from silently losing them not by changing this default,
-    // but by CmrMigrationGate forcing the *effective* controller off for such a save until the
-    // player resolves the one-time migration prompt - see ApplyControllerState.
+    // Defaults to on: CMR-driven control is the intended way to use this mod. Saves that already
+    // have old-style bounds configured are protected from silently losing them not by changing
+    // this default, but by CmrMigrationGate forcing the *effective* controller off for such a
+    // save until the player resolves the one-time migration prompt - see ApplyControllerState.
     public bool TakeOverHysteresisControl = true;
 
     /// <summary>
@@ -27,14 +25,10 @@ internal sealed class ManagerSettings_FarmingHysteresis : ManagerSettings
     /// a brand new, separately-constructed object carrying the actual persisted settings, but
     /// never calls <see cref="PostMake"/> on it. A static field only ever set from
     /// <see cref="PostMake"/> would therefore keep pointing at the discarded, default-valued
-    /// throwaway object forever - exactly the bug this replaced (see this session's
-    /// investigation via the temporary debug logging previously added to
-    /// <see cref="ApplyControllerState"/>): <see cref="CmrMigrationGate.HandleGameLoaded"/> kept
-    /// reading a stale <see cref="TakeOverHysteresisControl"/>default of <see langword="true"/>
-    /// on every game load, no matter what the player had actually set in the mod options tab
-    /// (which, unlike <see cref="CmrMigrationGate"/>, was already operating on the real object -
-    /// this is why manually re-toggling the option in-game always "fixed" it: that path never
-    /// went through this stale reference to begin with).
+    /// throwaway object forever, so any code reading it (e.g.
+    /// <see cref="CmrMigrationGate.HandleGameLoaded"/>) would see a stale
+    /// <see cref="TakeOverHysteresisControl"/> value that never reflects what the player actually
+    /// set in the mod options tab.
     /// </summary>
     internal static ManagerSettings_FarmingHysteresis? Instance =>
         ColonyManagerReduxMod.Settings.ManagerSettingsFor<ManagerSettings_FarmingHysteresis>(

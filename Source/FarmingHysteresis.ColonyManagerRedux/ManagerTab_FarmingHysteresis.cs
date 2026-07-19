@@ -70,9 +70,8 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         );
         // Each rotation entry draws its own tracked-product icon/label and current storage count
         // (see DrawRotationEntryTrackedItems) rather than there being a separate, job-wide
-        // "Trigger" section - keeping bounds, tracked items, and status together per-entry is
-        // what fixes the disconnect between the crop rotation list and "what determines when a
-        // crop finishes" (see Docs/CMRIntegrationRework.md's Step 5 follow-up).
+        // "Trigger" section - keeping bounds, tracked items, and status together per-entry avoids
+        // a disconnect between the crop rotation list and what determines when a crop finishes.
         DrawSection(
             "FarmingHysteresis.Job",
             "CropRotation",
@@ -132,11 +131,10 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     private const float ReorderButtonSize = 22f;
 
     /// <summary>
-    /// The "Crop rotation" section (see <c>Docs/CMRIntegrationRework.md</c>, Step 5 - resolves
-    /// #6): a switch-mode toggle, then <see cref="ManagerJob_FarmingHysteresis.RotationEntries"/>
-    /// as an ordered, editable list - each entry's own bounds decide when the job moves on to the
-    /// next one, cycling. Replaces the old single "Target plant" section; a job with exactly one
-    /// entry behaves exactly like this integration's original one-crop-per-job design.
+    /// The "Crop rotation" section: a switch-mode toggle, then
+    /// <see cref="ManagerJob_FarmingHysteresis.RotationEntries"/> as an ordered, editable list -
+    /// each entry's own bounds decide when the job moves on to the next one, cycling. A job with
+    /// exactly one entry behaves like a plain one-crop-per-job setup.
     /// </summary>
     private static float DrawCropRotation(
         ManagerJob_FarmingHysteresis job,
@@ -455,9 +453,9 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
 
     /// <summary>
     /// An entry's own Lower/Upper bound editor - the same <see cref="Widgets.IntEntry"/> stepper
-    /// <c>Trigger_Hysteresis</c> used to draw once for the whole job (before Step 5 gave each
-    /// rotation entry its own bounds), minus the long per-row description paragraph (impractical
-    /// once a job can have several entries) - a hover tooltip carries the same explanation instead.
+    /// used elsewhere for a job's bounds, minus the long per-row description paragraph
+    /// (impractical once a job can have several entries) - a hover tooltip carries the same
+    /// explanation instead.
     /// </summary>
     private static float DrawRotationEntryBounds(
         ManagerJob_FarmingHysteresis job,
@@ -518,16 +516,13 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     }
 
     /// <summary>
-    /// An entry's own tracked items section - the same icon+label row (and, when the filter
-    /// allows more than one def, plain summary label) this trigger used to show once for the
-    /// whole job in a separate, disconnected section, plus a "Current amount of X in storage: N"
-    /// line and the "Configure tracked items…" button that opens a
-    /// <see cref="WindowTriggerHysteresisDetails"/> scoped to this entry alone. Moved here, and
-    /// duplicated per entry, from the job-wide <c>Trigger_Hysteresis.DrawTriggerConfig</c> (see
-    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 5 follow-up) since what determines "this crop is
-    /// done" often differs per crop - showing only the active entry's icon/count in a lone section
-    /// at the bottom of the list gave no indication of what any of the *other* entries were
-    /// tracking.
+    /// An entry's own tracked items section - the icon+label row (and, when the filter allows
+    /// more than one def, plain summary label), a "Current amount of X in storage: N" line, and
+    /// the "Configure tracked items…" button that opens a
+    /// <see cref="WindowTriggerHysteresisDetails"/> scoped to this entry alone. Drawn per entry,
+    /// rather than once for the whole job, since what determines "this crop is done" often
+    /// differs per crop - showing only the active entry's icon/count in a single job-wide section
+    /// would give no indication of what any of the *other* entries were tracking.
     /// </summary>
     private static float DrawRotationEntryTrackedItems(
         ManagerJob_FarmingHysteresis job,
@@ -622,10 +617,10 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
 
     /// <summary>
     /// Whether this entry's crop has a resolvable secondary product (see
-    /// <see cref="SecondaryProductResolvers"/>, Step 6) that its current
+    /// <see cref="SecondaryProductResolvers"/>) that its current
     /// <see cref="DualCropTrackingMode"/> isn't tracking, and if so, the tooltip text describing
-    /// it - without this, a player who never opens "Configure tracked items…" (most players, per
-    /// direct feedback) would have no way to even learn the dual-crop feature exists, since
+    /// it - without this, a player who never opens "Configure tracked items…" would have no way
+    /// to even learn the dual-crop feature exists, since
     /// <see cref="DualCropTrackingMode.PrimaryOnly"/> is deliberately the default for save
     /// compatibility. Symmetric with <see cref="DualCropTrackingMode.SecondaryOnly"/> - a crop
     /// tracked secondary-only is just as "missing" its primary product as one tracked

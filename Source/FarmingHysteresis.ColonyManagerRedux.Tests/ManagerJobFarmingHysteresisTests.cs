@@ -3,8 +3,7 @@ using static FarmingHysteresis.ColonyManagerRedux.ManagerJob_FarmingHysteresis;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
-// Regression guard for the grower-exclusivity mechanism: a grower must never end up managed by
-// more than one Farming Hysteresis manager job at once. See Docs/CMRIntegrationRework.md, Step 2.
+// A grower must never end up managed by more than one Farming Hysteresis manager job at once.
 [HotSwappable]
 [TestSuite]
 internal static class ManagerJobFarmingHysteresisScopeTests
@@ -79,9 +78,9 @@ internal static class ManagerJobFarmingHysteresisScopeTests
     }
 }
 
-// Regression guard for the "don't even offer it" fix: plants with no harvestedThingDef (e.g.
-// purely decorative plants like roses) must never appear in ValidTargetPlants, since
-// Trigger_Hysteresis would have nothing to count for them. See Docs/CMRIntegrationRework.md.
+// Regression guard: plants with no harvestedThingDef (e.g. purely decorative plants like roses)
+// must never appear in ValidTargetPlants, since Trigger_Hysteresis would have nothing to count
+// for them.
 [HotSwappable]
 [TestSuite]
 internal static class ValidTargetPlantCandidateTests
@@ -148,9 +147,9 @@ internal static class GrowerClaimResolutionTests
     }
 }
 
-// Regression guard for ManagerJob_FarmingHysteresis.History's per-chapter selection logic (see
-// Docs/CMRIntegrationRework.md, Step 3) - stock, lower bound, and upper bound are each their own
-// flat/varying chapter, and none of them ever draw a target line.
+// Covers ManagerJob_FarmingHysteresis.History's per-chapter selection logic: stock, lower bound,
+// and upper bound are each their own flat/varying chapter, and none of them ever draw a target
+// line.
 [HotSwappable]
 [TestSuite]
 internal static class ManagerJobFarmingHysteresisHistoryTests
@@ -195,10 +194,9 @@ internal static class ManagerJobFarmingHysteresisHistoryTests
             .Is.EqualTo(20);
 }
 
-// Regression guard for the "active crop follows identity, not position" fix (see
-// Docs/CMRIntegrationRework.md's Step 5 follow-up): reordering/removing entries other than the
-// active one must never silently change which crop is considered active - a plain index-based
-// ActiveRotationIndex used to do exactly that whenever an earlier entry was removed.
+// Regression guard: reordering/removing entries other than the active one must never silently
+// change which crop is considered active - the active entry must be tracked by identity, not by
+// list position.
 [HotSwappable]
 [TestSuite]
 internal static class ComputeActiveEntryIdAfterRemovalTests
@@ -287,10 +285,9 @@ internal static class ComputeNextActiveEntryIdTests
     }
 }
 
-// Regression guard for RotationMode.Priority's active-entry selection (see
-// Docs/CMRIntegrationRework.md's per-job rotation mode follow-up): list order is a priority
-// order, so the winner is the first entry that isn't already satisfied (AboveUpperBound),
-// skipping over any that are - not whichever entry was active before.
+// Covers RotationMode.Priority's active-entry selection: list order is a priority order, so the
+// winner is the first entry that isn't already satisfied (AboveUpperBound), skipping over any
+// that are - not whichever entry was active before.
 [HotSwappable]
 [TestSuite]
 internal static class ComputePriorityActiveEntryIdTests
@@ -344,11 +341,10 @@ internal static class ComputePriorityActiveEntryIdTests
             .Is.EqualTo(1);
 }
 
-// Regression guard for RotationMode.RoundRobin's active-entry selection, now that it's a pure
-// function (Trigger_Hysteresis.ComputeCycleUpdate/ApplyCycleUpdate split - see the Gather/Execute
-// contract follow-up in Docs/CMRIntegrationRework.md): stays on the active entry unless *its own*
-// latch just made a fresh transition into AboveUpperBound this cycle - a latch that was already
-// AboveUpperBound going into the cycle must not re-trigger an advance every cycle thereafter.
+// Covers RotationMode.RoundRobin's active-entry selection: stays on the active entry unless *its
+// own* latch just made a fresh transition into AboveUpperBound this cycle - a latch that was
+// already AboveUpperBound going into the cycle must not re-trigger an advance every cycle
+// thereafter.
 [HotSwappable]
 [TestSuite]
 internal static class ComputeRoundRobinActiveEntryIdTests
@@ -413,9 +409,9 @@ internal static class ComputeRoundRobinActiveEntryIdTests
     }
 }
 
-// Regression guard for the crop-rotation "don't strand the outgoing crop" fix (see
-// Docs/CMRIntegrationRework.md, Step 5 - resolves #6): a grower still holding a plant that isn't
-// the active rotation entry's crop must be detected regardless of what else is standing in it.
+// Regression guard: a grower still holding a plant that isn't the active rotation entry's crop
+// must be detected regardless of what else is standing in it, so the outgoing crop doesn't get
+// stranded during a rotation switch.
 [HotSwappable]
 [TestSuite]
 internal static class GrowerHasLeftoverPlantsTests

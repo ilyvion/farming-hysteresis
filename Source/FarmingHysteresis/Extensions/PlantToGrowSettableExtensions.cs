@@ -58,11 +58,10 @@ internal static class PlantToGrowSettableExtensions
     /// <summary>
     /// Applies the hysteresis latch's enabled/disabled <paramref name="state"/> to
     /// <paramref name="plantGrower"/>'s sow/harvest gating. <paramref name="forceHarvestEnabled"/>
-    /// (used by the CMR integration's crop rotation, see <c>Docs/CMRIntegrationRework.md</c>,
-    /// Step 5 - resolves #6) overrides harvest to stay allowed regardless of
-    /// <paramref name="state"/>/<see cref="Settings.ControlHarvesting"/> - needed so a crop this
-    /// job has already rotated away from never gets stranded unharvested, permanently occupying
-    /// its cell and stalling the rotation.
+    /// (used by the CMR integration's crop rotation) overrides harvest to stay allowed regardless
+    /// of <paramref name="state"/>/<see cref="Settings.ControlHarvesting"/> - needed so a crop
+    /// this job has already rotated away from never gets stranded unharvested, permanently
+    /// occupying its cell and stalling the rotation.
     /// </summary>
     internal static void SetHysteresisControlState(
         this IPlantToGrowSettable plantGrower,
