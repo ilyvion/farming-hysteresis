@@ -52,16 +52,40 @@ internal static class PlantToGrowSettableExtensions
                 .Sum(t => t.stackCount)
             : map.resourceCounter.GetCount(harvestedThingDef);
 
+    /// <summary>
+    /// Applies the hysteresis latch's enabled/disabled <paramref name="state"/> to
+    /// <paramref name="plantGrower"/>'s sow/harvest gating. <paramref name="forceHarvestEnabled"/>
+    /// (used by the CMR integration's crop rotation, see <c>Docs/CMRIntegrationRework.md</c>,
+    /// Step 5 - resolves #6) overrides harvest to stay allowed regardless of
+    /// <paramref name="state"/>/<see cref="Settings.ControlHarvesting"/> - needed so a crop this
+    /// job has already rotated away from never gets stranded unharvested, permanently occupying
+    /// its cell and stalling the rotation.
+    /// </summary>
     internal static void SetHysteresisControlState(
         this IPlantToGrowSettable plantGrower,
-        bool state
+        bool state,
+        bool forceHarvestEnabled = false
     )
     {
         var def = GetControlDefForPlantGrower(plantGrower, nameof(SetHysteresisControlState));
 
-        def.SetAllowSow(plantGrower, !FarmingHysteresisMod.Settings.ControlSowing || state);
-        def.SetAllowHarvest(plantGrower, !FarmingHysteresisMod.Settings.ControlHarvesting || state);
+        def.SetAllowSow(plantGrower, ComputeAllowSow(FarmingHysteresisMod.Settings.ControlSowing, state));
+        def.SetAllowHarvest(
+            plantGrower,
+            ComputeAllowHarvest(
+                FarmingHysteresisMod.Settings.ControlHarvesting,
+                state,
+                forceHarvestEnabled
+            )
+        );
     }
+
+    /// <summary>Pure decision logic behind <see cref="SetHysteresisControlState"/>'s sow gating.</summary>
+    internal static bool ComputeAllowSow(bool controlSowing, bool state) => !controlSowing || state;
+
+    /// <summary>Pure decision logic behind <see cref="SetHysteresisControlState"/>'s harvest gating.</summary>
+    internal static bool ComputeAllowHarvest(bool controlHarvesting, bool state, bool forceHarvestEnabled) =>
+        forceHarvestEnabled || !controlHarvesting || state;
 
     private static void ThrowError(IPlantToGrowSettable plantGrower, string method) =>
         throw new InvalidOperationException(

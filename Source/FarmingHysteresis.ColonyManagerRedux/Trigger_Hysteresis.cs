@@ -11,67 +11,206 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 /// <c>Docs/CMRIntegrationRework.md</c>, Step 4 — resolves #16, e.g. sowing Hops based on Beer
 /// stock) via <see cref="TrackedThingFilter"/>, the same <see cref="ThingFilter"/>-based shape
 /// CMR's own <see cref="Trigger_Threshold"/> uses, reusing its public
-/// <c>Utilities.CountProducts</c>/<c>Utilities.CountProductsCoroutine</c> helpers
-/// instead of this mod's own per-grower counting. By default (<see cref="TrackedFilterFollowsTargetPlant"/>)
-/// the filter tracks whatever <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> the job
-/// pushes onto every grower it manages — matching this integration's original, simpler behavior
-/// verbatim — until a player explicitly detaches it to track something else instead.
+/// <c>Utilities.CountProducts</c>/<c>Utilities.CountProductsCoroutine</c> helpers instead of this
+/// mod's own per-grower counting. <see cref="TrackedThingFilter"/> and friends
+/// (<see cref="TrackedFilterFollowsTargetPlant"/>, <see cref="Stockpile"/>,
+/// <see cref="CountAllOnMap"/>) all delegate to the job's currently active
+/// <see cref="ManagerJob_FarmingHysteresis.RotationEntries"/> entry, since what determines "this
+/// crop is done" often differs per crop (Step 5 follow-up) - by default
+/// (<see cref="CropRotationEntry.TrackedFilterFollowsTargetPlant"/>) each entry's filter tracks
+/// whatever plant it's set to grow, matching this integration's original, simpler behavior
+/// verbatim, until a player explicitly detaches it to track something else instead.
 /// </summary>
 internal sealed class Trigger_Hysteresis : Trigger
 {
     private const float ProductIconSize = 24f;
     private const float ProductRowPadding = 5f;
 
-    public int Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound;
-    public int Upper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound;
+    private int _legacyLower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound;
+    private int _legacyUpper = FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound;
 
-    internal LatchMode LatchModeValue { get; private set; } = LatchMode.Unknown;
-    internal int TrackedThingCount { get; private set; }
+    /// <summary>
+    /// The active <see cref="ManagerJob_FarmingHysteresis.RotationEntries"/> entry, or
+    /// <see langword="null"/> if the job has no rotation entries yet (a brand new job, or an old
+    /// save not yet migrated - see <see cref="ManagerJob_FarmingHysteresis.ExposeData"/>).
+    /// </summary>
+    private CropRotationEntry? ActiveEntry => HysteresisJob.ActiveEntry;
 
-    public ThingFilter ParentFilter { get; private set; } = ThingFilter.CreateOnlyEverStorableThingFilter();
+    /// <summary>
+    /// The active rotation entry's lower bound, or (while <see cref="ActiveEntry"/> is
+    /// <see langword="null"/>) a legacy fallback field - see <c>Docs/CMRIntegrationRework.md</c>,
+    /// Step 5. Scribed under this trigger's original "lower" key so an old save (from before crop
+    /// rotation existed) keeps working with zero behavior change until it's migrated into a real
+    /// rotation entry.
+    /// </summary>
+    public int Lower
+    {
+        get => ActiveEntry?.Lower ?? _legacyLower;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.Lower = value;
+            }
+            else
+            {
+                _legacyLower = value;
+            }
+        }
+    }
 
-    private ThingFilter trackedThingFilter;
+    /// <summary>See <see cref="Lower"/> - same shape, for the upper bound.</summary>
+    public int Upper
+    {
+        get => ActiveEntry?.Upper ?? _legacyUpper;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.Upper = value;
+            }
+            else
+            {
+                _legacyUpper = value;
+            }
+        }
+    }
+
+    private LatchMode LegacyLatchModeValue { get; set; } = LatchMode.Unknown;
+    private int LegacyTrackedThingCount { get; set; }
+
+    /// <summary>
+    /// The active rotation entry's own hysteresis latch, or (while <see cref="ActiveEntry"/> is
+    /// <see langword="null"/>) a legacy fallback - same shape as <see cref="Lower"/>. Since each
+    /// entry now tracks its own latch independently (see <see cref="CropRotationEntry.LatchModeValue"/>),
+    /// this is purely a read-through convenience for this trigger's own <see cref="State"/>/
+    /// <see cref="StatusTooltip"/>/history consumers, which only ever care about whichever entry
+    /// is currently active.
+    /// </summary>
+    internal LatchMode LatchModeValue
+    {
+        get => ActiveEntry?.LatchModeValue ?? LegacyLatchModeValue;
+        private set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.LatchModeValue = value;
+            }
+            else
+            {
+                LegacyLatchModeValue = value;
+            }
+        }
+    }
+
+    /// <summary>See <see cref="LatchModeValue"/> - same shape, for the active entry's tracked-thing count.</summary>
+    internal int TrackedThingCount
+    {
+        get => ActiveEntry?.TrackedThingCount ?? LegacyTrackedThingCount;
+        private set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.TrackedThingCount = value;
+            }
+            else
+            {
+                LegacyTrackedThingCount = value;
+            }
+        }
+    }
+
+    public static ThingFilter ParentFilter { get; } = ThingFilter.CreateOnlyEverStorableThingFilter();
+
+    // Legacy fallback state, used only while HysteresisJob has no rotation entries yet (an old
+    // save not yet migrated - see ManagerJob_FarmingHysteresis.ExposeData). Once per-entry tracked
+    // items existed (Step 5 follow-up), these are what let an old save keep working with
+    // zero behavior change until migrated - same reasoning as Lower/Upper's own legacy fields.
+    private ThingFilter _legacyTrackedThingFilter;
+    private bool _legacyTrackedFilterFollowsTargetPlant = true;
+    private Zone_Stockpile? _legacyStockpile;
+    private string? _legacyStockpileScribe;
+    private bool _legacyCountAllOnMap;
 
     public Trigger_Hysteresis(ManagerJob job)
         : base(job)
     {
-        trackedThingFilter = new ThingFilter(TrackedThingFilter_SettingsChanged);
-        trackedThingFilter.SetDisallowAll();
+        _legacyTrackedThingFilter = new ThingFilter(NoOpSettingsChangedCallback);
+        _legacyTrackedThingFilter.SetDisallowAll();
     }
 
     /// <summary>
-    /// The filter this trigger actually counts against (see <see cref="RecomputeState"/>). Kept
-    /// distinct from <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> per Step 4 — see
-    /// this class's own doc comment.
+    /// The active rotation entry's tracked items filter, or (while <see cref="ActiveEntry"/> is
+    /// <see langword="null"/>) the legacy fallback filter - see this class's own doc comment on
+    /// <see cref="Lower"/>. Kept distinct from <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>
+    /// per Step 4 - see this class's own doc comment.
     /// </summary>
-    public ThingFilter TrackedThingFilter => trackedThingFilter;
-
-    private void TrackedThingFilter_SettingsChanged() => _cachedState.Invalidate();
+    public ThingFilter TrackedThingFilter => ActiveEntry?.TrackedThingFilter ?? _legacyTrackedThingFilter;
 
     /// <summary>
-    /// Whether <see cref="TrackedThingFilter"/> is kept in sync with
-    /// <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> (see
-    /// <see cref="SyncTrackedFilterToTargetPlant"/>) rather than left to the player's own
-    /// choice. Defaults to <see langword="true"/> so a freshly created job behaves exactly like
-    /// this integration did before Step 4 — tracking whatever plant the job pushes onto its
-    /// growers — until a player explicitly detaches it via <c>WindowTriggerHysteresisDetails</c>.
+    /// <see cref="ThingFilter"/>'s settings-changed callback is bound at construction time (a
+    /// private field with no public setter), so a callback is required even though nothing needs
+    /// to react to it - see <see cref="CropRotationEntry.NoOpSettingsChangedCallback"/>'s own doc
+    /// comment for why: this trigger's latch state is only ever recomputed once per actual
+    /// manager job cycle (see <see cref="ComputeCycleUpdate"/>/<see cref="ApplyCycleUpdate"/>),
+    /// never eagerly on edit.
     /// </summary>
-    public bool TrackedFilterFollowsTargetPlant { get; set; } = true;
+    private static void NoOpSettingsChangedCallback() { }
 
-    private Zone_Stockpile? stockpile;
+    /// <summary>
+    /// Whether <see cref="TrackedThingFilter"/> is kept in sync with the active entry's own plant
+    /// (see <see cref="SyncTrackedFilterToTargetPlant"/>) rather than left to the player's own
+    /// choice. Delegates to the active <see cref="CropRotationEntry.TrackedFilterFollowsTargetPlant"/>,
+    /// falling back to a legacy field - same shape as <see cref="Lower"/>.
+    /// </summary>
+    public bool TrackedFilterFollowsTargetPlant
+    {
+        get => ActiveEntry?.TrackedFilterFollowsTargetPlant ?? _legacyTrackedFilterFollowsTargetPlant;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.TrackedFilterFollowsTargetPlant = value;
+            }
+            else
+            {
+                _legacyTrackedFilterFollowsTargetPlant = value;
+            }
+        }
+    }
 
     /// <summary>Restricts <see cref="TrackedThingFilter"/> counting to a single stockpile, mirroring <see cref="Trigger_Threshold.Stockpile"/>.</summary>
     public Zone_Stockpile? Stockpile
     {
-        get => stockpile;
-        set => stockpile = value;
+        get => ActiveEntry?.Stockpile ?? _legacyStockpile;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.Stockpile = value;
+            }
+            else
+            {
+                _legacyStockpile = value;
+            }
+        }
     }
 
-    public ref Zone_Stockpile? StockpileRef => ref stockpile;
-
-    private string? _stockpileScribe;
-
-    public bool CountAllOnMap;
+    public bool CountAllOnMap
+    {
+        get => ActiveEntry?.CountAllOnMap ?? _legacyCountAllOnMap;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.CountAllOnMap = value;
+            }
+            else
+            {
+                _legacyCountAllOnMap = value;
+            }
+        }
+    }
 
     /// <summary>
     /// Pure "seed once" helper behind <see cref="SyncTrackedFilterToTargetPlant"/> - resets
@@ -89,25 +228,27 @@ internal sealed class Trigger_Hysteresis : Trigger
     }
 
     /// <summary>
-    /// Called from <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>'s setter whenever
-    /// the job's target plant actually changes. No-ops unless
-    /// <see cref="TrackedFilterFollowsTargetPlant"/> is on - the job doesn't need to know that
-    /// detail itself.
+    /// Delegates to the active entry's own <see cref="CropRotationEntry.SyncTrackedFilterToTargetPlant"/>,
+    /// or (while <see cref="ActiveEntry"/> is <see langword="null"/>) re-seeds the legacy fallback
+    /// filter from the job's legacy target plant - only reachable for an old save not yet
+    /// migrated, since a job with rotation entries syncs each entry's filter itself whenever its
+    /// own <see cref="CropRotationEntry.PlantDef"/> changes.
     /// </summary>
     internal void SyncTrackedFilterToTargetPlant()
     {
-        if (!TrackedFilterFollowsTargetPlant)
+        if (ActiveEntry is { } entry)
+        {
+            entry.SyncTrackedFilterToTargetPlant();
+            return;
+        }
+
+        if (!_legacyTrackedFilterFollowsTargetPlant)
         {
             return;
         }
 
-        SyncFilterToSingleDef(trackedThingFilter, HysteresisJob.TargetPlantDef?.plant.harvestedThingDef);
+        SyncFilterToSingleDef(_legacyTrackedThingFilter, HysteresisJob.TargetPlantDef?.plant.harvestedThingDef);
     }
-
-    private readonly CachedValue<bool> _cachedState = new(false);
-
-    private string? _lowerBoundBuffer;
-    private string? _upperBoundBuffer;
 
     public ManagerJob_FarmingHysteresis HysteresisJob => (ManagerJob_FarmingHysteresis)Job;
 
@@ -136,38 +277,183 @@ internal sealed class Trigger_Hysteresis : Trigger
             _ => current,
         };
 
-    private bool RecomputeState()
-    {
-        // No more special-casing "no target plant chosen"/"plant has no harvested product" -
-        // see this class's own doc comment (Step 4): TrackedThingFilter is independent of
-        // TargetPlantDef now, and an empty/disallow-all filter (e.g. a brand new job) already
-        // naturally counts 0 via CMR's own CountProducts. Whether the job actually has a plant
-        // to sow is a separate concern, gated in ManagerJob_FarmingHysteresis.GatherJobDataCoroutine.
-        var count = HysteresisJob.Manager.map.CountProducts(TrackedThingFilter, Stockpile, CountAllOnMap);
-        TrackedThingCount = count;
-
-        LatchModeValue = ComputeNextLatchMode(LatchModeValue, count, Lower, Upper);
-        return LatchModeValue is LatchMode.BelowLowerBound or LatchMode.BetweenBoundsEnabled;
-    }
-
-    /// <inheritdoc/>
-    public override bool State =>
-        _cachedState.TryGetValue(out var value) ? value : _cachedState.Update(RecomputeState());
+    /// <summary>
+    /// Pure decision behind <see cref="ManagerJob_FarmingHysteresis.ComputeRoundRobinActiveEntryId"/>'s
+    /// crop-rotation advance (see <c>Docs/CMRIntegrationRework.md</c>, Step 5 - resolves #6): the active crop's own upper
+    /// bound was just reached (a fresh transition, not merely still sitting there from an earlier
+    /// cycle) and there's actually more than one crop to rotate through. With
+    /// <paramref name="rotationEntryCount"/> &lt;= 1 this is always <see langword="false"/> -
+    /// today's exact single-crop behavior (sit disabled once over <c>Upper</c>, indefinitely) is
+    /// unreachable/unaffected.
+    /// </summary>
+    internal static bool ShouldAdvanceRotation(
+        LatchMode previous,
+        LatchMode current,
+        int rotationEntryCount
+    ) => rotationEntryCount > 1 && previous != LatchMode.AboveUpperBound && current == LatchMode.AboveUpperBound;
 
     /// <summary>
-    /// <see cref="State"/> is otherwise only ever recomputed from
-    /// <see cref="ManagerJob_FarmingHysteresis.GatherJobDataCoroutine"/>, which only runs on
-    /// CMR's own ticking job schedule - it never runs at all while the game is paused, which is
-    /// exactly when a player is likely to be poking at this job's scope/config in the UI. Reading
-    /// <see cref="StatusTooltip"/> forces a fresh computation instead of showing whatever was
-    /// last computed (possibly nothing, for a brand new job), so the displayed status can't lag
-    /// behind an already-chosen target plant.
+    /// The gather phase's pure verdict on this cycle's latch/rotation update - counts things (a
+    /// read, not a game-world change) but writes nothing; see <see cref="ComputeCycleUpdate"/>
+    /// (produces this) and <see cref="ApplyCycleUpdate"/> (the only place it's ever written back).
+    /// Split into two variants: <see cref="EntryUpdates"/> is empty exactly when there are no
+    /// rotation entries yet (an old save not yet migrated - see
+    /// <see cref="ManagerJob_FarmingHysteresis.ExposeData"/>'s <c>PostLoadInit</c>), in which case
+    /// <see cref="LegacyCount"/>/<see cref="LegacyLatch"/> carry this trigger's own legacy
+    /// fallback update instead.
+    /// </summary>
+    internal readonly struct CycleUpdate
+    {
+        public required IReadOnlyList<(int Id, int Count, LatchMode Latch)> EntryUpdates { get; init; }
+        public required int? NewActiveEntryId { get; init; }
+        public required int? LegacyCount { get; init; }
+        public required LatchMode? LegacyLatch { get; init; }
+    }
+
+    /// <summary>
+    /// Computes what this cycle's latch/rotation update would be - every rotation entry's own
+    /// <see cref="CropRotationEntry.TrackedThingCount"/>/<see cref="CropRotationEntry.LatchModeValue"/>
+    /// (not just the active one's, since each crop's hysteresis is its own independent memory
+    /// regardless of whether it's being actively grown right now - see
+    /// <see cref="CropRotationEntry.LatchModeValue"/>'s own doc comment) and the new active entry
+    /// according to <see cref="ManagerJob_FarmingHysteresis.Mode"/> (see
+    /// <see cref="ManagerJob_FarmingHysteresis.ComputeNewActiveEntryId"/>) - <b>without writing any
+    /// of it back</b>. Deliberately pure/side-effect-free: this is called from
+    /// <see cref="ManagerJob_FarmingHysteresis.GatherJobDataCoroutine"/>, which per the base
+    /// <c>ManagerJob&lt;TWorkData&gt;</c>'s own contract must not change anything in the game (see
+    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 5 follow-up) - the actual write only happens once
+    /// this cycle's result reaches <see cref="ApplyCycleUpdate"/>, from
+    /// <see cref="ManagerJob_FarmingHysteresis.ExecuteJobDataCoroutine"/>.
+    /// </summary>
+    internal CycleUpdate ComputeCycleUpdate()
+    {
+        var rotationEntries = HysteresisJob.RotationEntries;
+
+        if (rotationEntries.Count == 0)
+        {
+            // Only reachable for a save from before Step 5's crop rotation existed, mid-session
+            // before ManagerJob_FarmingHysteresis.ExposeData's PostLoadInit migration has had a
+            // chance to run - falls back to this trigger's own legacy Lower/Upper/TrackedThingFilter
+            // etc., which already resolve to the legacy fields correctly since ActiveEntry is null.
+            var legacyCount = HysteresisJob.Manager.map.CountProducts(TrackedThingFilter, Stockpile, CountAllOnMap);
+            return new CycleUpdate
+            {
+                EntryUpdates = [],
+                NewActiveEntryId = null,
+                LegacyCount = legacyCount,
+                LegacyLatch = ComputeNextLatchMode(LatchModeValue, legacyCount, Lower, Upper),
+            };
+        }
+
+        var activeEntryId = HysteresisJob.ActiveEntryId;
+        LatchMode? previousActiveLatch = null;
+        var entryUpdates = new List<(int Id, int Count, LatchMode Latch)>(rotationEntries.Count);
+
+        foreach (var entry in rotationEntries)
+        {
+            var count = HysteresisJob.Manager.map.CountProducts(
+                entry.TrackedThingFilter,
+                entry.Stockpile,
+                entry.CountAllOnMap
+            );
+
+            if (entry.Id == activeEntryId)
+            {
+                previousActiveLatch = entry.LatchModeValue;
+            }
+
+            var latch = ComputeNextLatchMode(entry.LatchModeValue, count, entry.Lower, entry.Upper);
+            entryUpdates.Add((entry.Id, count, latch));
+        }
+
+        var newActiveEntryId = ManagerJob_FarmingHysteresis.ComputeNewActiveEntryId(
+            HysteresisJob.Mode,
+            [.. entryUpdates.Select(u => (u.Id, u.Latch))],
+            activeEntryId,
+            previousActiveLatch
+        );
+
+        return new CycleUpdate
+        {
+            EntryUpdates = entryUpdates,
+            NewActiveEntryId = newActiveEntryId,
+            LegacyCount = null,
+            LegacyLatch = null,
+        };
+    }
+
+    /// <summary>
+    /// Writes back a <see cref="CycleUpdate"/> computed by <see cref="ComputeCycleUpdate"/> -
+    /// the only place this trigger's/its entries' latch state or
+    /// <see cref="ManagerJob_FarmingHysteresis.ActiveEntryId"/> is ever actually mutated. Called
+    /// exactly once per actual manager job cycle, from
+    /// <see cref="ManagerJob_FarmingHysteresis.ExecuteJobDataCoroutine"/> - deliberately NOT wired
+    /// to any cached/on-demand read of <see cref="State"/>, so a rotation only ever advances - and
+    /// sow/harvest state only ever changes - when a manager pawn actually works this job, not
+    /// merely because a player is watching a progress bar or editing config while paused (see
+    /// <c>Docs/CMRIntegrationRework.md</c>'s Step 5 follow-up).
+    /// </summary>
+    internal void ApplyCycleUpdate(CycleUpdate update)
+    {
+        if (update.EntryUpdates.Count == 0)
+        {
+            TrackedThingCount = update.LegacyCount!.Value;
+            LatchModeValue = update.LegacyLatch!.Value;
+            return;
+        }
+
+        foreach (var (id, count, latch) in update.EntryUpdates)
+        {
+            var entry = HysteresisJob.RotationEntries.First(e => e.Id == id);
+            entry.TrackedThingCount = count;
+            entry.LatchModeValue = latch;
+        }
+
+        HysteresisJob.ActiveEntryId = update.NewActiveEntryId;
+    }
+
+    /// <summary>
+    /// Purely reflects <see cref="LatchModeValue"/> as of the last manager job cycle (see
+    /// <see cref="ApplyCycleUpdate"/>) - reading this never recomputes or advances anything.
+    /// </summary>
+    /// <inheritdoc/>
+    public override bool State => LatchModeValue is LatchMode.BelowLowerBound or LatchMode.BetweenBoundsEnabled;
+
+    /// <summary>
+    /// A short human-readable description of <paramref name="latchMode"/> - the same
+    /// "Current state: …" text this trigger's <see cref="DrawTriggerConfig"/> already showed for
+    /// the job as a whole, split out as a static helper so <c>ManagerTab_FarmingHysteresis</c> can
+    /// show each rotation entry's own hysteresis state (see
+    /// <see cref="CropRotationEntry.LatchModeValue"/>) the same way, matching the legacy per-grower
+    /// ITab's own status line.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="LatchMode.Unknown"/> gets its own CMR-specific wording
+    /// (<c>FarmingHysteresis.CMR.LatchModeDesc.Unknown</c>) rather than reusing the legacy ITab's
+    /// <c>FarmingHysteresis.LatchModeDesc.Unknown</c>, which calls it a bug: for a per-grower
+    /// zone that's true (a live zone updates its latch every tick), but here it's the normal,
+    /// expected state until the manager job's first cycle runs (see
+    /// <see cref="ApplyCycleUpdate"/>), which can be an arbitrary delay after the job/entry is
+    /// created.
+    /// </remarks>
+    internal static string DescribeLatchMode(LatchMode latchMode) =>
+        "FarmingHysteresis.LatchModeDesc".Translate(
+            latchMode == LatchMode.Unknown
+                ? "FarmingHysteresis.CMR.LatchModeDesc.Unknown".Translate()
+                : ("FarmingHysteresis.LatchModeDesc." + latchMode).Translate(
+                    FarmingHysteresisMod.Settings.HysteresisMode.AsString()
+                )
+        );
+
+    /// <summary>
+    /// Like <see cref="State"/>, purely reflects the last manager job cycle rather than forcing a
+    /// fresh computation - a brand new job (or one waiting on its next cycle) simply shows
+    /// whatever it last computed (nothing yet, for a job that's never run).
     /// </summary>
     public override string StatusTooltip
     {
         get
         {
-            _ = State;
             var targetPlantDef = HysteresisJob.TargetPlantDef;
             return targetPlantDef == null
                 ? "FarmingHysteresis.CMR.Trigger.NoTargetPlant".Translate()
@@ -181,52 +467,48 @@ internal sealed class Trigger_Hysteresis : Trigger
     }
 
     /// <summary>
-    /// A short label describing whatever <see cref="TrackedThingFilter"/> currently allows -
-    /// the single allowed def's own label if there's exactly one (the common case, whether
-    /// following the target plant or a player's own single-def choice), or a translated summary
-    /// otherwise. Used for standalone display (the tracked-product row, the "configure tracked
-    /// items" area) where naming how many kinds are tracked is useful context. For text that
-    /// embeds a count (e.g. "fewer than 1000 {label} in storage"), use
-    /// <see cref="TrackedCountNoun"/> instead - substituting this property there previously
-    /// produced ungrammatical, ambiguous sentences like "fewer than 1000 2 kinds of items in
-    /// storage" (unclear whether that meant per-kind or combined) once more than one def could be
-    /// tracked - see this class's own doc comment, Step 4.
+    /// Pure display-count-noun logic behind <see cref="TrackedCountNoun"/>, split out (same
+    /// reasoning as <see cref="DescribeTrackedFilter"/>) so <c>ManagerTab_FarmingHysteresis</c>
+    /// can describe each rotation entry's own tracked count the same way.
     /// </summary>
-    private string TrackedLabel
+    internal static string DescribeTrackedCountNoun(ThingFilter filter)
     {
-        get
+        var allowedDefs = filter.AllowedThingDefs.ToList();
+        return allowedDefs.Count == 1
+            ? allowedDefs[0].label
+            : "FarmingHysteresis.CMR.Trigger.TrackedCountNoun.Generic".Translate();
+    }
+
+    /// <summary>
+    /// A short label describing whatever <paramref name="filter"/> currently allows - the single
+    /// allowed def's own label if there's exactly one (the common case, whether following the
+    /// target plant or a player's own single-def choice), or a translated summary otherwise. Kept
+    /// as a static, parameterized helper (rather than an instance property tied to this trigger's
+    /// own <see cref="TrackedThingFilter"/>) so <c>ManagerTab_FarmingHysteresis</c>'s per-rotation-
+    /// entry rows can describe each entry's own <see cref="CropRotationEntry.TrackedThingFilter"/>
+    /// the same way, now that tracked items live per entry rather than once per job.
+    /// </summary>
+    internal static string DescribeTrackedFilter(ThingFilter filter)
+    {
+        var allowedDefs = filter.AllowedThingDefs.ToList();
+        return allowedDefs.Count switch
         {
-            var allowedDefs = TrackedThingFilter.AllowedThingDefs.ToList();
-            return allowedDefs.Count switch
-            {
-                0 => "FarmingHysteresis.CMR.Trigger.TrackedSummary.None".Translate(),
-                1 => allowedDefs[0].label,
-                _ => "FarmingHysteresis.CMR.Trigger.TrackedSummary.Multiple".Translate(
-                    allowedDefs.Count
-                ),
-            };
-        }
+            0 => "FarmingHysteresis.CMR.Trigger.TrackedSummary.None".Translate(),
+            1 => allowedDefs[0].label,
+            _ => "FarmingHysteresis.CMR.Trigger.TrackedSummary.Multiple".Translate(allowedDefs.Count),
+        };
     }
 
     /// <summary>
     /// A plain, pluralizable noun phrase for <see cref="TrackedThingFilter"/>'s current contents -
     /// the single allowed def's own label if there's exactly one, or the generic "items" otherwise
-    /// (whether zero or several defs are allowed). Unlike <see cref="TrackedLabel"/>, this always
+    /// (whether zero or several defs are allowed). Unlike <see cref="DescribeTrackedFilter"/>, this always
     /// reads correctly when substituted into a "{count} {noun} in storage" sentence, and always
     /// refers unambiguously to <see cref="TrackedThingCount"/>'s combined total rather than a
     /// per-kind amount - the exact set of tracked defs is what "Configure tracked items…" and the
     /// tracked-product row are for.
     /// </summary>
-    private string TrackedCountNoun
-    {
-        get
-        {
-            var allowedDefs = TrackedThingFilter.AllowedThingDefs.ToList();
-            return allowedDefs.Count == 1
-                ? allowedDefs[0].label
-                : "FarmingHysteresis.CMR.Trigger.TrackedCountNoun.Generic".Translate();
-        }
-    }
+    private string TrackedCountNoun => DescribeTrackedCountNoun(TrackedThingFilter);
 
     /// <inheritdoc/>
     /// <remarks>
@@ -316,6 +598,14 @@ internal sealed class Trigger_Hysteresis : Trigger
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// Required by the abstract <see cref="Trigger"/> base but not currently called by this mod's
+    /// own UI - <see cref="ManagerTab_FarmingHysteresis"/> draws each rotation entry's own tracked-
+    /// product row, storage count, and "Configure tracked items…" button inline in the crop
+    /// rotation list (see <c>ManagerTab_FarmingHysteresis.DrawRotationEntryTrackedItems</c>) rather
+    /// than a separate, job-wide trigger section, per <c>Docs/CMRIntegrationRework.md</c>'s Step 5
+    /// follow-up.
+    /// </remarks>
     public override void DrawTriggerConfig(
         ref Vector2 cur,
         float width,
@@ -337,62 +627,6 @@ internal sealed class Trigger_Hysteresis : Trigger
 
         cur.y += DrawTrackedProductRow(cur, width);
 
-        if (
-            Widgets.ButtonText(
-                new Rect(cur.x, cur.y, width, entryHeight),
-                "FarmingHysteresis.CMR.Trigger.ConfigureTracked".Translate()
-            )
-        )
-        {
-            Find.WindowStack.Add(
-                new WindowTriggerHysteresisDetails(this) { closeOnClickedOutside = true, draggable = true }
-            );
-        }
-        cur.y += entryHeight;
-
-        DrawBoundEntry(
-            ref cur,
-            width,
-            entryHeight,
-            "FarmingHysteresis.CMR.Trigger.Lower".Translate(),
-            ref Lower,
-            ref _lowerBoundBuffer,
-            "FarmingHysteresis.LowerBound".Translate(
-                targetPlantDef.label,
-                Lower,
-                TrackedCountNoun,
-                FarmingHysteresisMod.Settings.HysteresisMode.AsString()
-            )
-        );
-
-        DrawBoundEntry(
-            ref cur,
-            width,
-            entryHeight,
-            "FarmingHysteresis.CMR.Trigger.Upper".Translate(),
-            ref Upper,
-            ref _upperBoundBuffer,
-            "FarmingHysteresis.UpperBound".Translate(
-                targetPlantDef.label,
-                Upper,
-                TrackedCountNoun,
-                FarmingHysteresisMod.Settings.HysteresisMode.AsString()
-            )
-        );
-
-        if (Lower < 0)
-        {
-            Lower = 0;
-        }
-        if (Upper < Lower)
-        {
-            Upper = Lower;
-        }
-
-        // Force a fresh read (see StatusTooltip's own doc comment) so the amount/state text
-        // below can't lag behind bounds the player just edited above.
-        _ = State;
-
         DrawWrappedLabel(
             ref cur,
             width,
@@ -404,25 +638,30 @@ internal sealed class Trigger_Hysteresis : Trigger
             ref cur,
             width,
             entryHeight,
-            "FarmingHysteresis.LatchModeDesc".Translate(
-                ("FarmingHysteresis.LatchModeDesc." + LatchModeValue).Translate(
-                    FarmingHysteresisMod.Settings.HysteresisMode.AsString()
-                )
-            )
+            DescribeLatchMode(LatchModeValue)
         );
     }
 
     /// <summary>
-    /// The tracked-product row: <see cref="DrawProductRow"/>'s icon+label when
-    /// <see cref="TrackedThingFilter"/> allows exactly one def (the common case - following the
-    /// target plant, or a player's own single-def choice), or a plain summary label otherwise
-    /// (see <see cref="TrackedLabel"/>) - the filter can no longer be assumed to always resolve
-    /// to a single def once it's independent of <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>
-    /// (Step 4).
+    /// The tracked-product row: icon+label when <see cref="TrackedThingFilter"/> allows exactly
+    /// one def (the common case - following the target plant, or a player's own single-def
+    /// choice), or a plain summary label otherwise (see <see cref="DescribeTrackedFilter"/>) -
+    /// the filter can no longer be assumed to always resolve to a single def once it's
+    /// independent of <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> (Step 4).
     /// </summary>
-    private float DrawTrackedProductRow(Vector2 pos, float width)
+    private float DrawTrackedProductRow(Vector2 pos, float width) =>
+        DrawTrackedProductRow(TrackedThingFilter, pos, width);
+
+    /// <summary>
+    /// Pure-parameter version of the tracked-product row, split out so
+    /// <c>ManagerTab_FarmingHysteresis</c> can draw each rotation entry's own
+    /// <see cref="CropRotationEntry.TrackedThingFilter"/> the same way this trigger draws its
+    /// active entry's - icon+label when the filter allows exactly one def, or a plain summary
+    /// label otherwise (see <see cref="DescribeTrackedFilter"/>).
+    /// </summary>
+    internal static float DrawTrackedProductRow(ThingFilter filter, Vector2 pos, float width)
     {
-        var allowedDefs = TrackedThingFilter.AllowedThingDefs.ToList();
+        var allowedDefs = filter.AllowedThingDefs.ToList();
         if (allowedDefs.Count == 1)
         {
             return DrawProductRow(allowedDefs[0], pos, width);
@@ -431,7 +670,7 @@ internal sealed class Trigger_Hysteresis : Trigger
         var rowHeight = ProductIconSize + (2 * ProductRowPadding);
         var rect = new Rect(pos.x, pos.y, width, rowHeight);
         Text.Anchor = TextAnchor.MiddleLeft;
-        Widgets.Label(rect, TrackedLabel);
+        Widgets.Label(rect, DescribeTrackedFilter(filter));
         Text.Anchor = TextAnchor.UpperLeft;
         return rowHeight;
     }
@@ -447,33 +686,6 @@ internal sealed class Trigger_Hysteresis : Trigger
         var height = Mathf.Max(minHeight, Text.CalcHeight(text, width));
         Widgets.Label(new Rect(cur.x, cur.y, width, height), text);
         cur.y += height;
-    }
-
-    /// <summary>
-    /// A labeled bound row using vanilla's own <see cref="Widgets.IntEntry"/> stepper (the same
-    /// "-10 / -1 / value / +1 / +10" control RimWorld's own numeric editors use, e.g.
-    /// <c>Listing_Standard.IntEntry</c>) instead of a bare <see cref="Widgets.TextFieldNumeric"/>,
-    /// plus a wrapped description line underneath - matching the legacy per-grower
-    /// <c>ITab_Hysteresis</c>'s bounds editor instead of the plain half-width text fields this
-    /// used to draw.
-    /// </summary>
-    private static void DrawBoundEntry(
-        ref Vector2 cur,
-        float width,
-        float entryHeight,
-        string label,
-        ref int value,
-        ref string? buffer,
-        string description
-    )
-    {
-        Widgets.Label(new Rect(cur.x, cur.y, width, entryHeight), label);
-        cur.y += entryHeight;
-
-        Widgets.IntEntry(new Rect(cur.x, cur.y, width, entryHeight), ref value, ref buffer);
-        cur.y += entryHeight;
-
-        DrawWrappedLabel(ref cur, width, entryHeight, description);
     }
 
     /// <summary>
@@ -531,13 +743,17 @@ internal sealed class Trigger_Hysteresis : Trigger
     {
         base.ExposeData();
 
+        // Kept under the original "lower"/"upper" keys even though these are now only the
+        // legacy fallback used while HysteresisJob has no rotation entries yet (see Lower/Upper's
+        // own doc comment, Step 5) - this is what lets an old save keep working with zero
+        // behavior change until ManagerJob_FarmingHysteresis.ExposeData migrates it.
         Scribe_Values.Look(
-            ref Lower,
+            ref _legacyLower,
             "lower",
             FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound
         );
         Scribe_Values.Look(
-            ref Upper,
+            ref _legacyUpper,
             "upper",
             FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound
         );
@@ -545,29 +761,32 @@ internal sealed class Trigger_Hysteresis : Trigger
         Scribe_Values.Look(ref latchMode, "latchMode", LatchMode.Unknown);
         LatchModeValue = latchMode;
 
-        var followsTargetPlant = TrackedFilterFollowsTargetPlant;
-        Scribe_Values.Look(ref followsTargetPlant, "trackedFilterFollowsTargetPlant", true);
-        TrackedFilterFollowsTargetPlant = followsTargetPlant;
+        // Kept under their original keys, same reasoning as _legacyLower/_legacyUpper above - only
+        // the legacy fallback used while HysteresisJob has no rotation entries yet. Scribed
+        // directly into the legacy fields (not through the delegating properties above), since
+        // those would write into the active entry instead once one exists - the active entry's own
+        // state is scribed separately, via CropRotationEntry.ExposeData.
+        Scribe_Values.Look(ref _legacyTrackedFilterFollowsTargetPlant, "trackedFilterFollowsTargetPlant", true);
 
         Scribe_Deep.Look(
-            ref trackedThingFilter,
+            ref _legacyTrackedThingFilter,
             "trackedThingFilter",
-            (object)TrackedThingFilter_SettingsChanged
+            (object)NoOpSettingsChangedCallback
         );
-        Scribe_Values.Look(ref CountAllOnMap, "countAllOnMap");
+        Scribe_Values.Look(ref _legacyCountAllOnMap, "countAllOnMap");
 
         // Stockpile isn't referenceable - scribe by label, same as Trigger_Threshold.ExposeData.
         if (Scribe.mode == LoadSaveMode.Saving)
         {
-            _stockpileScribe = stockpile?.ToString() ?? "null";
+            _legacyStockpileScribe = _legacyStockpile?.ToString() ?? "null";
         }
 
-        Scribe_Values.Look(ref _stockpileScribe, "stockpile", "null");
+        Scribe_Values.Look(ref _legacyStockpileScribe, "stockpile", "null");
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            stockpile =
+            _legacyStockpile =
                 Job.Manager.map.zoneManager.AllZones.FirstOrDefault(z =>
-                    z is Zone_Stockpile && z.label == _stockpileScribe
+                    z is Zone_Stockpile && z.label == _legacyStockpileScribe
                 ) as Zone_Stockpile;
         }
     }

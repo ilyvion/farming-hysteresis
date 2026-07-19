@@ -56,7 +56,7 @@ internal static class HysteresisMigration
         var job = manager.NewJob<ManagerJob_FarmingHysteresis>(def);
 
         job.AssignmentMode = GrowerAssignmentMode.Specific;
-        job.TargetPlantDef = plantDef;
+        job.AddRotationEntry(plantDef);
         foreach (var grower in growers)
         {
             switch (grower)

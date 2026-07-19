@@ -198,3 +198,48 @@ internal static class SyncFilterToSingleDefTests
         Assert.ThatCollection(filter.AllowedThingDefs).Is.Empty();
     }
 }
+
+// Regression guard for Trigger_Hysteresis's crop-rotation advance decision (see
+// Docs/CMRIntegrationRework.md, Step 5 - resolves #6): only a fresh transition into
+// AboveUpperBound should advance the rotation, and only when there's more than one crop to
+// rotate through - otherwise this integration's original single-crop behavior (sit disabled
+// once over Upper, indefinitely) must stay unreachable/unaffected.
+[HotSwappable]
+[TestSuite]
+internal static class ShouldAdvanceRotationTests
+{
+    [Test]
+    public static void DoesNotAdvanceWithoutMultipleRotationEntries()
+    {
+        Assert
+            .That(ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 0))
+            .Is.False();
+        Assert
+            .That(ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 1))
+            .Is.False();
+    }
+
+    [Test]
+    public static void AdvancesOnFreshTransitionIntoAboveUpperBoundWithMultipleEntries()
+    {
+        Assert
+            .That(ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 2))
+            .Is.True();
+        Assert
+            .That(ShouldAdvanceRotation(BelowLowerBound, AboveUpperBound, rotationEntryCount: 2))
+            .Is.True();
+    }
+
+    // Sticky - already over the bound last cycle too, so this isn't a fresh transition.
+    [Test]
+    public static void DoesNotAdvanceWhenAlreadyAboveUpperBound() =>
+        Assert
+            .That(ShouldAdvanceRotation(AboveUpperBound, AboveUpperBound, rotationEntryCount: 2))
+            .Is.False();
+
+    [Test]
+    public static void DoesNotAdvanceWhenNotAboveUpperBound() =>
+        Assert
+            .That(ShouldAdvanceRotation(BelowLowerBound, BetweenBoundsEnabled, rotationEntryCount: 2))
+            .Is.False();
+}

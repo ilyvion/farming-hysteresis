@@ -4,14 +4,18 @@ using static ColonyManagerRedux.Constants;
 namespace FarmingHysteresis.ColonyManagerRedux;
 
 /// <summary>
-/// Configures <see cref="Trigger_Hysteresis.TrackedThingFilter"/> - modeled directly on CMR's own
-/// <see cref="WindowTriggerThresholdDetails"/> (see <c>Docs/CMRIntegrationRework.md</c>, Step 4),
-/// minus its <c>Ops</c>/target-count editor - <see cref="Trigger_Hysteresis"/>'s Lower/Upper bounds
-/// stay exactly where they are today, in the main tab.
+/// Configures a single <see cref="CropRotationEntry"/>'s own <see cref="CropRotationEntry.TrackedThingFilter"/>
+/// - modeled directly on CMR's own <see cref="WindowTriggerThresholdDetails"/> (see
+/// <c>Docs/CMRIntegrationRework.md</c>, Step 4), minus its <c>Ops</c>/target-count editor. Tracked
+/// items live per rotation entry (see Step 5 follow-up) rather than on the job's
+/// <see cref="Trigger_Hysteresis"/> as a whole, since what determines "this crop is done" often
+/// differs per crop; <see cref="CropRotationEntry.Lower"/>/<see cref="CropRotationEntry.Upper"/>
+/// bounds stay where they are, in the crop rotation list itself.
 /// </summary>
-internal sealed class WindowTriggerHysteresisDetails(Trigger_Hysteresis trigger) : Window
+internal sealed class WindowTriggerHysteresisDetails(CropRotationEntry entry, Manager manager) : Window
 {
-    private readonly Trigger_Hysteresis _trigger = trigger;
+    private readonly CropRotationEntry _entry = entry;
+    private readonly Manager _manager = manager;
     private readonly ThingFilterUI.UIState _uiState = new();
 
     public override Vector2 InitialSize => new(300f, 500f);
@@ -21,7 +25,7 @@ internal sealed class WindowTriggerHysteresisDetails(Trigger_Hysteresis trigger)
         var pos = inRect.ContractedBy(6f).position;
         var width = inRect.ContractedBy(6f).width;
 
-        var followsTargetPlant = _trigger.TrackedFilterFollowsTargetPlant;
+        var followsTargetPlant = _entry.TrackedFilterFollowsTargetPlant;
         Utilities.DrawToggle(
             ref pos,
             width,
@@ -29,12 +33,12 @@ internal sealed class WindowTriggerHysteresisDetails(Trigger_Hysteresis trigger)
             "FarmingHysteresis.CMR.Trigger.FollowTargetPlant.Tip".Translate(),
             ref followsTargetPlant
         );
-        if (followsTargetPlant != _trigger.TrackedFilterFollowsTargetPlant)
+        if (followsTargetPlant != _entry.TrackedFilterFollowsTargetPlant)
         {
-            _trigger.TrackedFilterFollowsTargetPlant = followsTargetPlant;
+            _entry.TrackedFilterFollowsTargetPlant = followsTargetPlant;
             if (followsTargetPlant)
             {
-                _trigger.SyncTrackedFilterToTargetPlant();
+                _entry.SyncTrackedFilterToTargetPlant();
             }
         }
 
@@ -50,7 +54,7 @@ internal sealed class WindowTriggerHysteresisDetails(Trigger_Hysteresis trigger)
             (int)
                 Math.Ceiling(
                     (double)(
-                        _trigger.Job.Manager.map.zoneManager.AllZones.OfType<Zone_Stockpile>().Count()
+                        _manager.map.zoneManager.AllZones.OfType<Zone_Stockpile>().Count()
                         + 1
                     ) / StockpileGUI.StockPilesPerRow
                 ),
@@ -64,8 +68,8 @@ internal sealed class WindowTriggerHysteresisDetails(Trigger_Hysteresis trigger)
         ThingFilterUI.DoThingFilterConfigWindow(
             filterRect,
             _uiState,
-            _trigger.TrackedThingFilter,
-            _trigger.ParentFilter
+            _entry.TrackedThingFilter,
+            Trigger_Hysteresis.ParentFilter
         );
         if (Event.current.type == EventType.Layout)
         {
@@ -74,15 +78,12 @@ internal sealed class WindowTriggerHysteresisDetails(Trigger_Hysteresis trigger)
             ThingFilterUI.viewHeight -= 90f;
         }
 
-        _ = StockpileGUI.DoStockpileSelectors(
-            zoneRect.position,
-            zoneRect.width,
-            ref _trigger.StockpileRef,
-            _trigger.Job.Manager
-        );
+        var stockpile = _entry.Stockpile;
+        _ = StockpileGUI.DoStockpileSelectors(zoneRect.position, zoneRect.width, ref stockpile, _manager);
+        _entry.Stockpile = stockpile;
 
         var countAllOnMapRect = new Rect(zoneRect.xMin, zoneRect.yMax + Margin, width, ListEntryHeight);
-        var countAllOnMap = _trigger.CountAllOnMap;
+        var countAllOnMap = _entry.CountAllOnMap;
         Utilities.DrawToggle(
             countAllOnMapRect,
             "ColonyManagerRedux.Threshold.CountAllOnMap".Translate(),
@@ -90,6 +91,6 @@ internal sealed class WindowTriggerHysteresisDetails(Trigger_Hysteresis trigger)
             ref countAllOnMap,
             true
         );
-        _trigger.CountAllOnMap = countAllOnMap;
+        _entry.CountAllOnMap = countAllOnMap;
     }
 }
