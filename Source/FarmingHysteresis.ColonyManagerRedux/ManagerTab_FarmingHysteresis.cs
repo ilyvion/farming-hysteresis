@@ -33,7 +33,25 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
 
         Widgets.DrawMenuSection(rect);
 
-        Widgets_Section.BeginSectionColumn(rect, "FarmingHysteresis.Job", out var position, out var width);
+        var columnRect = new Rect(
+            rect.xMin,
+            rect.yMin,
+            rect.width,
+            rect.height - Margin - ButtonSize.y
+        );
+        var buttonRect = new Rect(
+            rect.xMax - ButtonSize.x,
+            rect.yMax - ButtonSize.y,
+            ButtonSize.x - Margin,
+            ButtonSize.y - Margin
+        );
+
+        Widgets_Section.BeginSectionColumn(
+            columnRect,
+            "FarmingHysteresis.Job",
+            out var position,
+            out var width
+        );
         DrawSection(
             "FarmingHysteresis.Job",
             "GrowerScope",
@@ -59,6 +77,37 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             "FarmingHysteresis.CMR.Trigger".Translate()
         );
         Widgets_Section.EndSectionColumn("FarmingHysteresis.Job", position);
+
+        DrawManageButton(buttonRect);
+    }
+
+    /// <summary>
+    /// The "Manage!"/"Delete" toggle every other stock CMR tab shows for its selected job - without
+    /// this, a configured job never actually gets added to <see cref="JobTracker"/> and so never
+    /// runs (see <see cref="ManagerJob_FarmingHysteresis.IsManaged"/>), leaving no way for the
+    /// player to actually put a job into effect from this tab.
+    /// </summary>
+    private void DrawManageButton(Rect buttonRect)
+    {
+        var job = SelectedJob!;
+        if (!job.IsManaged)
+        {
+            if (Widgets.ButtonText(buttonRect, "ColonyManagerRedux.Common.Manage".Translate()))
+            {
+                job.IsManaged = true;
+                Manager.JobTracker.Add(job);
+                Refresh();
+            }
+        }
+        else
+        {
+            if (Widgets.ButtonText(buttonRect, "ColonyManagerRedux.Common.Delete".Translate()))
+            {
+                Manager.JobTracker.Delete(job);
+                Selected = MakeNewJob();
+                Refresh();
+            }
+        }
     }
 
     private static float DrawTargetPlant(ManagerJob_FarmingHysteresis job, Vector2 pos, float width)
