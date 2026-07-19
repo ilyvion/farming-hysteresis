@@ -85,12 +85,16 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     /// The "Manage!"/"Delete" toggle every other stock CMR tab shows for its selected job - without
     /// this, a configured job never actually gets added to <see cref="JobTracker"/> and so never
     /// runs (see <see cref="ManagerJob_FarmingHysteresis.IsManaged"/>), leaving no way for the
-    /// player to actually put a job into effect from this tab.
+    /// player to actually put a job into effect from this tab. Deliberately keyed off
+    /// <see cref="ManagerJob_FarmingHysteresis.IsCommittedToTracker"/> rather than
+    /// <see cref="ManagerJob_FarmingHysteresis.IsManaged"/> - the latter also folds in whether CMR
+    /// is currently the active controller, so a job that's already committed but temporarily
+    /// dormant would otherwise show "Manage!" again and get re-added to the tracker as a duplicate.
     /// </summary>
     private void DrawManageButton(Rect buttonRect)
     {
         var job = SelectedJob!;
-        if (!job.IsManaged)
+        if (!job.IsCommittedToTracker)
         {
             if (Widgets.ButtonText(buttonRect, "ColonyManagerRedux.Common.Manage".Translate()))
             {

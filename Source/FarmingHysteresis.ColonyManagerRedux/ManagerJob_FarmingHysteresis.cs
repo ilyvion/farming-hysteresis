@@ -67,6 +67,18 @@ internal sealed class ManagerJob_FarmingHysteresis
             FarmingHysteresisMod.HysteresisController is CmrHysteresisController
         );
 
+    /// <summary>
+    /// The raw "has this job been committed to <see cref="JobTracker"/>" flag, ignoring whether
+    /// CMR is currently the active controller - unlike <see cref="IsManaged"/>, which folds both
+    /// together for job-execution gating. <see cref="ManagerTab_FarmingHysteresis"/>'s
+    /// Manage!/Delete toggle needs this instead of <see cref="IsManaged"/>: if it used
+    /// <see cref="IsManaged"/>, a job that's already committed but currently dormant (takeover
+    /// off, or a <see cref="CmrMigrationGate"/> still suppressing it) would read as "not managed"
+    /// and show "Manage!" again, and clicking it would re-add an already-tracked job to
+    /// <see cref="JobTracker"/> as a duplicate.
+    /// </summary>
+    internal bool IsCommittedToTracker => base.IsManaged;
+
     public GrowerAssignmentMode AssignmentMode = GrowerAssignmentMode.All;
     public Area? GrowerArea;
     public bool InvertGrowerArea;
