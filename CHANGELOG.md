@@ -9,9 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Optional integration with [Colony Manager Redux](https://github.com/ilyvion/colony-manager-redux) (CMR): if you have CMR installed, you can now hand hysteresis control over to a CMR manager job instead of configuring it grower-by-grower. The manager job covers a chosen area/zone selection, shows up in CMR's own manager tab, and unlocks the features below. Turning this on is optional and per-save — everything continues to work exactly as before if you don't use it, and it defaults to on only for new games with CMR installed.
+- Crop rotation for CMR-managed hysteresis: set up an ordered list of crops for a job, and once the current crop's stock threshold is satisfied, growers automatically switch to the next crop in the list, cycling back around. Resolves [#6](https://github.com/ilyvion/farming-hysteresis/issues/6).
+- CMR-managed hysteresis can now track a different item than the one it's actually growing — for example, sowing hops based on how much beer you have in stock, rather than how many hops. Resolves [#16](https://github.com/ilyvion/farming-hysteresis/issues/16).
+- CMR-managed hysteresis jobs get a graph tracking stock against the lower and upper bounds over time, same as CMR's other manager jobs. Resolves [#17](https://github.com/ilyvion/farming-hysteresis/issues/17).
+- Dual-crop plants from Vanilla Expanded Framework (e.g. mods adding a bonus secondary harvest alongside the main one) are now recognized by CMR-managed hysteresis, with a per-crop choice of tracking the primary product, the secondary product, or both. Resolves [#25](https://github.com/ilyvion/farming-hysteresis/issues/25).
+- A one-time, dismissible message for players who don't use Colony Manager Redux, noting that future development is focused on the CMR integration above. It's purely informational — nothing changes and nothing is required if you'd rather not use CMR.
 - A third "Game" bounds option, alongside the existing "Self" and "Map" ones. Growing zones and hydroponics basins set to "Game" share their hysteresis bounds with every other grower of the same crop across your _entire_ save, not just the map they're on — so the bounds now survive traveling between maps, including via Odyssey gravships. Resolves [#26](https://github.com/ilyvion/farming-hysteresis/issues/26).
 - The old "global" bounds option has been renamed "Map" to make clear it's shared per-map, not across your whole save. Existing zones and basins using it are carried over automatically; no action needed.
 - The bounds-source setting is now a single button that opens a menu with all three choices (Self / Map / Game), replacing the old on/off checkbox.
+
+### Changed
+
+- In the mod settings, options that only matter for the mod's older per-grower controls are now greyed out and explained as such once Colony Manager Redux has taken over hysteresis control, rather than sitting there looking like they still do something.
 
 ### Fixed
 
