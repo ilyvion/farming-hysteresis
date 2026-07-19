@@ -104,7 +104,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         var rect2 = inRect;
         rect2.yMin += 45f;
 
-        Rect sourceSelectorRect = new(rect2.x, rect2.y - 40f, 200f, 30f);
+        Rect sourceSelectorRect = new(rect2.xMax - 200f, rect2.y - 32f, 200f, 30f);
         if (Widgets.ButtonText(sourceSelectorRect, BoundsSourceUi.Label(selectedSource)))
         {
             List<FloatMenuOption> options =
