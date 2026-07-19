@@ -15,8 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CMR-managed hysteresis jobs get a graph tracking stock against the lower and upper bounds over time, same as CMR's other manager jobs. Resolves [#17](https://github.com/ilyvion/farming-hysteresis/issues/17).
 - Dual-crop plants from Vanilla Expanded Framework (e.g. mods adding a bonus secondary harvest alongside the main one) are now recognized by CMR-managed hysteresis, with a per-crop choice of tracking the primary product, the secondary product, or both. Resolves [#25](https://github.com/ilyvion/farming-hysteresis/issues/25).
 - A one-time, dismissible message for players who don't use Colony Manager Redux, noting that future development is focused on the CMR integration above. It's purely informational — nothing changes and nothing is required if you'd rather not use CMR.
-- A third "Game" bounds option, alongside the existing "Self" and "Map" ones. Growing zones and hydroponics basins set to "Game" share their hysteresis bounds with every other grower of the same crop across your _entire_ save, not just the map they're on — so the bounds now survive traveling between maps, including via Odyssey gravships. Resolves [#26](https://github.com/ilyvion/farming-hysteresis/issues/26).
-- The old "global" bounds option has been renamed "Map" to make clear it's shared per-map, not across your whole save. Existing zones and basins using it are carried over automatically; no action needed.
+- A third 'Game' bounds option, alongside the existing 'Self' and 'Map' ones. Growing zones and hydroponics basins set to 'Game' share their hysteresis bounds with every other grower of the same crop across your _entire_ save, not just the map they're on — so the bounds now survive traveling between maps, including via Odyssey gravships. Resolves [#26](https://github.com/ilyvion/farming-hysteresis/issues/26).
+- The old 'global' bounds option has been renamed 'Map' to make clear it's shared per-map, not across your whole save. Existing zones and basins using it are carried over automatically; no action needed.
 - The bounds-source setting is now a single button that opens a menu with all three choices (Self / Map / Game), replacing the old on/off checkbox.
 
 ### Changed
@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Growing zones and hydroponics basins using "Map" bounds now always check against the bounds of the map they're actually on, instead of whichever map you currently have open.
+- Growing zones and hydroponics basins using 'Map' bounds now always check against the bounds of the map they're actually on, instead of whichever map you currently have open.
 
 ## [0.9.2] - 2025-07-20
 
