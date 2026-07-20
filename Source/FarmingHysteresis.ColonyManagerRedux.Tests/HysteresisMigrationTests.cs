@@ -163,3 +163,86 @@ internal static class ManagerJobFarmingHysteresisIsManagedTests
         Assert.That(ManagerJob_FarmingHysteresis.ComputeIsManaged(false, false)).Is.False();
     }
 }
+
+// Minimal IPlantToGrowSettable stand-in for GroupByTargetPlant, whose own logic only ever calls
+// GetPlantDefToGrow() - the other interface members are never touched by it and just throw if
+// something starts relying on them.
+file sealed class FakeGrower(ThingDef? plantDef) : IPlantToGrowSettable
+{
+    public ThingDef? GetPlantDefToGrow() => plantDef;
+
+    public void SetPlantDefToGrow(ThingDef plantDef) => throw new NotImplementedException();
+
+    public bool CanAcceptSowNow() => throw new NotImplementedException();
+
+    public IEnumerable<IntVec3> Cells => throw new NotImplementedException();
+
+    public Map Map => throw new NotImplementedException();
+}
+
+// Covers HysteresisMigration.GroupByTargetPlant's dropping/grouping rules in isolation from the
+// live map scan it's normally fed by.
+[HotSwappable]
+[TestSuite]
+internal static class GroupByTargetPlantTests
+{
+    private static ThingDef HarvestablePlant(string defName) =>
+        new()
+        {
+            defName = defName,
+            plant = new PlantProperties { harvestedThingDef = new ThingDef { label = defName } },
+        };
+
+    private static ThingDef DecorativePlant() => new() { plant = new PlantProperties() };
+
+    [Test]
+    public static void GrowersWithNoPlantChosenAreDropped()
+    {
+        var grower = new FakeGrower(null);
+
+        var groups = GroupByTargetPlant([grower]).ToList();
+
+        Assert.ThatCollection(groups).Is.Empty();
+    }
+
+    [Test]
+    public static void GrowersOfADecorativeOnlyPlantAreDropped()
+    {
+        var grower = new FakeGrower(DecorativePlant());
+
+        var groups = GroupByTargetPlant([grower]).ToList();
+
+        Assert.ThatCollection(groups).Is.Empty();
+    }
+
+    [Test]
+    public static void GrowersOfTheSamePlantLandInOneGroupTogetherInOriginalOrder()
+    {
+        var hops = HarvestablePlant("hops");
+        var growerA = new FakeGrower(hops);
+        var growerB = new FakeGrower(hops);
+
+        var groups = GroupByTargetPlant([growerA, growerB]).ToList();
+
+        Assert.ThatCollection(groups).Has.Count(1);
+        Assert.That(groups[0].PlantDef.defName).Is.EqualTo(hops.defName);
+        Assert.ThatCollection(groups[0].Growers).Has.Count(2);
+        Assert.That(ReferenceEquals(groups[0].Growers[0], growerA)).Is.True();
+        Assert.That(ReferenceEquals(groups[0].Growers[1], growerB)).Is.True();
+    }
+
+    [Test]
+    public static void GrowersOfDifferentPlantsProduceSeparateGroups()
+    {
+        var hops = HarvestablePlant("hops");
+        var rice = HarvestablePlant("rice");
+        var hopsGrower = new FakeGrower(hops);
+        var riceGrower = new FakeGrower(rice);
+
+        var groups = GroupByTargetPlant([hopsGrower, riceGrower]).ToList();
+
+        Assert.ThatCollection(groups).Has.Count(2);
+        Assert.ThatCollection(groups.Select(g => g.PlantDef)).Does.Contain(hops);
+        Assert.ThatCollection(groups.Select(g => g.PlantDef)).Does.Contain(rice);
+    }
+}

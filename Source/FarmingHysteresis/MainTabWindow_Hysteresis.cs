@@ -7,8 +7,18 @@ public class MainButtonWorker_Hysteresis : MainButtonWorker_ToggleTab
 {
     /// <inheritdoc/>
     public override bool Visible =>
-        FarmingHysteresisMod.Settings.ShowHysteresisMainTab
-        && FarmingHysteresisMod.HysteresisController.ShowMainTab;
+        ComputeVisible(
+            FarmingHysteresisMod.Settings.ShowHysteresisMainTab,
+            FarmingHysteresisMod.HysteresisController.ShowMainTab
+        );
+
+    /// <summary>
+    /// Pure AND behind <see cref="Visible"/>, split out so it's unit-testable without the live
+    /// <see cref="FarmingHysteresisMod.Settings"/>/<see cref="FarmingHysteresisMod.HysteresisController"/>
+    /// singletons.
+    /// </summary>
+    internal static bool ComputeVisible(bool showHysteresisMainTab, bool controllerShowMainTab) =>
+        showHysteresisMainTab && controllerShowMainTab;
 }
 
 /// <summary>

@@ -53,7 +53,7 @@ public class FarmingHysteresisGameComponent(Game game) : GameComponent
     }
 
     internal bool HasBoundsFor(ThingDef harvestedThingDef) =>
-        gameBoundValues != null && gameBoundValues.ContainsKey(harvestedThingDef);
+        BoundValuesLookup.HasBounds(gameBoundValues, harvestedThingDef);
 
     /// <summary>
     /// Gets the <see cref="FarmingHysteresisGameComponent"/> for the given <paramref name="game"/>,

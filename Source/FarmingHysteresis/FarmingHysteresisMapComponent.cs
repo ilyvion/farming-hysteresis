@@ -68,7 +68,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
     }
 
     internal bool HasBoundsFor(ThingDef harvestedThingDef) =>
-        globalBoundValues != null && globalBoundValues.ContainsKey(harvestedThingDef);
+        BoundValuesLookup.HasBounds(globalBoundValues, harvestedThingDef);
 
     internal IBoundedValueAccessor GetMapBoundedValueAccessorFor(ThingDef thingDef) =>
         new MapThingDefBoundValueAccessor(this, thingDef);

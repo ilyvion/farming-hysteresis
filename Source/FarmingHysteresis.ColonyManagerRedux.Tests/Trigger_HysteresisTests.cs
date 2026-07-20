@@ -294,3 +294,94 @@ internal static class ShouldAdvanceRotationTests
             )
             .Is.False();
 }
+
+// Covers DescribeTrackedCountNoun's pluralizable-noun logic, tested directly against a bare
+// ThingFilter rather than a live job/trigger.
+[HotSwappable]
+[TestSuite]
+internal static class DescribeTrackedCountNounTests
+{
+    [Test]
+    public static void SingleAllowedDefReturnsItsLabel()
+    {
+        var beer = new ThingDef { label = "beer" };
+        var filter = new ThingFilter();
+        SyncFilterToSingleDef(filter, beer);
+
+        var result = DescribeTrackedCountNoun(filter);
+
+        Assert.That(result).Is.EqualTo("beer");
+    }
+
+    [Test]
+    public static void NoAllowedDefsReturnsTheGenericNoun()
+    {
+        var filter = new ThingFilter();
+
+        var result = DescribeTrackedCountNoun(filter);
+
+        Assert.That(result).Is.Not.Null();
+        Assert.That(result).Is.Not.EqualTo("");
+    }
+
+    [Test]
+    public static void MultipleAllowedDefsReturnsTheGenericNounNotAnyIndividualLabel()
+    {
+        var hops = new ThingDef { label = "hops" };
+        var beer = new ThingDef { label = "beer" };
+        var filter = new ThingFilter();
+        SyncFilterToDefs(filter, [hops, beer]);
+
+        var result = DescribeTrackedCountNoun(filter);
+
+        Assert.That(result).Is.Not.EqualTo("hops");
+        Assert.That(result).Is.Not.EqualTo("beer");
+    }
+}
+
+// Covers DescribeTrackedFilter's 3-way None/single-label/Multiple summary, tested directly
+// against a bare ThingFilter rather than a live job/trigger.
+[HotSwappable]
+[TestSuite]
+internal static class DescribeTrackedFilterTests
+{
+    [Test]
+    public static void NoAllowedDefsReturnsTheNoneSummary()
+    {
+        var filter = new ThingFilter();
+
+        var result = DescribeTrackedFilter(filter);
+
+        Assert.That(result).Is.Not.Null();
+        Assert.That(result).Is.Not.EqualTo("");
+    }
+
+    [Test]
+    public static void SingleAllowedDefReturnsItsLabel()
+    {
+        var beer = new ThingDef { label = "beer" };
+        var filter = new ThingFilter();
+        SyncFilterToSingleDef(filter, beer);
+
+        var result = DescribeTrackedFilter(filter);
+
+        Assert.That(result).Is.EqualTo("beer");
+    }
+
+    [Test]
+    public static void MultipleAllowedDefsReturnsAMultipleSummaryMentioningTheCount()
+    {
+        var hops = new ThingDef { label = "hops" };
+        var beer = new ThingDef { label = "beer" };
+        var rice = new ThingDef { label = "rice" };
+        var filter = new ThingFilter();
+        SyncFilterToDefs(filter, [hops, beer, rice]);
+
+        var result = DescribeTrackedFilter(filter);
+
+        Assert.That(result).Is.Not.EqualTo("hops");
+        Assert.That(result).Is.Not.EqualTo("beer");
+        Assert.That(result).Is.Not.EqualTo("rice");
+        Assert.ThatCollection(result.Split(' ')).Does.Contain("3");
+    }
+}

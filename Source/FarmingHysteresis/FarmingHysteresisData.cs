@@ -22,6 +22,19 @@ internal class BoundValues : IExposable
     }
 }
 
+/// <summary>
+/// Shared "does this dictionary of bound values have an entry for this key" check behind
+/// <see cref="FarmingHysteresisGameComponent.HasBoundsFor"/> and
+/// <see cref="FarmingHysteresisMapComponent.HasBoundsFor"/>, split out so it's unit-testable
+/// against a bare <see cref="Dictionary{TKey, TValue}"/> without either component's own
+/// constructor-guarded <see cref="Map"/>/<see cref="Game"/> dependency.
+/// </summary>
+internal static class BoundValuesLookup
+{
+    internal static bool HasBounds<TKey>(Dictionary<TKey, BoundValues>? values, TKey key)
+        where TKey : notnull => values != null && values.ContainsKey(key);
+}
+
 internal class FarmingHysteresisData : IBoundedValueAccessor
 {
     private readonly System.WeakReference<IPlantToGrowSettable> _plantGrowerWeakReference;
