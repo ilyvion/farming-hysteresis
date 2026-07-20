@@ -14,7 +14,7 @@ internal static class RimWorld_VersionUpdateDialogMaker_CreateVersionUpdateDialo
 
     private static bool ShownThisTime;
 
-    private static bool IsIlyvionLaboratoryActive() =>
+    private static bool IsIlyvionLaboratoryInactive() =>
 #if v1_3
         ModLister.GetActiveModWithIdentifier("ilyvion.laboratory") == null;
 #else
@@ -24,7 +24,7 @@ internal static class RimWorld_VersionUpdateDialogMaker_CreateVersionUpdateDialo
     private static void Postfix()
     {
         if (
-            IsIlyvionLaboratoryActive()
+            IsIlyvionLaboratoryInactive()
             && FarmingHysteresisMod.Settings.ShowIlyvionLaboratoryWarning
             && !ShownThisTime
         )
