@@ -228,6 +228,21 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
         }
     }
 
+    /// <summary>
+    /// Seeds the currently-selected bounds tier's raw <see cref="BoundValues"/> with
+    /// <paramref name="lower"/>/<paramref name="upper"/> directly, without going through the
+    /// <see cref="LowerBound"/>/<see cref="UpperBound"/> setters. Those setters each clamp
+    /// against the *other* bound's current value, so assigning them one at a time when seeding
+    /// a fresh tier (still holding its own default bounds) can silently corrupt the seeded
+    /// value regardless of assignment order.
+    /// </summary>
+    internal void SeedBounds(int lower, int upper)
+    {
+        var values = GetBoundedValueAccessor().BoundValueRaw;
+        values.Lower = lower;
+        values.Upper = upper;
+    }
+
     internal bool Enabled => _enabled;
 
     internal void Enable(IPlantToGrowSettable plantToGrowSettable)

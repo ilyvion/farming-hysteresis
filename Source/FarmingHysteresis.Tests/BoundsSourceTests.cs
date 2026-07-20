@@ -44,3 +44,26 @@ internal static class BoundsSourceUiShouldSeedOnSwitchTests
         Assert.That(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Game, true)).Is.False();
     }
 }
+
+[HotSwappable]
+[TestSuite]
+internal static class FarmingHysteresisDataSeedBoundsTests
+{
+    // Regression test: switching to a fresh Map/Game tier used to seed it by
+    // assigning LowerBound then UpperBound through the clamped property setters. Since a
+    // fresh tier still holds its own default bounds at that point, seeding a lower value
+    // above the still-default upper bound got silently clamped down instead of applied.
+    [Test]
+    public static void SeedBoundsAppliesBothValuesEvenWhenSeededLowerExceedsThePriorUpper()
+    {
+        var data = new FarmingHysteresisData(null!) { boundsSource = BoundsSource.Self };
+        var priorUpper = data.UpperBound;
+        var seededLower = priorUpper + 1000;
+        var seededUpper = priorUpper + 2000;
+
+        data.SeedBounds(seededLower, seededUpper);
+
+        Assert.That(data.LowerBound).Is.EqualTo(seededLower);
+        Assert.That(data.UpperBound).Is.EqualTo(seededUpper);
+    }
+}

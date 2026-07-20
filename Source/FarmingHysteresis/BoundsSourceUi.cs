@@ -85,8 +85,7 @@ internal static class BoundsSourceUi
 
             if (shouldSeed)
             {
-                data.LowerBound = currentLower;
-                data.UpperBound = currentUpper;
+                data.SeedBounds(currentLower, currentUpper);
             }
 
             onSwitched?.Invoke();
