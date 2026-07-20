@@ -161,10 +161,16 @@ internal class ITab_Hysteresis : ITab
             Rect harvestLabelRect = new(
                 ProductIconSize + (2 * ProductRowPadding),
                 rowY,
-                rowRect.width - ProductIconSize + (2 * ProductRowPadding),
+                rowRect.width - (ProductIconSize + (2 * ProductRowPadding)),
                 rowRect.height
             );
             Rect harvestIconRect = new(5f, rowY + 5f, ProductIconSize, ProductIconSize);
+
+            IlyvionDebugViewSettings.DrawIfUIHelpers(() =>
+            {
+                Widgets.DrawRectFast(harvestLabelRect, ColorLibrary.PaleGreen.ToTransparent(.5f));
+                Widgets.DrawRectFast(harvestIconRect, ColorLibrary.PaleBlue.ToTransparent(.5f));
+            });
 
             GUI.color = new Color(1f, 1f, 1f, 0.5f);
             Widgets.DrawHighlightIfMouseover(rowRect);
