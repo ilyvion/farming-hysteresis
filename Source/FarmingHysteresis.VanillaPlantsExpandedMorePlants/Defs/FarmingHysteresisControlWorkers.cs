@@ -17,10 +17,19 @@ internal sealed class FarmingHysteresisControlWorker_Zone_GrowingAquatic
     public override bool HandleAllowSow => true;
 
     public override bool GetAllowSow(IPlantToGrowSettable plantGrower) =>
-        ((Zone_GrowingAquatic)plantGrower).allowSow;
+        plantGrower == null
+            ? throw new ArgumentNullException(nameof(plantGrower))
+            : ((Zone_GrowingAquatic)plantGrower).allowSow;
 
-    public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value) =>
+    public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
+    {
+        if (plantGrower == null)
+        {
+            throw new ArgumentNullException(nameof(plantGrower));
+        }
+
         ((Zone_GrowingAquatic)plantGrower).allowSow = value;
+    }
 }
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage(
@@ -37,8 +46,17 @@ internal sealed class FarmingHysteresisControlWorker_Zone_GrowingSandy
     public override bool HandleAllowSow => true;
 
     public override bool GetAllowSow(IPlantToGrowSettable plantGrower) =>
-        ((Zone_GrowingSandy)plantGrower).allowSow;
+        plantGrower == null
+            ? throw new ArgumentNullException(nameof(plantGrower))
+            : ((Zone_GrowingSandy)plantGrower).allowSow;
 
-    public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value) =>
+    public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
+    {
+        if (plantGrower == null)
+        {
+            throw new ArgumentNullException(nameof(plantGrower));
+        }
+
         ((Zone_GrowingSandy)plantGrower).allowSow = value;
+    }
 }

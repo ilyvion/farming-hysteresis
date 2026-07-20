@@ -63,15 +63,12 @@ internal static class FarmingHysteresisDataSelectAccessorTests
     }
 
     [Test]
+    [ShouldThrow(typeof(InvalidOperationException))]
     public static void UncoveredBoundsSourceThrows() =>
-        Assert
-            .ThatFunc(() =>
-                FarmingHysteresisData.SelectAccessor(
-                    (BoundsSource)99,
-                    SelfAccessor,
-                    () => MapAccessor,
-                    () => GameAccessor
-                )
-            )
-            .Does.Throw();
+        FarmingHysteresisData.SelectAccessor(
+            (BoundsSource)99,
+            SelfAccessor,
+            () => MapAccessor,
+            () => GameAccessor
+        );
 }

@@ -74,8 +74,8 @@ internal static class BoundsSourceUiLabelTests
     }
 
     [Test]
-    public static void UncoveredBoundsSourceThrows() =>
-        Assert.ThatFunc(() => BoundsSourceUi.Label((BoundsSource)99)).Does.Throw();
+    [ShouldThrow(typeof(InvalidOperationException))]
+    public static void UncoveredBoundsSourceThrows() => BoundsSourceUi.Label((BoundsSource)99);
 }
 
 [HotSwappable]
