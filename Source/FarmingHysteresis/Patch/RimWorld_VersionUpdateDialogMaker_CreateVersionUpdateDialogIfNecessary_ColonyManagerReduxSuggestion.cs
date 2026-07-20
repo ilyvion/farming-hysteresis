@@ -1,3 +1,4 @@
+#if v1_5 || v1_6
 using Verse.Steam;
 
 namespace FarmingHysteresis.Patch;
@@ -69,3 +70,4 @@ internal static class RimWorld_VersionUpdateDialogMaker_CreateVersionUpdateDialo
         }
     }
 }
+#endif

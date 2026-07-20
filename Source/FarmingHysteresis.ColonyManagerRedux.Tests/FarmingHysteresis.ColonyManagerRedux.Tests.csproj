@@ -4,6 +4,7 @@
         <RootNamespace>FarmingHysteresis.ColonyManagerRedux.Tests</RootNamespace>
         <AssemblyName>FarmingHysteresis.ColonyManagerRedux.Tests</AssemblyName>
         <OutputPath>../../Integrations/ColonyManagerRedux/$(RimWorldVersion)/Assemblies</OutputPath>
+        <SupportedRimWorldVersions>1.5;1.6</SupportedRimWorldVersions>
     </PropertyGroup>
     <!--
         Dev-only test assembly for the Colony Manager Redux integration, built and run in-game

@@ -6,6 +6,7 @@
 
     <PropertyGroup>
         <OutputPath>../../Integrations/ColonyManagerRedux/$(RimWorldVersion)/Assemblies</OutputPath>
+        <SupportedRimWorldVersions>1.5;1.6</SupportedRimWorldVersions>
     </PropertyGroup>
 
     <ItemGroup>
