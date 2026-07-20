@@ -40,7 +40,7 @@
             defeating the point of that folder being gated behind Colony Manager Redux actually
             being installed.
         -->
-        <ProjectReference Include="..\..\..\colony-manager-redux\Source\ColonyManagerRedux\ColonyManagerRedux.csproj">
+        <ProjectReference Include="$(ProjectDependenciesBasePath)\colony-manager-redux\Source\ColonyManagerRedux\ColonyManagerRedux.csproj">
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
         </ProjectReference>

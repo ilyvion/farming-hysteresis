@@ -21,7 +21,7 @@
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
         </ProjectReference>
-        <ProjectReference Include="..\..\..\colony-manager-redux\Source\ColonyManagerRedux\ColonyManagerRedux.csproj">
+        <ProjectReference Include="$(ProjectDependenciesBasePath)\colony-manager-redux\Source\ColonyManagerRedux\ColonyManagerRedux.csproj">
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
         </ProjectReference>

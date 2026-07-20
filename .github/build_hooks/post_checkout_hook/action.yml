@@ -6,3 +6,15 @@ runs:
           with:
               repository: "ilyvion/ilyvion-laboratory"
               path: "ilyvion.Laboratory"
+
+        - name: Checkout Colony Manager Redux Repository
+          uses: actions/checkout@v4
+          with:
+              repository: "ilyvion/colony-manager-redux"
+              path: "colony-manager-redux"
+
+        - name: Move dependencies to parent, where they're expected
+          shell: bash
+          run: |
+              mv ilyvion.Laboratory ..
+              mv colony-manager-redux ..
