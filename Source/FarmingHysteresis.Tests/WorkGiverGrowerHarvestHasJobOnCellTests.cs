@@ -10,6 +10,8 @@ internal static class WorkGiverGrowerHarvestHasJobOnCellTests
     // Regression test: a grower whose hysteresis was disabled while its persisted
     // allowHarvest flag happened to be false used to stay permanently blocked from
     // harvesting, because the postfix applied that stale flag regardless of Enabled.
+    // FarmingHysteresis.VanillaPlantsExpandedMorePlants's aquatic/sandy postfixes now
+    // route through this same ComputeResult, so this suite guards those too.
     [Test]
     public static void DisabledGrowerLeavesOriginalResultUntouched() =>
         Assert

@@ -1,5 +1,6 @@
 using FarmingHysteresis.ITabs;
 using VanillaPlantsExpandedMorePlants;
+using CoreZoneGetInspectTabs = FarmingHysteresis.Patch.Zone_GetInspectTabs;
 
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Patch;
 
@@ -14,15 +15,10 @@ internal static class Zone_GetInspectTabs
     private static IEnumerable<InspectTabBase> Postfix(
         IEnumerable<InspectTabBase> values,
         Zone __instance
-    )
-    {
-        if (__instance is not Zone_GrowingAquatic and not Zone_GrowingSandy)
-        {
-            return values;
-        }
-
-        values = values == null ? ITabs : values.Concat(ITabs);
-
-        return values;
-    }
+    ) =>
+        CoreZoneGetInspectTabs.ComputeInspectTabs(
+            __instance is Zone_GrowingAquatic or Zone_GrowingSandy,
+            values,
+            ITabs
+        )!;
 }

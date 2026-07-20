@@ -47,6 +47,39 @@ internal static class BoundsSourceUiShouldSeedOnSwitchTests
 
 [HotSwappable]
 [TestSuite]
+internal static class BoundsSourceUiLabelTests
+{
+    [Test]
+    public static void SelfReturnsNonEmptyString()
+    {
+        var result = BoundsSourceUi.Label(BoundsSource.Self);
+        Assert.That(result).Is.Not.Null();
+        Assert.That(result).Is.Not.EqualTo("");
+    }
+
+    [Test]
+    public static void MapReturnsNonEmptyString()
+    {
+        var result = BoundsSourceUi.Label(BoundsSource.Map);
+        Assert.That(result).Is.Not.Null();
+        Assert.That(result).Is.Not.EqualTo("");
+    }
+
+    [Test]
+    public static void GameReturnsNonEmptyString()
+    {
+        var result = BoundsSourceUi.Label(BoundsSource.Game);
+        Assert.That(result).Is.Not.Null();
+        Assert.That(result).Is.Not.EqualTo("");
+    }
+
+    [Test]
+    public static void UncoveredBoundsSourceThrows() =>
+        Assert.ThatFunc(() => BoundsSourceUi.Label((BoundsSource)99)).Does.Throw();
+}
+
+[HotSwappable]
+[TestSuite]
 internal static class FarmingHysteresisDataSeedBoundsTests
 {
     // Regression test: switching to a fresh Map/Game tier used to seed it by

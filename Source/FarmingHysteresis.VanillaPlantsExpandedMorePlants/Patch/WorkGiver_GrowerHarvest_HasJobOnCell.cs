@@ -1,4 +1,5 @@
 using FarmingHysteresis.Extensions;
+using FarmingHysteresis.Patch;
 using VanillaPlantsExpandedMorePlants;
 
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Patch;
@@ -18,7 +19,12 @@ internal static class WorkGiver_GrowerHarvestAquatic_HasJobOnCell
             // allowed, override it with what the hysteresis value is at any given time.
             if (c.GetZone(pawn.Map) is Zone_GrowingAquatic zoneGrowingAquatic)
             {
-                __result = zoneGrowingAquatic.GetAllowHarvest();
+                var data = zoneGrowingAquatic.GetFarmingHysteresisData();
+                __result = WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
+                    __result,
+                    data.Enabled,
+                    zoneGrowingAquatic.GetAllowHarvest()
+                );
             }
         }
     }
@@ -39,7 +45,12 @@ internal static class WorkGiver_GrowerHarvestSandy_HasJobOnCell
             // allowed, override it with what the hysteresis value is at any given time.
             if (c.GetZone(pawn.Map) is Zone_GrowingSandy zoneGrowingSandy)
             {
-                __result = zoneGrowingSandy.GetAllowHarvest();
+                var data = zoneGrowingSandy.GetFarmingHysteresisData();
+                __result = WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
+                    __result,
+                    data.Enabled,
+                    zoneGrowingSandy.GetAllowHarvest()
+                );
             }
         }
     }
