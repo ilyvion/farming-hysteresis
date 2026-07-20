@@ -142,4 +142,29 @@ internal static class PlantToGrowSettableExtensionsResolveControlDefTests
 
         Assert.That(result is null).Is.True();
     }
+
+    // Regression guard: two defs colliding on the same controlledClass must not crash
+    // the job-search hot path via SingleOrDefault - resolution degrades to picking one of them,
+    // while FarmingHysteresisControlDefTests.ConfigErrors is what surfaces the collision to the modder.
+    [Test]
+    public static void DuplicateExactControlledClassDoesNotThrowAndPicksOne()
+    {
+        var first = new FarmingHysteresisControlDef
+        {
+            defName = "First",
+            controlledClass = typeof(Zone_Growing),
+        };
+        var second = new FarmingHysteresisControlDef
+        {
+            defName = "Second",
+            controlledClass = typeof(Zone_Growing),
+        };
+
+        var result = PlantToGrowSettableExtensions.ResolveControlDef(
+            [first, second],
+            typeof(Zone_Growing)
+        );
+
+        Assert.That(result?.defName).Is.EqualTo("First");
+    }
 }

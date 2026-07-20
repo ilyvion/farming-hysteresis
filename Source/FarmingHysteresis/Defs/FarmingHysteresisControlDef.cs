@@ -40,6 +40,36 @@ public class FarmingHysteresisControlDef : Def
     /// <summary>The <see cref="IPlantToGrowSettable"/> implementation this def controls.</summary>
     public Type controlledClass = typeof(IPlantToGrowSettable);
 
+    /// <inheritdoc/>
+    public override IEnumerable<string> ConfigErrors()
+    {
+        foreach (var error in base.ConfigErrors())
+        {
+            yield return error;
+        }
+
+        foreach (
+            var error in FindControlledClassCollisions(
+                DefDatabase<FarmingHysteresisControlDef>.AllDefsListForReading,
+                this
+            )
+        )
+        {
+            yield return error;
+        }
+    }
+
+    /// <summary>Pure logic behind <see cref="ConfigErrors"/>'s cross-def check: yields one error per other def in <paramref name="allDefs"/> that claims the same <see cref="controlledClass"/> as <paramref name="def"/>.</summary>
+    internal static IEnumerable<string> FindControlledClassCollisions(
+        IEnumerable<FarmingHysteresisControlDef> allDefs,
+        FarmingHysteresisControlDef def
+    ) =>
+        allDefs
+            .Where(d => d != def && d.controlledClass == def.controlledClass)
+            .Select(other =>
+                $"controlledClass {def.controlledClass.FullName} is already controlled by {other.defName}"
+            );
+
     /// <summary>
     /// Gets the worker instance for this def, created from <see cref="workerClass"/> on first access.
     /// </summary>

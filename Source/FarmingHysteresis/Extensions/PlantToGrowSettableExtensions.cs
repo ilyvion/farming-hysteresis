@@ -14,15 +14,15 @@ internal static class PlantToGrowSettableExtensions
 
     private static readonly Dictionary<Type, FarmingHysteresisControlDef> controlDefCache = [];
 
-    /// <summary>Pure lookup logic behind <see cref="GetControlDefForPlantGrower"/>'s def resolution: an exact <see cref="FarmingHysteresisControlDef.controlledClass"/> match wins, falling back to the first def whose <c>controlledClass</c> is assignable from <paramref name="type"/>.</summary>
+    /// <summary>Pure lookup logic behind <see cref="GetControlDefForPlantGrower"/>'s def resolution: an exact <see cref="FarmingHysteresisControlDef.controlledClass"/> match wins, falling back to the first def whose <c>controlledClass</c> is assignable from <paramref name="type"/>. If more than one def claims the same <c>controlledClass</c>, this arbitrarily picks the first rather than throwing; <see cref="FarmingHysteresisControlDef.ConfigErrors"/> is what surfaces that collision to the modder.</summary>
     internal static FarmingHysteresisControlDef? ResolveControlDef(
         IEnumerable<FarmingHysteresisControlDef> defs,
         Type type
     )
     {
         var defList = defs as IReadOnlyCollection<FarmingHysteresisControlDef> ?? [.. defs];
-        return defList.SingleOrDefault(d => d.controlledClass == type)
-            ?? defList.SingleOrDefault(d => d.controlledClass.IsAssignableFrom(type));
+        return defList.FirstOrDefault(d => d.controlledClass == type)
+            ?? defList.FirstOrDefault(d => d.controlledClass.IsAssignableFrom(type));
     }
 
     private static FarmingHysteresisControlDef GetControlDefForPlantGrower(
