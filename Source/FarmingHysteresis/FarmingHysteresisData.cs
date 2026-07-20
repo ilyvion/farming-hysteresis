@@ -252,83 +252,70 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 
         var values = GetBoundedValueAccessor();
 
-        // First, check the simple cases
-        if (harvestedThingCount < values.BoundValueRaw.Lower)
-        {
-            // Below lower bound: Enabled
-            latchMode = LatchMode.BelowLowerBound;
-        }
-        else if (harvestedThingCount > values.BoundValueRaw.Upper)
-        {
-            // Above upper bound: Disabled
-            latchMode = LatchMode.AboveUpperBound;
-        }
-        else
-        {
-            // We know harvestedThingCount is between lower and upper bound
-            // at this point thanks to the above checks.
-
-            switch (latchMode)
-            {
-                case LatchMode.BelowLowerBound:
-                case LatchMode.Unknown:
-                    // If we were previously below the lower bound, it's time to enter
-                    // the "above lower bound enabled" state.
-                    if (harvestedThingCount > values.BoundValueRaw.Lower)
-                    {
-                        latchMode = LatchMode.BetweenBoundsEnabled;
-                    }
-                    break;
-
-                case LatchMode.AboveUpperBound:
-                    // If we were previously above the upper bound, it's time to enter
-                    // the "above lower bound disabled" state.
-                    if (harvestedThingCount < values.BoundValueRaw.Upper)
-                    {
-                        latchMode = LatchMode.BetweenBoundsDisabled;
-                    }
-                    break;
-
-                case LatchMode.BetweenBoundsEnabled:
-                case LatchMode.BetweenBoundsDisabled:
 #if !v1_5_OR_GREATER
 #pragma warning disable CS0612
-                case LatchMode.AboveLowerBoundDisabled:
-                case LatchMode.AboveLowerBoundEnabled:
-#pragma warning restore CS0612
-#endif
-                default:
-                    break;
-            }
-        }
-
-        switch (latchMode)
+        // Deprecated pre-1.5 latch values are converted to their modern equivalent on load
+        // (see LatchMode.cs); if one somehow survives to here, leave it alone rather than
+        // running it through the modern transition/resolution logic below.
+        if (latchMode is LatchMode.AboveLowerBoundDisabled or LatchMode.AboveLowerBoundEnabled)
         {
-            case LatchMode.AboveUpperBound:
-            case LatchMode.BetweenBoundsDisabled:
-                plantToGrowSettable.SetHysteresisControlState(false);
-                break;
-
-            case LatchMode.BelowLowerBound:
-            case LatchMode.BetweenBoundsEnabled:
-                plantToGrowSettable.SetHysteresisControlState(true);
-                break;
-
-#if !v1_5_OR_GREATER
-#pragma warning disable CS0612
-            case LatchMode.AboveLowerBoundDisabled:
-            case LatchMode.AboveLowerBoundEnabled:
-                break;
+            return;
+        }
 #pragma warning restore CS0612
 #endif
 
-            case LatchMode.Unknown:
-            default:
-                throw new InvalidOperationException(
-                    $"We should never be in this state. This is a bug! State was {latchMode}."
-                );
-        }
+        latchMode = ComputeNextLatchMode(
+            latchMode,
+            harvestedThingCount,
+            values.BoundValueRaw.Lower,
+            values.BoundValueRaw.Upper
+        );
+
+        plantToGrowSettable.SetHysteresisControlState(ResolveControlState(latchMode));
     }
+
+    /// <summary>
+    /// Pure hysteresis transition table - identical to
+    /// <c>Trigger_Hysteresis.ComputeNextLatchMode</c> in
+    /// <c>Source/FarmingHysteresis.ColonyManagerRedux</c>, the CMR port of this same logic.
+    /// Split out here so it's unit-testable without a live grower, and so an unresolved
+    /// <see cref="LatchMode.Unknown"/> (e.g. the harvested count sitting exactly at
+    /// <paramref name="lower"/> on first evaluation) has a definite fallback instead of getting
+    /// stuck.
+    /// </summary>
+    internal static LatchMode ComputeNextLatchMode(
+        LatchMode current,
+        int count,
+        int lower,
+        int upper
+    ) =>
+        count < lower ? LatchMode.BelowLowerBound
+        : count > upper ? LatchMode.AboveUpperBound
+        : current switch
+        {
+            LatchMode.BelowLowerBound or LatchMode.Unknown => count > lower
+                ? LatchMode.BetweenBoundsEnabled
+                : current,
+            LatchMode.AboveUpperBound => count < upper ? LatchMode.BetweenBoundsDisabled : current,
+            LatchMode.BetweenBoundsEnabled
+            or LatchMode.BetweenBoundsDisabled
+#if !v1_5_OR_GREATER
+#pragma warning disable 612
+            or LatchMode.AboveLowerBoundEnabled
+            or LatchMode.AboveLowerBoundDisabled
+#pragma warning restore 612
+#endif
+            => current,
+            _ => current,
+        };
+
+    /// <summary>
+    /// Pure resolution from latch state to hysteresis control state. An unresolved
+    /// <see cref="LatchMode.Unknown"/> resolves to disabled rather than throwing, matching
+    /// <c>Trigger_Hysteresis.State</c> in <c>Source/FarmingHysteresis.ColonyManagerRedux</c>.
+    /// </summary>
+    internal static bool ResolveControlState(LatchMode latchMode) =>
+        latchMode is LatchMode.BelowLowerBound or LatchMode.BetweenBoundsEnabled;
 
     internal void DisableDueToMissingHarvestedThingDef(
         IPlantToGrowSettable plantToGrowSettable,
