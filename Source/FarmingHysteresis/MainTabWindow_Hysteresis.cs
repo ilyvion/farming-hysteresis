@@ -280,6 +280,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         var buffer = boundLowerBuffers[harvestDef];
         _ = listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
+        value = ClampLowerBound(value, bounds[harvestDef].Upper);
         boundLowerBuffers[harvestDef] = buffer;
         listingStandard.End();
 
@@ -307,11 +308,37 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         var buffer = boundUpperBuffers[harvestDef];
         _ = listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
+        value = ClampUpperBound(value, bounds[harvestDef].Lower);
         boundUpperBuffers[harvestDef] = buffer;
         listingStandard.End();
 
         return upperBoundRect;
     }
+
+    /// <summary>
+    /// Clamps a candidate lower-bound value to the same rules as
+    /// <see cref="FarmingHysteresisData.LowerBound"/>'s setter: never below zero, never above
+    /// the current upper bound.
+    /// </summary>
+    internal static int ClampLowerBound(int value, int upper)
+    {
+        if (value < 0)
+        {
+            return 0;
+        }
+        else if (value > upper)
+        {
+            return upper;
+        }
+        return value;
+    }
+
+    /// <summary>
+    /// Clamps a candidate upper-bound value to the same rules as
+    /// <see cref="FarmingHysteresisData.UpperBound"/>'s setter: never below the current lower
+    /// bound.
+    /// </summary>
+    internal static int ClampUpperBound(int value, int lower) => value < lower ? lower : value;
 
     // private void DoSomethingElsePage(Rect rect2)
     // {
