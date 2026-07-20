@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Growing zones and hydroponics basins using 'Map' bounds now always check against the bounds of the map they're actually on, instead of whichever map you currently have open.
 - Fixed a crash that could permanently disable hysteresis on a grower if its harvested-item count happened to land exactly on the lower bound the very first time it was checked (e.g. right after loading a save or enabling hysteresis).
+- Fixed harvesting staying permanently blocked on a growing zone or plant grower after turning hysteresis off for it, if harvesting happened to be latched shut at the moment it was disabled.
 
 ## [0.9.2] - 2025-07-20
 
