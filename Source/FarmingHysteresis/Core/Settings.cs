@@ -172,25 +172,13 @@ public class Settings : ModSettings
         Listing_Standard listingStandard = new();
         listingStandard.Begin(inRect);
 
-#if v1_3
         if (
-            listingStandard.ButtonTextLabeled(
+            listingStandard.ButtonTextLabeledCompat(
                 "FarmingHysteresis.HysteresisMode".Translate(),
                 "FarmingHysteresis.Control".Translate(_hysteresisMode.AsString())
             )
         )
         {
-#else
-        if (
-            listingStandard.ButtonTextLabeledPct(
-                "FarmingHysteresis.HysteresisMode".Translate(),
-                "FarmingHysteresis.Control".Translate(_hysteresisMode.AsString()),
-                0.6f,
-                TextAnchor.MiddleLeft
-            )
-        )
-        {
-#endif
             List<FloatMenuOption> list =
             [
                 new FloatMenuOption(
@@ -252,23 +240,12 @@ public class Settings : ModSettings
             "FarmingHysteresis.EnabledByDefault".Translate(),
             ref _enabledByDefault
         );
-#if v1_3
         if (
-            listingStandard.ButtonTextLabeled(
+            listingStandard.ButtonTextLabeledCompat(
                 "FarmingHysteresis.DefaultBoundsSource".Translate(),
                 BoundsSourceUi.Label(_defaultBoundsSource)
             )
         )
-#else
-        if (
-            listingStandard.ButtonTextLabeledPct(
-                "FarmingHysteresis.DefaultBoundsSource".Translate(),
-                BoundsSourceUi.Label(_defaultBoundsSource),
-                0.6f,
-                TextAnchor.MiddleLeft
-            )
-        )
-#endif
         {
             List<FloatMenuOption> boundsSourceOptions =
             [

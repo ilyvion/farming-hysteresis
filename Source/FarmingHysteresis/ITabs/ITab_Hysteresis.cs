@@ -77,23 +77,12 @@ internal class ITab_Hysteresis : ITab
         listingStandard.GapLine(ProductRowPadding);
         listingStandard.Gap(5f);
 
-#if v1_3
         if (
-            listingStandard.ButtonTextLabeled(
+            listingStandard.ButtonTextLabeledCompat(
                 "FarmingHysteresis.BoundsSourceLabel".Translate(),
                 BoundsSourceUi.Label(_boundsSource)
             )
         )
-#else
-        if (
-            listingStandard.ButtonTextLabeledPct(
-                "FarmingHysteresis.BoundsSourceLabel".Translate(),
-                BoundsSourceUi.Label(_boundsSource),
-                0.6f,
-                TextAnchor.MiddleLeft
-            )
-        )
-#endif
         {
             BoundsSourceUi.OpenFloatMenu(
                 data,
