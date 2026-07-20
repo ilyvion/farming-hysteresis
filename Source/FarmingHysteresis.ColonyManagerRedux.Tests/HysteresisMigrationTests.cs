@@ -148,6 +148,58 @@ internal static class ShouldBeginMigrationGateTests
     }
 }
 
+// Regression guard for the rule ApplyControllerState uses to pick between CmrHysteresisController
+// and DefaultHysteresisController - the CMR controller should only ever be active when takeover is
+// on and the current save isn't still being suppressed by the migration gate.
+[HotSwappable]
+[TestSuite]
+internal static class ComputeShouldUseCmrControllerTests
+{
+    [Test]
+    public static void UsesCmrOnlyWhenTakeoverIsOnAndNotSuppressed() =>
+        Assert
+            .That(
+                ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
+                    takeOverHysteresisControl: true,
+                    isCurrentSaveSuppressingTakeover: false
+                )
+            )
+            .Is.True();
+
+    [Test]
+    public static void DoesNotUseCmrWhenTakeoverIsOff() =>
+        Assert
+            .That(
+                ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
+                    takeOverHysteresisControl: false,
+                    isCurrentSaveSuppressingTakeover: false
+                )
+            )
+            .Is.False();
+
+    [Test]
+    public static void DoesNotUseCmrWhenSuppressed() =>
+        Assert
+            .That(
+                ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
+                    takeOverHysteresisControl: true,
+                    isCurrentSaveSuppressingTakeover: true
+                )
+            )
+            .Is.False();
+
+    [Test]
+    public static void DoesNotUseCmrWhenTakeoverIsOffAndSuppressed() =>
+        Assert
+            .That(
+                ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
+                    takeOverHysteresisControl: false,
+                    isCurrentSaveSuppressingTakeover: true
+                )
+            )
+            .Is.False();
+}
+
 // A Farming Hysteresis job must never be allowed to act on its growers while CMR isn't genuinely
 // the active controller, even if the job itself would otherwise be managed.
 [HotSwappable]

@@ -409,6 +409,35 @@ internal static class ComputeRoundRobinActiveEntryIdTests
     }
 }
 
+// Minimal IPlantToGrowSettable stand-in for GrowerLabel's fallback branch - neither a Zone nor a
+// Thing, so it should fall through to the type-name case.
+file sealed class FakeGrower : IPlantToGrowSettable
+{
+    public ThingDef? GetPlantDefToGrow() => throw new NotImplementedException();
+
+    public void SetPlantDefToGrow(ThingDef plantDef) => throw new NotImplementedException();
+
+    public bool CanAcceptSowNow() => throw new NotImplementedException();
+
+    public IEnumerable<IntVec3> Cells => throw new NotImplementedException();
+
+    public Map Map => throw new NotImplementedException();
+}
+
+// Covers GrowerLabel's fallback branch for a grower that's neither a Zone nor a Thing.
+[HotSwappable]
+[TestSuite]
+internal static class GrowerLabelTests
+{
+    [Test]
+    public static void FallsBackToTheGrowerTypeNameForAnUnrecognizedGrowerType()
+    {
+        var grower = new FakeGrower();
+
+        Assert.That(GrowerLabel(grower)).Is.EqualTo(grower.GetType().Name);
+    }
+}
+
 // Regression guard: a grower still holding a plant that isn't the active rotation entry's crop
 // must be detected regardless of what else is standing in it, so the outgoing crop doesn't get
 // stranded during a rotation switch.

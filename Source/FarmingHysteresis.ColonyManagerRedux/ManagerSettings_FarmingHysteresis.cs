@@ -89,9 +89,20 @@ internal sealed class ManagerSettings_FarmingHysteresis : ManagerSettings
     /// suppressed", matching pre-migration-gate behavior at the main menu).
     /// </summary>
     internal void ApplyControllerState() =>
-        FarmingHysteresisMod.HysteresisController =
-            TakeOverHysteresisControl
-            && !CmrMigrationGameComponent.IsCurrentSaveSuppressingTakeover()
-                ? CmrHysteresisController.Instance
-                : DefaultHysteresisController.Instance;
+        FarmingHysteresisMod.HysteresisController = ComputeShouldUseCmrController(
+            TakeOverHysteresisControl,
+            CmrMigrationGameComponent.IsCurrentSaveSuppressingTakeover()
+        )
+            ? CmrHysteresisController.Instance
+            : DefaultHysteresisController.Instance;
+
+    /// <summary>
+    /// Pure dispatch behind <see cref="ApplyControllerState"/> - whether the CMR controller should
+    /// be the effective one, given the two flags that decide it. Split out as a static method so
+    /// it's unit-testable without touching the live controller singletons.
+    /// </summary>
+    internal static bool ComputeShouldUseCmrController(
+        bool takeOverHysteresisControl,
+        bool isCurrentSaveSuppressingTakeover
+    ) => takeOverHysteresisControl && !isCurrentSaveSuppressingTakeover;
 }

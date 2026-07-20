@@ -628,7 +628,7 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     /// already acted on it (switched to <see cref="DualCropTrackingMode.Both"/>) or detached the
     /// filter from the target plant entirely.
     /// </summary>
-    private static string? DescribeUntrackedProductHint(CropRotationEntry entry)
+    internal static string? DescribeUntrackedProductHint(CropRotationEntry entry)
     {
         if (!entry.TrackedFilterFollowsTargetPlant || entry.Mode == DualCropTrackingMode.Both)
         {

@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <UseLaboratory>true</UseLaboratory>
+        <RootNamespace>FarmingHysteresis.VanillaExpandedFramework.Tests</RootNamespace>
+        <AssemblyName>FarmingHysteresis.VanillaExpandedFramework.Tests</AssemblyName>
+        <OutputPath>../../Integrations/VanillaExpandedFramework/$(RimWorldVersion)/Assemblies</OutputPath>
+    </PropertyGroup>
+    <!--
+        Dev-only test assembly for the Vanilla Expanded Framework integration, built and run
+        in-game via RimTest Redux (see https://github.com/ilyvion/rimtest-redux). Its output is
+        deployed alongside FarmingHysteresis.VanillaExpandedFramework.dll into
+        Integrations/VanillaExpandedFramework/<version>/Assemblies, which LoadFolders.xml only
+        loads when Vanilla Expanded Framework (OskarPotocki.VanillaFactionsExpanded.Core) is
+        active, so these tests are only discovered when there's a VEF install for them to
+        actually exercise, and launching FarmingHysteresis without it never touches this
+        assembly.
+
+        It's listed in FarmingHysteresis.sln so it always builds locally (default Configuration
+        is Debug, see .vscode/build_config.sh), but FarmingHysteresis.sln deliberately omits a
+        Release|Any CPU.Build.0 line for this project's GUID, so a Release-configuration build
+        (what CI/release always use, per rimworld-utils' build_mod.yml) skips building it
+        entirely; its output never lands in a shipped release.
+    -->
+    <ItemGroup>
+        <ProjectReference Include="..\FarmingHysteresis\FarmingHysteresis.csproj">
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
+        <ProjectReference Include="..\FarmingHysteresis.VanillaExpandedFramework\FarmingHysteresis.VanillaExpandedFramework.csproj">
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
+        <ProjectReference Include="$(ProjectDependenciesBasePath)\RimTest\Source\RimTestRedux\RimTestRedux.csproj">
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
+    </ItemGroup>
+
+    <!-- Vanilla Expanded Framework's dual-crop assembly is named VFECore.dll through RimWorld 1.5
+         and was renamed VEF.dll at 1.6, both under the same workshop id (2023507013). -->
+    <Choose>
+        <When Condition="'$(RimWorldVersion)' == '1.6'">
+            <ItemGroup>
+                <Reference Include="VEF">
+                    <HintPath>$(RimWorldSteamWorkshopFolderPath)\2023507013\$(RimWorldVersion)\Assemblies\VEF.dll</HintPath>
+                    <CopyLocal>False</CopyLocal>
+                    <Private>false</Private>
+                </Reference>
+            </ItemGroup>
+        </When>
+        <Otherwise>
+            <ItemGroup>
+                <Reference Include="VFECore">
+                    <HintPath>$(RimWorldSteamWorkshopFolderPath)\2023507013\$(RimWorldVersion)\Assemblies\VFECore.dll</HintPath>
+                    <CopyLocal>False</CopyLocal>
+                    <Private>false</Private>
+                </Reference>
+            </ItemGroup>
+        </Otherwise>
+    </Choose>
+</Project>
