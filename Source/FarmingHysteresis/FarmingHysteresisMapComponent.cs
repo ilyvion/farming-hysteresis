@@ -125,7 +125,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
             LookMode.Deep
         );
 
-#if v1_3 || v1_4
+#if !v1_5_OR_GREATER
         if (globalBoundValues == null || globalBoundValues.Count == 0)
         {
             if (Scribe.mode == LoadSaveMode.LoadingVars)

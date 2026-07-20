@@ -60,7 +60,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             Lower = FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound,
         };
 
-#if v1_3 || v1_4
+#if !v1_5_OR_GREATER
         if (Scribe.mode == LoadSaveMode.LoadingVars)
         {
             TransferOldBounds();
@@ -68,7 +68,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 #endif
 
         Scribe_Values.Look(ref latchMode, "farmingHysteresisLatchMode", LatchMode.Unknown, true);
-#if v1_3 || v1_4
+#if !v1_5_OR_GREATER
         if (Scribe.mode == LoadSaveMode.LoadingVars)
         {
             // Ignore obsolete warning (612) since we're explicitly
@@ -116,7 +116,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             );
         }
 
-#if v1_3 || v1_4
+#if !v1_5_OR_GREATER
         void TransferOldBounds()
         {
             var lowerBound = 0;
@@ -291,7 +291,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
 
                 case LatchMode.BetweenBoundsEnabled:
                 case LatchMode.BetweenBoundsDisabled:
-#if v1_3 || v1_4
+#if !v1_5_OR_GREATER
 #pragma warning disable CS0612
                 case LatchMode.AboveLowerBoundDisabled:
                 case LatchMode.AboveLowerBoundEnabled:
@@ -314,7 +314,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
                 plantToGrowSettable.SetHysteresisControlState(true);
                 break;
 
-#if v1_3 || v1_4
+#if !v1_5_OR_GREATER
 #pragma warning disable CS0612
             case LatchMode.AboveLowerBoundDisabled:
             case LatchMode.AboveLowerBoundEnabled:

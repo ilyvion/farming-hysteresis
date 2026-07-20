@@ -154,7 +154,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         _filteredHarvestedThingDefs =
         [
             .. boundAccessors.Keys.Where(h =>
-#if v1_3 || v1_4 || v1_5
+#if !v1_6_OR_GREATER
                 h.label.Contains(_quickSearch.filter.Text)
 #else
                 h.label.Contains(_quickSearch.filter.Text, StringComparison.OrdinalIgnoreCase)

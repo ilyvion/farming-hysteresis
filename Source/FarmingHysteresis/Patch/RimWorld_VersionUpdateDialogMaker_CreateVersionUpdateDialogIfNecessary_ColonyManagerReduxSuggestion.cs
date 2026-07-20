@@ -1,4 +1,4 @@
-#if v1_5 || v1_6
+#if v1_5_OR_GREATER
 using Verse.Steam;
 
 namespace FarmingHysteresis.Patch;
