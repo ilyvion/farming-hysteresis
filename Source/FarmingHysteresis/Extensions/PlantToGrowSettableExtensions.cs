@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using FarmingHysteresis.Defs;
 
 namespace FarmingHysteresis.Extensions;
@@ -11,23 +12,38 @@ internal static class PlantToGrowSettableExtensions
     > dataTable = new();
 #pragma warning restore IDE0028 // Simplify collection initialization
 
+    private static readonly Dictionary<Type, FarmingHysteresisControlDef> controlDefCache = [];
+
+    /// <summary>Pure lookup logic behind <see cref="GetControlDefForPlantGrower"/>'s def resolution: an exact <see cref="FarmingHysteresisControlDef.controlledClass"/> match wins, falling back to the first def whose <c>controlledClass</c> is assignable from <paramref name="type"/>.</summary>
+    internal static FarmingHysteresisControlDef? ResolveControlDef(
+        IEnumerable<FarmingHysteresisControlDef> defs,
+        Type type
+    )
+    {
+        var defList = defs as IReadOnlyCollection<FarmingHysteresisControlDef> ?? [.. defs];
+        return defList.SingleOrDefault(d => d.controlledClass == type)
+            ?? defList.SingleOrDefault(d => d.controlledClass.IsAssignableFrom(type));
+    }
+
     private static FarmingHysteresisControlDef GetControlDefForPlantGrower(
         IPlantToGrowSettable plantToGrowSettable,
         string method
     )
     {
-        var controlDef = DefDatabase<FarmingHysteresisControlDef>.AllDefs.SingleOrDefault(d =>
-            d.controlledClass == plantToGrowSettable.GetType()
-        );
-        controlDef ??= DefDatabase<FarmingHysteresisControlDef>.AllDefs.SingleOrDefault(d =>
-            d.controlledClass.IsAssignableFrom(plantToGrowSettable.GetType())
-        );
+        var type = plantToGrowSettable.GetType();
+        if (controlDefCache.TryGetValue(type, out var controlDef))
+        {
+            return controlDef;
+        }
+
+        controlDef = ResolveControlDef(DefDatabase<FarmingHysteresisControlDef>.AllDefs, type);
         if (controlDef == null)
         {
             ThrowError(plantToGrowSettable, method);
         }
 
-        return controlDef!;
+        controlDefCache[type] = controlDef;
+        return controlDef;
     }
 
     internal static (ThingDef?, int) PlantHarvestInfo(this IPlantToGrowSettable plantToGrowSettable)
@@ -95,6 +111,7 @@ internal static class PlantToGrowSettableExtensions
         bool forceHarvestEnabled
     ) => forceHarvestEnabled || !controlHarvesting || state;
 
+    [DoesNotReturn]
     private static void ThrowError(IPlantToGrowSettable plantGrower, string method) =>
         throw new InvalidOperationException(
             $"Called {nameof(PlantToGrowSettableExtensions)}.{method} with an IPlantToGrowSettable without a FarmingHysteresisControlDef. Type was {plantGrower.GetType().FullName}"

@@ -1,3 +1,4 @@
+using FarmingHysteresis.Defs;
 using FarmingHysteresis.Extensions;
 using RimTestRedux;
 
@@ -75,4 +76,70 @@ internal static class PlantToGrowSettableExtensionsComputeAllowTests
                 )
             )
             .Is.True();
+}
+
+// Regression guard for the GetControlDefForPlantGrower cache added to fix the uncached LINQ
+// scan on the pawn job-search hot path: the resolution logic it caches by Type must keep
+// picking an exact controlledClass match over a broader IsAssignableFrom fallback, regardless
+// of def order, and must keep returning null (not throwing or matching wrongly) when nothing
+// controls the given type.
+[HotSwappable]
+[TestSuite]
+internal static class PlantToGrowSettableExtensionsResolveControlDefTests
+{
+    [Test]
+    public static void ExactControlledClassMatchIsPreferredOverAssignableFromFallback()
+    {
+        var exact = new FarmingHysteresisControlDef
+        {
+            defName = "Exact",
+            controlledClass = typeof(Zone_Growing),
+        };
+        var fallback = new FarmingHysteresisControlDef
+        {
+            defName = "Fallback",
+            controlledClass = typeof(IPlantToGrowSettable),
+        };
+
+        var result = PlantToGrowSettableExtensions.ResolveControlDef(
+            [fallback, exact],
+            typeof(Zone_Growing)
+        );
+
+        Assert.That(result?.defName).Is.EqualTo("Exact");
+    }
+
+    [Test]
+    public static void FallsBackToAssignableFromWhenNoExactMatchExists()
+    {
+        var fallback = new FarmingHysteresisControlDef
+        {
+            defName = "Fallback",
+            controlledClass = typeof(IPlantToGrowSettable),
+        };
+
+        var result = PlantToGrowSettableExtensions.ResolveControlDef(
+            [fallback],
+            typeof(Zone_Growing)
+        );
+
+        Assert.That(result?.defName).Is.EqualTo("Fallback");
+    }
+
+    [Test]
+    public static void ReturnsNullWhenNoDefControlsTheType()
+    {
+        var unrelated = new FarmingHysteresisControlDef
+        {
+            defName = "Unrelated",
+            controlledClass = typeof(Building_PlantGrower),
+        };
+
+        var result = PlantToGrowSettableExtensions.ResolveControlDef(
+            [unrelated],
+            typeof(Zone_Growing)
+        );
+
+        Assert.That(result is null).Is.True();
+    }
 }
