@@ -201,13 +201,13 @@ public class Settings : ModSettings
             Find.WindowStack.Add(new FloatMenu(list));
         }
 
-        listingStandard.Label("FarmingHysteresis.DefaultLowerBound".Translate());
+        _ = listingStandard.Label("FarmingHysteresis.DefaultLowerBound".Translate());
         listingStandard.IntEntry(
             ref _defaultHysteresisLowerBound,
             ref _defaultHysteresisLowerBoundBuffer
         );
 
-        listingStandard.Label("FarmingHysteresis.DefaultUpperBound".Translate());
+        _ = listingStandard.Label("FarmingHysteresis.DefaultUpperBound".Translate());
         listingStandard.IntEntry(
             ref _defaultHysteresisUpperBound,
             ref _defaultHysteresisUpperBoundBuffer
@@ -221,7 +221,7 @@ public class Settings : ModSettings
         var previousFont = Text.Font;
         Text.Font = GameFont.Tiny;
         GUI.color = Color.grey;
-        listingStandard.Label(
+        _ = listingStandard.Label(
             "FarmingHysteresis.OnlyAppliesWithoutCmr".Translate(),
             -1f,
             (
