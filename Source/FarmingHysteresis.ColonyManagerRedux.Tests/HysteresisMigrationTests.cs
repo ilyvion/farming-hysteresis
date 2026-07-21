@@ -148,6 +148,74 @@ internal static class ShouldBeginMigrationGateTests
     }
 }
 
+// Regression guard for the "nothing to migrate" case: a save with no legacy setup shouldn't ever
+// see the dialog, but it still needs to end up Migrated rather than staying NotGated forever
+// (which would keep re-running the legacy-data scan on every single load).
+[HotSwappable]
+[TestSuite]
+internal static class ShouldSilentlyMarkMigratedTests
+{
+    [Test]
+    public static void MarksMigratedWhenNotGatedAndTakeoverOnAndNoLegacyData() =>
+        Assert
+            .That(
+                CmrMigrationGate.ShouldSilentlyMarkMigrated(
+                    CmrMigrationGateStatus.NotGated,
+                    takeoverHysteresisControl: true,
+                    hasLegacyHysteresisDataConfigured: false
+                )
+            )
+            .Is.True();
+
+    [Test]
+    public static void DoesNotMarkMigratedWhenLegacyDataExists() =>
+        Assert
+            .That(
+                CmrMigrationGate.ShouldSilentlyMarkMigrated(
+                    CmrMigrationGateStatus.NotGated,
+                    takeoverHysteresisControl: true,
+                    hasLegacyHysteresisDataConfigured: true
+                )
+            )
+            .Is.False();
+
+    [Test]
+    public static void DoesNotMarkMigratedWhenTakeoverIsOff() =>
+        Assert
+            .That(
+                CmrMigrationGate.ShouldSilentlyMarkMigrated(
+                    CmrMigrationGateStatus.NotGated,
+                    takeoverHysteresisControl: false,
+                    hasLegacyHysteresisDataConfigured: false
+                )
+            )
+            .Is.False();
+
+    [Test]
+    public static void DoesNotMarkMigratedWhenAlreadyGated()
+    {
+        foreach (
+            var status in new[]
+            {
+                CmrMigrationGateStatus.AwaitingChoice,
+                CmrMigrationGateStatus.Declined,
+                CmrMigrationGateStatus.Migrated,
+            }
+        )
+        {
+            Assert
+                .That(
+                    CmrMigrationGate.ShouldSilentlyMarkMigrated(
+                        status,
+                        takeoverHysteresisControl: true,
+                        hasLegacyHysteresisDataConfigured: false
+                    )
+                )
+                .Is.False();
+        }
+    }
+}
+
 // Regression guard for the rule ApplyControllerState uses to pick between CmrHysteresisController
 // and DefaultHysteresisController - the CMR controller should only ever be active when takeover is
 // on and the current save isn't still being suppressed by the migration gate.
@@ -198,6 +266,37 @@ internal static class ComputeShouldUseCmrControllerTests
                 )
             )
             .Is.False();
+}
+
+// Regression guard for a bug where a save that had used CMR from the very start still got the
+// migration dialog on every load: CmrMigrationGameComponent.Status used to default to NotGated
+// both in memory (fresh component) and as the ExposeData fallback for a missing save node, so
+// "genuinely never needed a gate" and "predates status tracking entirely" were indistinguishable,
+// and the "nothing to migrate" outcome was never actually persisted (Scribe skips writing a value
+// that matches its own default), so the decision had to be re-derived on every single load.
+// Splitting the two defaults means any status other than NotGated now always gets scribed
+// explicitly, so a save only ever sees NotGated again if it truly never resolved this gate before.
+[HotSwappable]
+[TestSuite]
+internal static class CmrMigrationGameComponentStatusDefaultTests
+{
+    [Test]
+    public static void FreshComponentDefaultsToMigratedNotNotGated() =>
+        Assert
+            .That(new CmrMigrationGameComponent(null!).Status)
+            .Is.EqualTo(CmrMigrationGateStatus.Migrated);
+
+    [Test]
+    public static void ComputeDefaultStatusIsMigratedWhenTakeoverStartsOn() =>
+        Assert
+            .That(CmrMigrationGameComponent.ComputeDefaultStatus(takeoverHysteresisControl: true))
+            .Is.EqualTo(CmrMigrationGateStatus.Migrated);
+
+    [Test]
+    public static void ComputeDefaultStatusIsDeclinedWhenTakeoverStartsOff() =>
+        Assert
+            .That(CmrMigrationGameComponent.ComputeDefaultStatus(takeoverHysteresisControl: false))
+            .Is.EqualTo(CmrMigrationGateStatus.Declined);
 }
 
 // A Farming Hysteresis job must never be allowed to act on its growers while CMR isn't genuinely

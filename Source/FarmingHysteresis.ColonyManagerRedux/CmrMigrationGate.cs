@@ -29,6 +29,21 @@ internal static class CmrMigrationGate
         && hasLegacyHysteresisDataConfigured;
 
     /// <summary>
+    /// Pure decision behind <see cref="HandleGameLoaded"/>: whether a save with nothing to
+    /// migrate should be silently marked <see cref="CmrMigrationGateStatus.Migrated"/> without
+    /// ever bothering the player with the dialog - there's no point asking whether to migrate a
+    /// save that has no old-style setup to strand in the first place.
+    /// </summary>
+    internal static bool ShouldSilentlyMarkMigrated(
+        CmrMigrationGateStatus currentStatus,
+        bool takeoverHysteresisControl,
+        bool hasLegacyHysteresisDataConfigured
+    ) =>
+        currentStatus == CmrMigrationGateStatus.NotGated
+        && takeoverHysteresisControl
+        && !hasLegacyHysteresisDataConfigured;
+
+    /// <summary>
     /// <see cref="FarmingHysteresisMod.HysteresisController"/> is a static field that otherwise
     /// only gets refreshed when the mod settings themselves are (re-)scribed (process start, or
     /// the settings tab being written) - neither of which happens when the player merely returns
@@ -45,17 +60,18 @@ internal static class CmrMigrationGate
     internal static void HandleGameLoaded()
     {
         var gate = CmrMigrationGameComponent.For(Current.Game);
+        var takeoverOn =
+            ManagerSettings_FarmingHysteresis.Instance?.TakeOverHysteresisControl == true;
+        var hasLegacyData = HasLegacyHysteresisDataConfigured();
 
-        if (
-            ShouldBeginMigrationGate(
-                gate.Status,
-                ManagerSettings_FarmingHysteresis.Instance?.TakeOverHysteresisControl == true,
-                HasLegacyHysteresisDataConfigured()
-            )
-        )
+        if (ShouldBeginMigrationGate(gate.Status, takeoverOn, hasLegacyData))
         {
             gate.Status = CmrMigrationGateStatus.AwaitingChoice;
             LongEventHandler.ExecuteWhenFinished(ShowMigrationDialog);
+        }
+        else if (ShouldSilentlyMarkMigrated(gate.Status, takeoverOn, hasLegacyData))
+        {
+            gate.Status = CmrMigrationGateStatus.Migrated;
         }
 
         ManagerSettings_FarmingHysteresis.Instance?.ApplyControllerState();

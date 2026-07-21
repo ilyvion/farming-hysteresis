@@ -6,8 +6,10 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 /// </summary>
 internal enum CmrMigrationGateStatus
 {
-    /// <summary>No gate was ever needed for this save - either takeover was off at load time, or
-    /// there was no old-style setup to strand.</summary>
+    /// <summary>
+    /// This save has never been through the migration gate - it's an old save that predates
+    /// this per-save status tracking entirely.
+    /// </summary>
     NotGated,
 
     /// <summary>The gate fired and the one-time dialog is pending/was shown but not yet answered
@@ -34,7 +36,36 @@ internal enum CmrMigrationGateStatus
 internal sealed class CmrMigrationGameComponent(Game game) : GameComponent
 #pragma warning restore CS9113
 {
-    public CmrMigrationGateStatus Status = CmrMigrationGateStatus.NotGated;
+    /// <summary>
+    /// Deliberately defaults to whatever <see cref="ComputeDefaultStatus"/> resolves to
+    /// for a freshly constructed component.
+    /// <see cref="ExposeData"/> uses a different default - <see cref="CmrMigrationGateStatus.NotGated"/>
+    /// - for the "node missing from this save's XML" case, which asymmetry is exactly the point:
+    /// because the two defaults differ, any status other than <see cref="CmrMigrationGateStatus.NotGated"/>
+    /// gets written to disk explicitly (Scribe skips writing a value that matches its own default),
+    /// so once a save has ever resolved this gate - migrated, declined, or simply started fresh
+    /// under this scheme - that decision sticks forever. <see cref="CmrMigrationGateStatus.NotGated"/>
+    /// is only ever seen for a save that predates this component's status tracking
+    /// altogether (nothing was ever scribed for it to load), which is exactly the case
+    /// <see cref="CmrMigrationGate"/> needs to catch.
+    /// </summary>
+    public CmrMigrationGateStatus Status = ComputeDefaultStatus(
+        ManagerSettings_FarmingHysteresis.Instance?.TakeOverHysteresisControl == true
+    );
+
+    /// <summary>
+    /// Pure predicate behind <see cref="Status"/>'s field initializer, split out so the rule is
+    /// unit-testable without a live <see cref="ManagerSettings_FarmingHysteresis"/> instance. A
+    /// brand new save with takeover already on has nothing to migrate from, so it starts already
+    /// <see cref="CmrMigrationGateStatus.Migrated"/>; one that starts with takeover off is
+    /// actually running the legacy per-grower engine, so it starts
+    /// <see cref="CmrMigrationGateStatus.Declined"/> - takeover stays suppressed until the player
+    /// explicitly migrates later, exactly as if they'd been asked and declined.
+    /// </summary>
+    internal static CmrMigrationGateStatus ComputeDefaultStatus(bool takeoverHysteresisControl) =>
+        takeoverHysteresisControl
+            ? CmrMigrationGateStatus.Migrated
+            : CmrMigrationGateStatus.Declined;
 
     /// <summary>
     /// Pure predicate behind <see cref="IsSuppressingTakeover"/>, split out so the rule (which
