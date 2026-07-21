@@ -9,9 +9,19 @@
 
         &lt;size=24&gt;Operation&lt;/size&gt;
 
-        The mod adds an "Enable farming hysteresis" to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported. When you enable this setting, the "Allow sowing" button is removed, and sowing and harvesting are instead controlled by a set of hysteresis bounds. Hydroponics basins typically don't have these settings, but with this mod and hysteresis enabled, sowing and/or cutting also stops on those when appropriate.
-
         When the amount of stored product goes below the lower bound, sowing and/or cutting is enabled. This remains enabled until the amount of stored product goes above the upper bound, at which point sowing and/or cutting is disabled. This then remains disabled until the amount of stored product once again goes below the lower bound.
+
+        &lt;size=24&gt;Colony Manager Redux integration (recommended)&lt;/size&gt;
+
+        The recommended way to use this mod is alongside Colony Manager Redux (CMR). With CMR installed, hysteresis is managed through a CMR manager job instead of being configured grower-by-grower: a job covers a chosen area/zone selection and shows up right in CMR's own manager tab, like any other job. This is where ongoing development is focused, and it unlocks some extra features over the legacy controls below: crop rotation (grow crop A until its threshold is met, then automatically move on to crop B, and so on, cycling back around), tracking a different item than what's grown (e.g. sow hops based on beer stock, not hop stock), a history graph of tracked stock against the bounds over time, and support for dual-crop plants (e.g. from Vanilla Expanded Framework) that let you track the secondary product instead of, or alongside, the primary one.
+
+        CMR is not required, however - everything below continues to work exactly as it always has if you don't install CMR, or don't turn this on for a given save.
+
+        &lt;size=24&gt;Legacy per-grower controls&lt;/size&gt;
+
+        Without CMR (or with CMR-managed hysteresis turned off), the mod adds an "Enable farming hysteresis" toggle to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported. When you enable this setting, the "Allow sowing" button is removed, and sowing and harvesting are instead controlled by the hysteresis bounds described above, editable per-grower. Hydroponics basins typically don't have these settings, but with this mod and hysteresis enabled, sowing and/or cutting also stops on those when appropriate.
+
+        This mode still works and isn't going away, but it's no longer where new features are added - see the section above.
     </description>
     <supportedVersions>
         <li>1.3</li>
