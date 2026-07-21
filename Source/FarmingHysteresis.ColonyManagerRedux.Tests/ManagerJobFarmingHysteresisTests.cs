@@ -339,6 +339,22 @@ internal static class ComputePriorityActiveEntryIdTests
                 )
             )
             .Is.EqualTo(1);
+
+    // Regression test: an entry that dropped back under its upper bound without reaching its
+    // lower bound (BetweenBoundsDisabled) must still be treated as disallowed, same as
+    // AboveUpperBound - previously this method only checked for AboveUpperBound, so it
+    // incorrectly switched back to entry 1 as soon as its count dipped under the upper bound,
+    // instead of waiting for it to drop below the lower bound like the hysteresis rule requires.
+    [Test]
+    public static void StaysOnTheLowerPriorityEntryWhileTheHigherPriorityOneIsBetweenBoundsDisabled() =>
+        Assert
+            .That(
+                ComputePriorityActiveEntryId(
+                    [(1, LatchMode.BetweenBoundsDisabled), (2, LatchMode.BelowLowerBound)],
+                    previousActiveEntryId: 2
+                )
+            )
+            .Is.EqualTo(2);
 }
 
 // Covers RotationMode.RoundRobin's active-entry selection: stays on the active entry unless *its

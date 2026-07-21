@@ -343,7 +343,12 @@ internal sealed class ManagerJob_FarmingHysteresis
     /// <summary>
     /// Pure decision behind <see cref="RotationMode.Priority"/>'s active-entry selection, split out
     /// so it's unit-testable without a live job: the first entry (by list position - i.e. by
-    /// priority) whose own latch isn't <see cref="LatchMode.AboveUpperBound"/> (not yet satisfied).
+    /// priority) whose own latch is enabled per hysteresis (<see cref="LatchMode.BelowLowerBound"/>
+    /// or <see cref="LatchMode.BetweenBoundsEnabled"/> - matching <see
+    /// cref="Trigger_Hysteresis.State"/>). <see cref="LatchMode.BetweenBoundsDisabled"/> must be
+    /// treated the same as <see cref="LatchMode.AboveUpperBound"/> here: it means the entry went
+    /// above its upper bound and hasn't dropped below its lower bound since, so it's still
+    /// disallowed even though the count is currently under the upper bound again.
     /// Falls back to <paramref name="previousActiveEntryId"/> if every entry is already satisfied
     /// (nothing needs growing right now, so there's no reason to change what's active), or the
     /// first entry in <paramref name="entries"/> if there was no previous active entry either.
@@ -355,7 +360,7 @@ internal sealed class ManagerJob_FarmingHysteresis
     {
         foreach (var (id, latch) in entries)
         {
-            if (latch != LatchMode.AboveUpperBound)
+            if (latch is LatchMode.BelowLowerBound or LatchMode.BetweenBoundsEnabled)
             {
                 return id;
             }
