@@ -33,73 +33,122 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     private CropRotationEntry? ActiveEntry => HysteresisJob.ActiveEntry;
 
     /// <summary>
-    /// The active rotation entry's lower bound. Only valid while <see cref="ActiveEntry"/> exists.
+    /// The active rotation entry's lower bound, or 0 if <see cref="ActiveEntry"/> doesn't exist
+    /// yet (a brand new job with no crop picked) - reading/writing this is a no-op rather than a
+    /// crash in that state, same reasoning as every other <see cref="ActiveEntry"/>-derived member
+    /// below.
     /// </summary>
     public int Lower
     {
-        get => ActiveEntry!.Lower;
-        set => ActiveEntry!.Lower = value;
+        get => ActiveEntry?.Lower ?? 0;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.Lower = value;
+            }
+        }
     }
 
     /// <summary>See <see cref="Lower"/> - same shape, for the upper bound.</summary>
     public int Upper
     {
-        get => ActiveEntry!.Upper;
-        set => ActiveEntry!.Upper = value;
+        get => ActiveEntry?.Upper ?? 0;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.Upper = value;
+            }
+        }
     }
 
     /// <summary>
-    /// The active rotation entry's own hysteresis latch. Since each entry tracks its own latch
-    /// independently (see <see cref="CropRotationEntry.LatchModeValue"/>), this is purely a
-    /// read-through convenience for this trigger's own <see cref="State"/>/
-    /// <see cref="StatusTooltip"/>/history consumers, which only ever care about whichever entry
-    /// is currently active.
+    /// The active rotation entry's own hysteresis latch, or <see cref="LatchMode.Unknown"/> if
+    /// there's no <see cref="ActiveEntry"/> yet - which is exactly what <see cref="LatchMode.Unknown"/>
+    /// already means elsewhere in this class (no cycle has run yet), so it doubles as the correct
+    /// "nothing to report" default here too. Since each entry tracks its own latch independently
+    /// (see <see cref="CropRotationEntry.LatchModeValue"/>), this is purely a read-through
+    /// convenience for this trigger's own <see cref="State"/>/<see cref="StatusTooltip"/>/history
+    /// consumers, which only ever care about whichever entry is currently active.
     /// </summary>
     internal LatchMode LatchModeValue
     {
-        get => ActiveEntry!.LatchModeValue;
-        private set => ActiveEntry!.LatchModeValue = value;
+        get => ActiveEntry?.LatchModeValue ?? LatchMode.Unknown;
+        private set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.LatchModeValue = value;
+            }
+        }
     }
 
     /// <summary>See <see cref="LatchModeValue"/> - same shape, for the active entry's tracked-thing count.</summary>
     internal int TrackedThingCount
     {
-        get => ActiveEntry!.TrackedThingCount;
-        private set => ActiveEntry!.TrackedThingCount = value;
+        get => ActiveEntry?.TrackedThingCount ?? 0;
+        private set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.TrackedThingCount = value;
+            }
+        }
     }
 
     public static ThingFilter ParentFilter { get; } =
         ThingFilter.CreateOnlyEverStorableThingFilter();
 
     /// <summary>
-    /// The active rotation entry's tracked items filter. Kept distinct from
+    /// The active rotation entry's tracked items filter, or <see langword="null"/> if there's no
+    /// <see cref="ActiveEntry"/> yet. Kept distinct from
     /// <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/> - see this class's own doc
     /// comment.
     /// </summary>
-    public ThingFilter TrackedThingFilter => ActiveEntry!.TrackedThingFilter;
+    public ThingFilter? TrackedThingFilter => ActiveEntry?.TrackedThingFilter;
 
     /// <summary>
     /// Whether <see cref="TrackedThingFilter"/> is kept in sync with the active entry's own plant
     /// (see <see cref="SyncTrackedFilterToTargetPlant"/>) rather than left to the player's own
-    /// choice. Delegates to the active <see cref="CropRotationEntry.TrackedFilterFollowsTargetPlant"/>.
+    /// choice, or <see langword="false"/> if there's no <see cref="ActiveEntry"/> yet. Delegates
+    /// to the active <see cref="CropRotationEntry.TrackedFilterFollowsTargetPlant"/>.
     /// </summary>
     public bool TrackedFilterFollowsTargetPlant
     {
-        get => ActiveEntry!.TrackedFilterFollowsTargetPlant;
-        set => ActiveEntry!.TrackedFilterFollowsTargetPlant = value;
+        get => ActiveEntry?.TrackedFilterFollowsTargetPlant ?? false;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.TrackedFilterFollowsTargetPlant = value;
+            }
+        }
     }
 
     /// <summary>Restricts <see cref="TrackedThingFilter"/> counting to a single stockpile, mirroring <see cref="Trigger_Threshold.Stockpile"/>.</summary>
     public Zone_Stockpile? Stockpile
     {
-        get => ActiveEntry!.Stockpile;
-        set => ActiveEntry!.Stockpile = value;
+        get => ActiveEntry?.Stockpile;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.Stockpile = value;
+            }
+        }
     }
 
     public bool CountAllOnMap
     {
-        get => ActiveEntry!.CountAllOnMap;
-        set => ActiveEntry!.CountAllOnMap = value;
+        get => ActiveEntry?.CountAllOnMap ?? false;
+        set
+        {
+            if (ActiveEntry is { } entry)
+            {
+                entry.CountAllOnMap = value;
+            }
+        }
     }
 
     /// <summary>
@@ -357,13 +406,16 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// <summary>
     /// A plain, pluralizable noun phrase for <see cref="TrackedThingFilter"/>'s current contents -
     /// the single allowed def's own label if there's exactly one, or the generic "items" otherwise
-    /// (whether zero or several defs are allowed). Unlike <see cref="DescribeTrackedFilter"/>, this always
-    /// reads correctly when substituted into a "{count} {noun} in storage" sentence, and always
-    /// refers unambiguously to <see cref="TrackedThingCount"/>'s combined total rather than a
-    /// per-kind amount - the exact set of tracked defs is what "Configure tracked items…" and the
-    /// tracked-product row are for.
+    /// (whether zero, several, or - with no <see cref="ActiveEntry"/> yet - no filter at all is
+    /// allowed). Unlike <see cref="DescribeTrackedFilter"/>, this always reads correctly when
+    /// substituted into a "{count} {noun} in storage" sentence, and always refers unambiguously to
+    /// <see cref="TrackedThingCount"/>'s combined total rather than a per-kind amount - the exact
+    /// set of tracked defs is what "Configure tracked items…" and the tracked-product row are for.
     /// </summary>
-    private string TrackedCountNoun => DescribeTrackedCountNoun(TrackedThingFilter);
+    private string TrackedCountNoun =>
+        TrackedThingFilter is { } filter
+            ? DescribeTrackedCountNoun(filter)
+            : "FarmingHysteresis.CMR.Trigger.TrackedCountNoun.Generic".Translate();
 
     /// <inheritdoc/>
     /// <remarks>
@@ -372,8 +424,20 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// same as <c>Trigger_Threshold</c> scales against its single target) draws the upper-bound
     /// mark for free, then <see cref="DrawBoundMark"/> adds the missing lower-bound mark on top.
     /// </remarks>
+    /// <remarks>
+    /// Skips drawing entirely without an <see cref="ActiveEntry"/> (a brand new job with no crop
+    /// picked yet) - unlike <see cref="DrawTriggerConfig"/>, <c>ManagerTab</c>'s job list calls
+    /// this unconditionally whenever <c>job.Trigger</c> is non-null, which is always true (see
+    /// <see cref="HysteresisJob"/>'s constructor), so without this guard a fresh job would draw a
+    /// meaningless 0/0 bar instead of nothing.
+    /// </remarks>
     public override void DrawVerticalProgressBars(Rect progressRect, bool active)
     {
+        if (ActiveEntry is not { })
+        {
+            return;
+        }
+
         progressRect.xMin += progressRect.width - 10;
         DrawVerticalProgressBar(
             progressRect,
@@ -390,6 +454,11 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// <remarks>See <see cref="DrawVerticalProgressBars"/>.</remarks>
     public override void DrawHorizontalProgressBars(Rect progressRect, bool active)
     {
+        if (ActiveEntry is not { })
+        {
+            return;
+        }
+
         progressRect.height = SmallIconSize;
         DrawHorizontalProgressBar(
             progressRect,
@@ -505,10 +574,12 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// one def (the common case - following the target plant, or a player's own single-def
     /// choice), or a plain summary label otherwise (see <see cref="DescribeTrackedFilter"/>) -
     /// the filter can no longer be assumed to always resolve to a single def once it's
-    /// independent of <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>.
+    /// independent of <see cref="ManagerJob_FarmingHysteresis.TargetPlantDef"/>. Draws nothing
+    /// without an <see cref="ActiveEntry"/> (in practice unreachable - <see cref="DrawTriggerConfig"/>,
+    /// this method's only caller, already returns early without an active entry).
     /// </summary>
     private float DrawTrackedProductRow(Vector2 pos, float width) =>
-        DrawTrackedProductRow(TrackedThingFilter, pos, width);
+        TrackedThingFilter is { } filter ? DrawTrackedProductRow(filter, pos, width) : 0f;
 
     /// <summary>
     /// Pure-parameter version of the tracked-product row, split out so
