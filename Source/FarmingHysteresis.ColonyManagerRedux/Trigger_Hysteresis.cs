@@ -305,13 +305,41 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     {
         foreach (var (id, count, latch) in update.EntryUpdates)
         {
-            var entry = HysteresisJob.RotationEntries.First(e => e.Id == id);
+            var entry = HysteresisJob.RotationEntries.FirstOrDefault(e => e.Id == id);
+            if (entry is null)
+            {
+                continue;
+            }
+
             entry.TrackedThingCount = count;
             entry.LatchModeValue = latch;
         }
 
-        HysteresisJob.ActiveEntryId = update.NewActiveEntryId;
+        HysteresisJob.ActiveEntryId = ResolveActiveEntryIdAfterCycleUpdate(
+            update.NewActiveEntryId,
+            HysteresisJob.ActiveEntryId,
+            [.. HysteresisJob.RotationEntries.Select(e => e.Id)]
+        );
     }
+
+    /// <summary>
+    /// Picks the id to actually commit as <see cref="ManagerJob_FarmingHysteresis.ActiveEntryId"/>
+    /// once <see cref="ApplyCycleUpdate"/> has skipped any entries removed since this cycle's
+    /// gather phase snapshotted <see cref="CycleUpdate.EntryUpdates"/>: prefers the freshly computed
+    /// <paramref name="newActiveEntryId"/>, but falls back to the still-current active id, then to
+    /// whatever entry remains first, if the computed one no longer exists among
+    /// <paramref name="remainingEntryIds"/>.
+    /// </summary>
+    internal static int? ResolveActiveEntryIdAfterCycleUpdate(
+        int? newActiveEntryId,
+        int? currentActiveEntryId,
+        IReadOnlyList<int> remainingEntryIds
+    ) =>
+        newActiveEntryId is { } id && remainingEntryIds.Contains(id) ? newActiveEntryId
+        : currentActiveEntryId is { } current && remainingEntryIds.Contains(current)
+            ? currentActiveEntryId
+        : remainingEntryIds.Count == 0 ? null
+        : remainingEntryIds[0];
 
     /// <summary>
     /// Purely reflects <see cref="LatchModeValue"/> as of the last manager job cycle (see

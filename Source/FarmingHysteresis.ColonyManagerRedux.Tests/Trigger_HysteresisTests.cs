@@ -339,6 +339,75 @@ internal static class DescribeTrackedCountNounTests
     }
 }
 
+// Covers ResolveActiveEntryIdAfterCycleUpdate, the fallback ApplyCycleUpdate uses to pick the
+// committed active entry id when a rotation entry was removed during the real multi-tick
+// gather->execute window, so the cycle's computed NewActiveEntryId can point at an id that no
+// longer exists (regression guard: this used to be a bare First(e => e.Id == id) that threw).
+[HotSwappable]
+[TestSuite]
+internal static class ResolveActiveEntryIdAfterCycleUpdateTests
+{
+    [Test]
+    public static void KeepsTheComputedIdWhenItStillExists()
+    {
+        var result = ResolveActiveEntryIdAfterCycleUpdate(
+            newActiveEntryId: 2,
+            currentActiveEntryId: 1,
+            remainingEntryIds: [1, 2, 3]
+        );
+
+        Assert.That(result).Is.EqualTo(2);
+    }
+
+    [Test]
+    public static void FallsBackToTheCurrentActiveIdWhenTheComputedOneWasRemoved()
+    {
+        var result = ResolveActiveEntryIdAfterCycleUpdate(
+            newActiveEntryId: 2,
+            currentActiveEntryId: 1,
+            remainingEntryIds: [1, 3]
+        );
+
+        Assert.That(result).Is.EqualTo(1);
+    }
+
+    [Test]
+    public static void FallsBackToWhateverEntryRemainsWhenBothComputedAndCurrentWereRemoved()
+    {
+        var result = ResolveActiveEntryIdAfterCycleUpdate(
+            newActiveEntryId: 2,
+            currentActiveEntryId: 1,
+            remainingEntryIds: [3, 4]
+        );
+
+        Assert.That(result).Is.EqualTo(3);
+    }
+
+    [Test]
+    public static void ReturnsNullWhenNoEntriesRemain()
+    {
+        var result = ResolveActiveEntryIdAfterCycleUpdate(
+            newActiveEntryId: 2,
+            currentActiveEntryId: 1,
+            remainingEntryIds: []
+        );
+
+        Assert.That(result).Is.Null();
+    }
+
+    [Test]
+    public static void KeepsTheCurrentIdWhenNoNewIdWasComputed()
+    {
+        var result = ResolveActiveEntryIdAfterCycleUpdate(
+            newActiveEntryId: null,
+            currentActiveEntryId: 1,
+            remainingEntryIds: [1, 2]
+        );
+
+        Assert.That(result).Is.EqualTo(1);
+    }
+}
+
 // Covers DescribeTrackedFilter's 3-way None/single-label/Multiple summary, tested directly
 // against a bare ThingFilter rather than a live job/trigger.
 [HotSwappable]
