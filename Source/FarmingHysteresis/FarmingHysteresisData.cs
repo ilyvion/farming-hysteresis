@@ -195,7 +195,7 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
             throw new InvalidOperationException("This should not happen. Code: FHD-GBVA-ZWR");
         }
 
-        var (harvestedThingDefOrNull, _) = plantGrower.PlantHarvestInfo();
+        var harvestedThingDefOrNull = plantGrower.PlantHarvestDef();
         var harvestedThingDef =
             harvestedThingDefOrNull
             ?? throw new InvalidOperationException("This should not happen. Code: FHD-GBVA-PI");

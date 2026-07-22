@@ -48,7 +48,7 @@ internal static class PlantToGrowSettableExtensions
 
     internal static (ThingDef?, int) PlantHarvestInfo(this IPlantToGrowSettable plantToGrowSettable)
     {
-        var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow()?.plant?.harvestedThingDef;
+        var harvestedThingDef = plantToGrowSettable.PlantHarvestDef();
         return harvestedThingDef != null
             ? (
                 harvestedThingDef,
@@ -56,6 +56,13 @@ internal static class PlantToGrowSettableExtensions
             )
             : (null, 0);
     }
+
+    /// <summary>
+    /// The <see cref="ThingDef"/> half of <see cref="PlantHarvestInfo"/>, without computing the
+    /// map-wide count - for call sites that only need to know whether a harvest def is chosen.
+    /// </summary>
+    internal static ThingDef? PlantHarvestDef(this IPlantToGrowSettable plantToGrowSettable) =>
+        plantToGrowSettable.GetPlantDefToGrow()?.plant?.harvestedThingDef;
 
     /// <summary>
     /// The current map-wide stock of <paramref name="harvestedThingDef"/> - shared by the

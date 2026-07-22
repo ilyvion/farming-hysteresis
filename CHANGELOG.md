@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - In the mod settings, options that only matter for the mod's older per-grower controls are now greyed out and explained as such once Colony Manager Redux has taken over hysteresis control, rather than sitting there looking like they still do something.
 - Reduced the overhead of hysteresis's grower lookups, which run repeatedly as colonists search for jobs. Shouldn't be noticeable except possibly in colonies with a very large number of growing zones and plant pots.
+- The per-grower hysteresis inspect tab no longer recomputes the harvested item's stockpile count every frame it's open, only when actually displaying it.
 
 ### Fixed
 

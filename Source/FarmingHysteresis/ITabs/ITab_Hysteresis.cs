@@ -34,7 +34,7 @@ internal class ITab_Hysteresis : ITab
     {
         var data = GetFarmingHysteresisData();
         var plantToGrowSettable = (IPlantToGrowSettable)SelObject;
-        var (harvestedThingDef, _) = plantToGrowSettable.PlantHarvestInfo();
+        var harvestedThingDef = plantToGrowSettable.PlantHarvestDef();
 
         if (data != null && harvestedThingDef != null)
         {
