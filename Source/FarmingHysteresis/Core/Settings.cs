@@ -137,6 +137,11 @@ public class Settings : ModSettings
             "defaultHysteresisUpperBound",
             Constants.DefaultHysteresisUpperBound
         );
+        (_defaultHysteresisLowerBound, _defaultHysteresisUpperBound) = HysteresisBoundClamp.Clamp(
+            _defaultHysteresisLowerBound,
+            _defaultHysteresisUpperBound
+        );
+
         Scribe_Values.Look(ref _enabledByDefault, "enabledByDefault", true);
 
         string? oldUseGlobalValuesByDefault = null;
@@ -211,6 +216,11 @@ public class Settings : ModSettings
         listingStandard.IntEntry(
             ref _defaultHysteresisUpperBound,
             ref _defaultHysteresisUpperBoundBuffer
+        );
+
+        (_defaultHysteresisLowerBound, _defaultHysteresisUpperBound) = HysteresisBoundClamp.Clamp(
+            _defaultHysteresisLowerBound,
+            _defaultHysteresisUpperBound
         );
 
         // The settings below only affect the mod's own older per-grower engine/UI, which Colony
