@@ -77,6 +77,59 @@ internal class ITab_Hysteresis : ITab
         listingStandard.GapLine(ProductRowPadding);
         listingStandard.Gap(5f);
 
+        DrawBoundsSourceRow(listingStandard, data, plantToGrowSettable, harvestedThingDef);
+
+        var plant = plantToGrowSettable.GetPlantDefToGrow();
+
+        DrawBoundRow(
+            listingStandard,
+            ref _lowerBound,
+            ref _lowerBoundBuffer,
+            data.LowerBound,
+            value => data.LowerBound = value,
+            "FarmingHysteresis.LowerBoundLabel",
+            "FarmingHysteresis.LowerBound",
+            plant,
+            harvestedThingDef
+        );
+
+        DrawBoundRow(
+            listingStandard,
+            ref _upperBound,
+            ref _upperBoundBuffer,
+            data.UpperBound,
+            value => data.UpperBound = value,
+            "FarmingHysteresis.UpperBoundLabel",
+            "FarmingHysteresis.UpperBound",
+            plant,
+            harvestedThingDef
+        );
+
+        listingStandard.GapLine();
+
+        _ = listingStandard.Label(
+            "FarmingHysteresis.InStorage".Translate(harvestedThingDef.label, harvestedThingCount)
+        );
+        _ = listingStandard.Label(
+            "FarmingHysteresis.LatchModeDesc".Translate(
+                ("FarmingHysteresis.LatchModeDesc." + data.latchMode.ToString()).Translate(
+                    FarmingHysteresisMod.Settings.HysteresisMode.AsString()
+                )
+            )
+        );
+
+        listingStandard.End();
+
+        size = new Vector2(440f, listingStandard.CurHeight + 24f);
+    }
+
+    private void DrawBoundsSourceRow(
+        Listing_Standard listingStandard,
+        FarmingHysteresisData data,
+        IPlantToGrowSettable plantToGrowSettable,
+        ThingDef harvestedThingDef
+    )
+    {
         if (
             listingStandard.ButtonTextLabeledCompat(
                 "FarmingHysteresis.BoundsSourceLabel".Translate(),
@@ -98,106 +151,79 @@ internal class ITab_Hysteresis : ITab
                 }
             );
         }
+    }
 
-        var plant = plantToGrowSettable.GetPlantDefToGrow();
-
-        _ = listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
-        listingStandard.IntEntry(ref _lowerBound, ref _lowerBoundBuffer);
+    private static void DrawBoundRow(
+        Listing_Standard listingStandard,
+        ref int bound,
+        ref string? buffer,
+        int dataBound,
+        Action<int> setDataBound,
+        string labelTranslationKey,
+        string descTranslationKey,
+        ThingDef plant,
+        ThingDef harvestedThingDef
+    )
+    {
+        _ = listingStandard.Label(labelTranslationKey.Translate());
+        listingStandard.IntEntry(ref bound, ref buffer);
         _ = listingStandard.Label(
-            "FarmingHysteresis.LowerBound".Translate(
-                plant.label,
-                data.LowerBound,
-                harvestedThingDef.label,
-                HysteresisModeString
-            )
+            descTranslationKey.Translate(plant.label, dataBound, harvestedThingDef.label, HysteresisModeString)
         );
 
-        if (_lowerBound != data.LowerBound)
+        if (bound != dataBound)
         {
-            data.LowerBound = _lowerBound;
+            setDataBound(bound);
+        }
+    }
+
+    private void DrawProductRow(ThingDef harvestedThingDef, float rowY)
+    {
+        Rect rowRect = new(
+            0f,
+            rowY,
+            size.x - (4 * ProductRowPadding),
+            ProductIconSize + (2 * ProductRowPadding)
+        );
+        Rect harvestLabelRect = new(
+            ProductIconSize + (2 * ProductRowPadding),
+            rowY,
+            rowRect.width - (ProductIconSize + (2 * ProductRowPadding)),
+            rowRect.height
+        );
+        Rect harvestIconRect = new(5f, rowY + 5f, ProductIconSize, ProductIconSize);
+
+        IlyvionDebugViewSettings.DrawIfUIHelpers(() =>
+        {
+            Widgets.DrawRectFast(harvestLabelRect, ColorLibrary.PaleGreen.ToTransparent(.5f));
+            Widgets.DrawRectFast(harvestIconRect, ColorLibrary.PaleBlue.ToTransparent(.5f));
+        });
+
+        GUI.color = new Color(1f, 1f, 1f, 0.5f);
+        Widgets.DrawHighlightIfMouseover(rowRect);
+        GUI.color = Color.white;
+
+        GUI.DrawTexture(harvestIconRect, harvestedThingDef.uiIcon);
+
+        GUI.color = Color.white;
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleLeft;
+        Widgets.Label(harvestLabelRect, harvestedThingDef.LabelCap);
+        Text.Anchor = TextAnchor.UpperLeft;
+
+        if (Mouse.IsOver(rowRect))
+        {
+            TipSignal tip = new(
+                harvestedThingDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor)
+                    + "\n\n"
+                    + harvestedThingDef.description
+            );
+            TooltipHandler.TipRegion(rowRect, tip);
         }
 
-        _ = listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
-        listingStandard.IntEntry(ref _upperBound, ref _upperBoundBuffer);
-        _ = listingStandard.Label(
-            "FarmingHysteresis.UpperBound".Translate(
-                plant.label,
-                data.UpperBound,
-                harvestedThingDef.label,
-                HysteresisModeString
-            )
-        );
-
-        if (_upperBound != data.UpperBound)
+        if (Widgets.ButtonInvisible(rowRect, doMouseoverSound: false))
         {
-            data.UpperBound = _upperBound;
-        }
-
-        listingStandard.GapLine();
-
-        _ = listingStandard.Label(
-            "FarmingHysteresis.InStorage".Translate(harvestedThingDef.label, harvestedThingCount)
-        );
-        _ = listingStandard.Label(
-            "FarmingHysteresis.LatchModeDesc".Translate(
-                ("FarmingHysteresis.LatchModeDesc." + data.latchMode.ToString()).Translate(
-                    FarmingHysteresisMod.Settings.HysteresisMode.AsString()
-                )
-            )
-        );
-
-        listingStandard.End();
-
-        size = new Vector2(440f, listingStandard.CurHeight + 24f);
-
-        void DrawProductRow(ThingDef harvestedThingDef, float rowY)
-        {
-            Rect rowRect = new(
-                0f,
-                rowY,
-                size.x - (4 * ProductRowPadding),
-                ProductIconSize + (2 * ProductRowPadding)
-            );
-            Rect harvestLabelRect = new(
-                ProductIconSize + (2 * ProductRowPadding),
-                rowY,
-                rowRect.width - (ProductIconSize + (2 * ProductRowPadding)),
-                rowRect.height
-            );
-            Rect harvestIconRect = new(5f, rowY + 5f, ProductIconSize, ProductIconSize);
-
-            IlyvionDebugViewSettings.DrawIfUIHelpers(() =>
-            {
-                Widgets.DrawRectFast(harvestLabelRect, ColorLibrary.PaleGreen.ToTransparent(.5f));
-                Widgets.DrawRectFast(harvestIconRect, ColorLibrary.PaleBlue.ToTransparent(.5f));
-            });
-
-            GUI.color = new Color(1f, 1f, 1f, 0.5f);
-            Widgets.DrawHighlightIfMouseover(rowRect);
-            GUI.color = Color.white;
-
-            GUI.DrawTexture(harvestIconRect, harvestedThingDef.uiIcon);
-
-            GUI.color = Color.white;
-            Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.MiddleLeft;
-            Widgets.Label(harvestLabelRect, harvestedThingDef.LabelCap);
-            Text.Anchor = TextAnchor.UpperLeft;
-
-            if (Mouse.IsOver(rowRect))
-            {
-                TipSignal tip = new(
-                    harvestedThingDef.LabelCap.Colorize(ColoredText.TipSectionTitleColor)
-                        + "\n\n"
-                        + harvestedThingDef.description
-                );
-                TooltipHandler.TipRegion(rowRect, tip);
-            }
-
-            if (Widgets.ButtonInvisible(rowRect, doMouseoverSound: false))
-            {
-                Find.WindowStack.Add(new Dialog_InfoCard(harvestedThingDef));
-            }
+            Find.WindowStack.Add(new Dialog_InfoCard(harvestedThingDef));
         }
     }
 
