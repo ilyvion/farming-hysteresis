@@ -722,6 +722,27 @@ internal sealed class ManagerJob_FarmingHysteresis
         yield break;
     }
 
+    /// <summary>
+    /// Pure decision logic behind the <see cref="SpecificGrowingZones"/> post-load cleanup, split
+    /// out so it's unit-testable without a live <see cref="Zone"/> — see
+    /// <see cref="ShouldRemoveUnresolvedPlantGrowerBuilding"/> for the building counterpart. A
+    /// scribed <c>LookMode.Reference</c> entry resolves to <see langword="null"/> whenever the
+    /// referenced zone was already gone at save time, which is ordinary (not corruption), so it
+    /// must be pruned rather than dereferenced.
+    /// </summary>
+    internal static bool ShouldRemoveUnresolvedGrowingZone(bool isNull, int cellCount) =>
+        isNull || cellCount == 0;
+
+    /// <summary>
+    /// Pure decision logic behind the <see cref="SpecificPlantGrowerBuildings"/> post-load
+    /// cleanup — see <see cref="ShouldRemoveUnresolvedGrowingZone"/>.
+    /// </summary>
+    internal static bool ShouldRemoveUnresolvedPlantGrowerBuilding(
+        bool isNull,
+        bool destroyed,
+        bool spawned
+    ) => isNull || destroyed || !spawned;
+
     public override void ExposeData()
     {
         base.ExposeData();
@@ -767,9 +788,15 @@ internal sealed class ManagerJob_FarmingHysteresis
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            _ = SpecificGrowingZones.RemoveWhere(zone => zone.Cells.Count == 0);
+            _ = SpecificGrowingZones.RemoveWhere(zone =>
+                ShouldRemoveUnresolvedGrowingZone(zone == null, zone?.Cells.Count ?? 0)
+            );
             _ = SpecificPlantGrowerBuildings.RemoveWhere(building =>
-                building.Destroyed || !building.Spawned
+                ShouldRemoveUnresolvedPlantGrowerBuilding(
+                    building == null,
+                    building?.Destroyed ?? false,
+                    building?.Spawned ?? false
+                )
             );
 
             foreach (var entry in RotationEntries)

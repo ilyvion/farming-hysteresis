@@ -486,3 +486,71 @@ internal static class GrowerHasLeftoverPlantsTests
         Assert.That(GrowerHasLeftoverPlants([target, outgoing, null], target)).Is.True();
     }
 }
+
+// Regression guard: PostLoadInit must prune unresolved (null) scribed references instead of
+// dereferencing them, since an unresolved LookMode.Reference is ordinary (the referenced
+// building/zone was already gone at save time), not corruption.
+[HotSwappable]
+[TestSuite]
+internal static class UnresolvedSpecificGrowerReferenceCleanupTests
+{
+    [Test]
+    public static void UnresolvedGrowingZoneIsRemoved() =>
+        Assert.That(ShouldRemoveUnresolvedGrowingZone(isNull: true, cellCount: 0)).Is.True();
+
+    [Test]
+    public static void EmptyGrowingZoneIsRemoved() =>
+        Assert.That(ShouldRemoveUnresolvedGrowingZone(isNull: false, cellCount: 0)).Is.True();
+
+    [Test]
+    public static void NonEmptyResolvedGrowingZoneIsKept() =>
+        Assert.That(ShouldRemoveUnresolvedGrowingZone(isNull: false, cellCount: 1)).Is.False();
+
+    [Test]
+    public static void UnresolvedPlantGrowerBuildingIsRemoved() =>
+        Assert
+            .That(
+                ShouldRemoveUnresolvedPlantGrowerBuilding(
+                    isNull: true,
+                    destroyed: false,
+                    spawned: true
+                )
+            )
+            .Is.True();
+
+    [Test]
+    public static void DestroyedPlantGrowerBuildingIsRemoved() =>
+        Assert
+            .That(
+                ShouldRemoveUnresolvedPlantGrowerBuilding(
+                    isNull: false,
+                    destroyed: true,
+                    spawned: false
+                )
+            )
+            .Is.True();
+
+    [Test]
+    public static void UnspawnedPlantGrowerBuildingIsRemoved() =>
+        Assert
+            .That(
+                ShouldRemoveUnresolvedPlantGrowerBuilding(
+                    isNull: false,
+                    destroyed: false,
+                    spawned: false
+                )
+            )
+            .Is.True();
+
+    [Test]
+    public static void ResolvedSpawnedPlantGrowerBuildingIsKept() =>
+        Assert
+            .That(
+                ShouldRemoveUnresolvedPlantGrowerBuilding(
+                    isNull: false,
+                    destroyed: false,
+                    spawned: true
+                )
+            )
+            .Is.False();
+}
