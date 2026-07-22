@@ -78,6 +78,23 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
         }
     }
 
+    /// <inheritdoc/>
+    public override void FinalizeInit()
+    {
+        base.FinalizeInit();
+
+        // Saves from before this component existed have no "id" node, so ExposeData's
+        // forceSave leaves it at -1 forever unless we fix it up here.
+        id = ResolveLoadedId(id, map.uniqueID);
+    }
+
+    /// <summary>
+    /// Given the <paramref name="loadedId"/> read from a save and the <paramref name="mapUniqueId"/>
+    /// of the map the component belongs to, returns the id the component should use going forward.
+    /// </summary>
+    internal static int ResolveLoadedId(int loadedId, int mapUniqueId) =>
+        loadedId == -1 ? mapUniqueId : loadedId;
+
     internal bool HasBoundsFor(ThingDef harvestedThingDef) =>
         BoundValuesLookup.HasBounds(globalBoundValues, harvestedThingDef);
 
