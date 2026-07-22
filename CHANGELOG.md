@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The Hysteresis main tab's bound entry fields now stop you from typing in an invalid combination (lower bound above upper bound, or a negative bound), matching how the per-grower bound entry already behaved.
 - Simply opening the Hysteresis main tab no longer permanently saves default bounds for every crop into your save. Previously, this silently defeated the 'carry over the old bounds' behavior described above the first time a crop's Map or Game bounds were viewed on that tab.
 - The mod settings' default lower/upper bound fields now stop you from typing in an invalid combination (lower bound above upper bound, or a negative bound), matching how the per-grower and main tab bound entries already behaved.
+- Fixed a possible crash if another mod ever sets a growing zone or plant grower's plant-to-grow to something that isn't actually a plant.
 
 ## [0.9.2] - 2025-07-20
 

@@ -48,7 +48,7 @@ internal static class PlantToGrowSettableExtensions
 
     internal static (ThingDef?, int) PlantHarvestInfo(this IPlantToGrowSettable plantToGrowSettable)
     {
-        var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow()?.plant.harvestedThingDef;
+        var harvestedThingDef = plantToGrowSettable.GetPlantDefToGrow()?.plant?.harvestedThingDef;
         return harvestedThingDef != null
             ? (
                 harvestedThingDef,

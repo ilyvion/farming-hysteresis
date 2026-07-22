@@ -42,7 +42,7 @@ internal static class HysteresisMigration
     )> GroupByTargetPlant(IEnumerable<IPlantToGrowSettable> growers) =>
         growers
             .Select(grower => (Grower: grower, PlantDef: grower.GetPlantDefToGrow()))
-            .Where(x => x.PlantDef?.plant.harvestedThingDef != null)
+            .Where(x => x.PlantDef?.plant?.harvestedThingDef != null)
             .GroupBy(x => x.PlantDef)
             .Select(group => (group.Key, group.Select(x => x.Grower).ToList()));
 

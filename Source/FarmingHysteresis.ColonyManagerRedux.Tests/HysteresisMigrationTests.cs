@@ -346,6 +346,18 @@ internal static class GroupByTargetPlantTests
 
     private static ThingDef DecorativePlant() => new() { plant = new PlantProperties() };
 
+    private static ThingDef NonPlantDef() => new() { defName = "NotAPlant", plant = null };
+
+    [Test]
+    public static void GrowersOfANonPlantDefAreDroppedWithoutThrowing()
+    {
+        var grower = new FakeGrower(NonPlantDef());
+
+        var groups = GroupByTargetPlant([grower]).ToList();
+
+        Assert.ThatCollection(groups).Is.Empty();
+    }
+
     [Test]
     public static void GrowersWithNoPlantChosenAreDropped()
     {
