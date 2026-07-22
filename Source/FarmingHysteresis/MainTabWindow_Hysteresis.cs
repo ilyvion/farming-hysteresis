@@ -45,6 +45,22 @@ public class MainTabWindow_Hysteresis : MainTabWindow
     private readonly Dictionary<ThingDef, string?> boundLowerBuffers = [];
     private readonly Dictionary<ThingDef, string?> boundUpperBuffers = [];
 
+    // The map RebuildBoundsList() last resolved Find.CurrentMap against, so DoWindowContents can
+    // detect a map switch while the tab stays open and
+    // rebuild against the new map instead of silently editing the old one's bounds.
+    private Map? boundMap;
+
+    /// <summary>
+    /// Whether a bound-map switch happened while the
+    /// tab is open and Map-tier bounds are being shown, requiring a rebuild against the new map
+    /// instead of continuing to show/edit the previous map's bounds.
+    /// </summary>
+    internal static bool ShouldRebuildForMapSwitch(
+        BoundsSource selectedSource,
+        object? boundMap,
+        object? currentMap
+    ) => selectedSource == BoundsSource.Map && !ReferenceEquals(boundMap, currentMap);
+
     private static IBoundedValueAccessor GetAccessorFor(ThingDef thingDef) =>
         selectedSource switch
         {
@@ -62,6 +78,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
 
     private void RebuildBoundsList()
     {
+        boundMap = Find.CurrentMap;
         boundAccessors.Clear();
         boundLowerBuffers.Clear();
         boundUpperBuffers.Clear();
@@ -111,6 +128,11 @@ public class MainTabWindow_Hysteresis : MainTabWindow
     /// <inheritdoc/>
     public override void DoWindowContents(Rect inRect)
     {
+        if (ShouldRebuildForMapSwitch(selectedSource, boundMap, Find.CurrentMap))
+        {
+            RebuildBoundsList();
+        }
+
         var rect2 = inRect;
         rect2.yMin += 45f;
 
