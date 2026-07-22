@@ -186,15 +186,20 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         _filteredHarvestedThingDefs =
         [
             .. boundAccessors.Keys.Where(h =>
-#if !v1_6_OR_GREATER
-                h.label.Contains(_quickSearch.filter.Text)
-#else
-                h.label.Contains(_quickSearch.filter.Text, StringComparison.OrdinalIgnoreCase)
-#endif
+                MatchesQuickSearch(h.label, _quickSearch.filter.Text)
             ),
         ];
         _quickSearch.noResultsMatched = _filteredHarvestedThingDefs.Count == 0;
     }
+
+    /// <summary>
+    /// Split out so the case-insensitivity of the quick search filter is unit-testable across
+    /// all supported RimWorld versions without a live <see cref="QuickSearchWidget"/>.
+    /// </summary>
+#pragma warning disable IDE0057, CA2249 // string.Contains(string, StringComparison) isn't available pre-1.6
+    internal static bool MatchesQuickSearch(string label, string filterText) =>
+        label.IndexOf(filterText, StringComparison.OrdinalIgnoreCase) >= 0;
+#pragma warning restore IDE0057, CA2249
 
     private void DoHysteresisValuesPage(Rect tabRect)
     {

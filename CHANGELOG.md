@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The mod settings' default lower/upper bound fields now stop you from typing in an invalid combination (lower bound above upper bound, or a negative bound), matching how the per-grower and main tab bound entries already behaved.
 - Fixed a possible crash if another mod ever sets a growing zone or plant grower's plant-to-grow to something that isn't actually a plant.
 - The Hysteresis main tab now refreshes its 'Map' bounds list if you switch maps while it's still open, instead of continuing to show and edit the map you had open when the tab was opened.
+- The Hysteresis main tab's crop search box now matches regardless of capitalization on RimWorld 1.3-1.5, matching how it already worked on 1.6. Previously, typing e.g. 'Rice' with a capital letter wouldn't find anything on those versions.
 
 ## [0.9.2] - 2025-07-20
 
