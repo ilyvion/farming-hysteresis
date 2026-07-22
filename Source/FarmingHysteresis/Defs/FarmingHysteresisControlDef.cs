@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using FarmingHysteresis.Extensions;
 
 namespace FarmingHysteresis.Defs;
 
@@ -26,13 +27,27 @@ public class FarmingHysteresisControlDef : Def
 
     /// <summary>
     /// Gets every plant grower on <paramref name="map"/>, across all registered
-    /// <see cref="FarmingHysteresisControlDef"/>s.
+    /// <see cref="FarmingHysteresisControlDef"/>s. Each grower is attributed to exactly one def -
+    /// its most specific controller as resolved by <see cref="PlantToGrowSettableExtensions.ResolveControlDef"/>
+    /// - so a grower whose concrete type is also matched (via inheritance) by a broader def's
+    /// worker isn't double-enumerated.
     /// </summary>
     /// <param name="map">The map to search.</param>
-    public static IEnumerable<IPlantToGrowSettable> AllControlledPlantGrowers(Map map) =>
-        DefDatabase<FarmingHysteresisControlDef>.AllDefs.SelectMany(d =>
+    public static IEnumerable<IPlantToGrowSettable> AllControlledPlantGrowers(Map map)
+    {
+        var allDefs = DefDatabase<FarmingHysteresisControlDef>.AllDefsListForReading;
+        return allDefs.SelectMany(d =>
             d.Worker.GetControlledPlantGrowers(map)
+                .Where(g => IsMostSpecificControllerFor(allDefs, g.GetType(), d))
         );
+    }
+
+    /// <summary>Pure logic behind <see cref="AllControlledPlantGrowers"/>'s per-grower dedup filter: true when <paramref name="def"/> is the def <see cref="PlantToGrowSettableExtensions.ResolveControlDef"/> would pick for a grower of <paramref name="growerType"/> - i.e. <paramref name="def"/> is that grower's most specific controller, so its worker (rather than a broader def's worker whose enumeration also happens to match this type via inheritance) is the one that should yield it.</summary>
+    internal static bool IsMostSpecificControllerFor(
+        IEnumerable<FarmingHysteresisControlDef> allDefs,
+        Type growerType,
+        FarmingHysteresisControlDef def
+    ) => PlantToGrowSettableExtensions.ResolveControlDef(allDefs, growerType) == def;
 
     /// <summary>The <see cref="FarmingHysteresisControlWorker"/> subclass to instantiate for this def.</summary>
     public Type workerClass = typeof(FarmingHysteresisControlWorker);
