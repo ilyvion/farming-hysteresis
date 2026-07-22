@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed harvesting staying permanently blocked on a growing zone or plant grower after turning hysteresis off for it, if harvesting happened to be latched shut at the moment it was disabled.
 - Fixed the wrong bounds getting carried over when switching a grower to 'Map' or 'Game' bounds for the first time for that crop; the lower bound could silently get clamped down to whatever the (still-default) upper bound happened to be.
 - The Hysteresis main tab's bound entry fields now stop you from typing in an invalid combination (lower bound above upper bound, or a negative bound), matching how the per-grower bound entry already behaved.
+- Simply opening the Hysteresis main tab no longer permanently saves default bounds for every crop into your save. Previously, this silently defeated the 'carry over the old bounds' behavior described above the first time a crop's Map or Game bounds were viewed on that tab.
 
 ## [0.9.2] - 2025-07-20
 

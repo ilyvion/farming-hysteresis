@@ -28,6 +28,17 @@ internal class MapThingDefBoundValueAccessor(
             }
         }
     }
+
+    public BoundValues PeekBoundValue() =>
+        BoundValuesLookup.Peek(
+            mapComponent.MapBoundValues,
+            thingDef,
+            FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound,
+            FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound
+        );
+
+    public void CommitBoundValue(BoundValues value) =>
+        BoundValuesLookup.Commit(mapComponent.MapBoundValues, thingDef, value);
 }
 
 /// <summary>

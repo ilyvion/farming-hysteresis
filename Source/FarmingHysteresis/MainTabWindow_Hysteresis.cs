@@ -78,7 +78,7 @@ public class MainTabWindow_Hysteresis : MainTabWindow
                 continue;
             }
             boundAccessors.Add(harvestedThingDef, GetAccessorFor(harvestedThingDef));
-            bounds.Add(harvestedThingDef, boundAccessors[harvestedThingDef].BoundValueRaw);
+            bounds.Add(harvestedThingDef, boundAccessors[harvestedThingDef].PeekBoundValue());
             boundLowerBuffers.Add(harvestedThingDef, null);
             boundUpperBuffers.Add(harvestedThingDef, null);
         }
@@ -286,13 +286,20 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         var lowerBoundRect = new Rect(prevRect.xMax, rowY, 250f, PLANT_ROW_HEIGHT);
         var listingStandard = new Listing_Standard();
         listingStandard.Begin(lowerBoundRect);
-        ref var value = ref bounds[harvestDef].Lower;
+        var boundValues = bounds[harvestDef];
+        var oldValue = boundValues.Lower;
+        ref var value = ref boundValues.Lower;
         var buffer = boundLowerBuffers[harvestDef];
         _ = listingStandard.Label("FarmingHysteresis.LowerBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
-        value = ClampLowerBound(value, bounds[harvestDef].Upper);
+        value = ClampLowerBound(value, boundValues.Upper);
         boundLowerBuffers[harvestDef] = buffer;
         listingStandard.End();
+
+        if (value != oldValue)
+        {
+            boundAccessors[harvestDef].CommitBoundValue(boundValues);
+        }
 
         return lowerBoundRect;
     }
@@ -314,13 +321,20 @@ public class MainTabWindow_Hysteresis : MainTabWindow
         );
         var listingStandard = new Listing_Standard();
         listingStandard.Begin(upperBoundRect);
-        ref var value = ref bounds[harvestDef].Upper;
+        var boundValues = bounds[harvestDef];
+        var oldValue = boundValues.Upper;
+        ref var value = ref boundValues.Upper;
         var buffer = boundUpperBuffers[harvestDef];
         _ = listingStandard.Label("FarmingHysteresis.UpperBoundLabel".Translate());
         listingStandard.IntEntry(ref value, ref buffer);
-        value = ClampUpperBound(value, bounds[harvestDef].Lower);
+        value = ClampUpperBound(value, boundValues.Lower);
         boundUpperBuffers[harvestDef] = buffer;
         listingStandard.End();
+
+        if (value != oldValue)
+        {
+            boundAccessors[harvestDef].CommitBoundValue(boundValues);
+        }
 
         return upperBoundRect;
     }

@@ -33,6 +33,33 @@ internal static class BoundValuesLookup
 {
     internal static bool HasBounds<TKey>(Dictionary<TKey, BoundValues>? values, TKey key)
         where TKey : notnull => values != null && values.ContainsKey(key);
+
+    /// <summary>
+    /// Returns the existing entry for <paramref name="key"/> if present, otherwise a detached
+    /// default that is <em>not</em> added to <paramref name="values"/>. Backs the read-only
+    /// display path so merely listing/viewing values never materializes a dictionary entry.
+    /// </summary>
+    internal static BoundValues Peek<TKey>(
+        Dictionary<TKey, BoundValues>? values,
+        TKey key,
+        int defaultLower,
+        int defaultUpper
+    )
+        where TKey : notnull =>
+        values != null && values.TryGetValue(key, out var value)
+            ? value
+            : new BoundValues { Lower = defaultLower, Upper = defaultUpper };
+
+    /// <summary>
+    /// Ensures <paramref name="value"/> (as previously returned by <see cref="Peek"/>) is present
+    /// in <paramref name="values"/>. Called only once the player actually edits a row.
+    /// </summary>
+    internal static void Commit<TKey>(
+        Dictionary<TKey, BoundValues> values,
+        TKey key,
+        BoundValues value
+    )
+        where TKey : notnull => values.TryAdd(key, value);
 }
 
 internal class FarmingHysteresisData : IBoundedValueAccessor
@@ -149,6 +176,12 @@ internal class FarmingHysteresisData : IBoundedValueAccessor
     }
 
     BoundValues IBoundedValueAccessor.BoundValueRaw => _bounds;
+
+    // _bounds is always already materialized (constructor/ExposeData), so peeking and
+    // committing it is a no-op beyond returning it.
+    BoundValues IBoundedValueAccessor.PeekBoundValue() => _bounds;
+
+    void IBoundedValueAccessor.CommitBoundValue(BoundValues value) { }
 
     private IBoundedValueAccessor GetBoundedValueAccessor()
     {

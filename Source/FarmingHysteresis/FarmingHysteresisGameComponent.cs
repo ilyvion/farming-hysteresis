@@ -28,6 +28,17 @@ internal class GameThingDefBoundValueAccessor(
             }
         }
     }
+
+    public BoundValues PeekBoundValue() =>
+        BoundValuesLookup.Peek(
+            gameComponent.GameBoundValues,
+            thingDef,
+            FarmingHysteresisMod.Settings.DefaultHysteresisLowerBound,
+            FarmingHysteresisMod.Settings.DefaultHysteresisUpperBound
+        );
+
+    public void CommitBoundValue(BoundValues value) =>
+        BoundValuesLookup.Commit(gameComponent.GameBoundValues, thingDef, value);
 }
 
 /// <summary>

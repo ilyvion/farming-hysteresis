@@ -9,6 +9,10 @@ internal static class FarmingHysteresisDataSelectAccessorTests
     private sealed class FakeAccessor : IBoundedValueAccessor
     {
         public required BoundValues BoundValueRaw { get; init; }
+
+        public BoundValues PeekBoundValue() => BoundValueRaw;
+
+        public void CommitBoundValue(BoundValues value) { }
     }
 
     private static readonly FakeAccessor SelfAccessor = new()
