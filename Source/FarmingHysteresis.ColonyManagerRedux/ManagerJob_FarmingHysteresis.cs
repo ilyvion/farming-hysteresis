@@ -447,15 +447,18 @@ internal sealed class ManagerJob_FarmingHysteresis
     public bool IsGrowerInScope(IPlantToGrowSettable grower) =>
         IsGrowerInScope(
             AssignmentMode,
-            grower.Cells.Any(cell => GrowerArea?.ActiveCells.Contains(cell) ?? false)
-                != InvertGrowerArea
-                && GrowerArea != null,
-            grower switch
-            {
-                Zone zone => SpecificGrowingZones.Contains(zone),
-                Building_PlantGrower building => SpecificPlantGrowerBuildings.Contains(building),
-                _ => false,
-            }
+            AssignmentMode == GrowerAssignmentMode.Area
+                && GrowerArea != null
+                && grower.Cells.Any(cell => GrowerArea[cell]) != InvertGrowerArea,
+            AssignmentMode == GrowerAssignmentMode.Specific
+                && grower switch
+                {
+                    Zone zone => SpecificGrowingZones.Contains(zone),
+                    Building_PlantGrower building => SpecificPlantGrowerBuildings.Contains(
+                        building
+                    ),
+                    _ => false,
+                }
         );
 
     /// <summary>
