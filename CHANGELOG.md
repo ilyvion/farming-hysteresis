@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed CMR crop rotation's 'Wait for growth to finish' mode not protecting a leftover plant from the outgoing crop once that plant became harvestable: colonists would still cut it down to make room for the new crop instead of letting it grow to full maturity, still wasting most of its yield.
+
 ## [0.12.0] - 2026-08-26
 
 ### Added

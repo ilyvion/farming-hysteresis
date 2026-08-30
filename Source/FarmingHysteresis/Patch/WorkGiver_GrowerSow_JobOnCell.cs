@@ -15,10 +15,7 @@ internal static class WorkGiver_GrowerSow_JobOnCell
 {
     private static void Postfix(ref Job? __result)
     {
-        if (
-            __result is not { def: var jobDef } job
-            || job.targetA.Thing is not Plant { HarvestableNow: false } plant
-        )
+        if (__result is not { def: var jobDef } job || job.targetA.Thing is not Plant plant)
         {
             return;
         }
