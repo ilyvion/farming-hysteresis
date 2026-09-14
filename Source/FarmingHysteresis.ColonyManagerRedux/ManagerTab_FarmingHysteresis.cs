@@ -1,4 +1,5 @@
 using ColonyManagerRedux;
+using FarmingHysteresis.ColonyManagerRedux.Debug;
 using FarmingHysteresis.Defs;
 using ilyvion.Laboratory.Extensions;
 using static ColonyManagerRedux.Constants;
@@ -61,6 +62,8 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             ButtonSize.x - Margin,
             ButtonSize.y - Margin
         );
+        var debugButtonRect = new Rect(buttonRect);
+        debugButtonRect.x -= ButtonSize.x + Margin;
 
         Widgets_Section.BeginSectionColumn(
             columnRect,
@@ -91,6 +94,11 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             "FarmingHysteresis.CMR.GrowerScope".Translate()
         );
         Widgets_Section.EndSectionColumn("FarmingHysteresis.Job", position);
+
+        if (Prefs.DevMode && Widgets.ButtonText(debugButtonRect, "DEV: Debug Options"))
+        {
+            Find.WindowStack.Add(new Dialog_FarmingHysteresisDebugOptions(Manager));
+        }
 
         DrawManageButton(buttonRect);
     }

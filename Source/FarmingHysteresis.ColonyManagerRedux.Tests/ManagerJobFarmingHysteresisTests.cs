@@ -536,6 +536,49 @@ internal static class GrowerHasLeftoverPlantsTests
     }
 }
 
+// Regression guard: a grower having a leftover rotation crop somewhere must not make every other
+// plant on that grower look like a leftover too - CmrHysteresisController.ShouldProtectLeftoverFromCut
+// checks the specific plant being targeted for cutting via this method, not GrowerHasLeftoverPlants,
+// so a non-rotation plant elsewhere on the same grower is never protected from being cut.
+[HotSwappable]
+[TestSuite]
+internal static class IsLeftoverPlantTests
+{
+    [Test]
+    public static void TargetPlantIsNeverALeftover()
+    {
+        var target = new ThingDef();
+
+        Assert.That(IsLeftoverPlant(target, target, [target])).Is.False();
+    }
+
+    [Test]
+    public static void BarePlantIsNeverALeftover()
+    {
+        var target = new ThingDef();
+
+        Assert.That(IsLeftoverPlant(null, target, [target])).Is.False();
+    }
+
+    [Test]
+    public static void OtherRotationCropIsALeftover()
+    {
+        var target = new ThingDef();
+        var outgoing = new ThingDef();
+
+        Assert.That(IsLeftoverPlant(outgoing, target, [target, outgoing])).Is.True();
+    }
+
+    [Test]
+    public static void PlantOutsideTheRotationIsNeverALeftover()
+    {
+        var target = new ThingDef();
+        var wildPlant = new ThingDef();
+
+        Assert.That(IsLeftoverPlant(wildPlant, target, [target])).Is.False();
+    }
+}
+
 // Regression guard: PostLoadInit must prune unresolved (null) scribed references instead of
 // dereferencing them, since an unresolved LookMode.Reference is ordinary (the referenced
 // building/zone was already gone at save time), not corruption.

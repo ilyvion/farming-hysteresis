@@ -19,14 +19,17 @@ public interface IHysteresisController
     void Tick(Map map);
 
     /// <summary>
-    /// Whether vanilla's sow work-giver should be stopped from cutting down a not-yet-ripe plant
-    /// standing on one of <paramref name="grower"/>'s cells to clear it for the incoming crop -
+    /// Whether vanilla's sow work-giver should be stopped from cutting down <paramref name="plant"/>,
+    /// standing on one of <paramref name="grower"/>'s cells, to clear it for the incoming crop -
     /// queried live (rather than cached) so it stops applying the moment this controller no
-    /// longer has a genuine reason to protect the grower, with nothing to go stale. Only a
-    /// Colony Manager Redux crop rotation job (see
-    /// <c>ColonyManagerRedux.CmrHysteresisController</c>) ever has such a reason.
+    /// longer has a genuine reason to protect the grower, with nothing to go stale. Takes the
+    /// specific plant being targeted for cutting, not just the grower, since a grower can have a
+    /// leftover rotation crop in one cell while other cells hold plants that were never part of
+    /// the rotation and should always be cuttable. Only a Colony Manager Redux crop rotation job
+    /// (see <c>ColonyManagerRedux.CmrHysteresisController</c>) ever has a reason to protect
+    /// anything.
     /// </summary>
-    bool ShouldProtectLeftoverFromCut(IPlantToGrowSettable grower);
+    bool ShouldProtectLeftoverFromCut(IPlantToGrowSettable grower, Plant plant);
 
     /// <summary>
     /// Whether the default per-grower hysteresis UI (the enable/disable gizmo and

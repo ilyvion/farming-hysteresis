@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The last crop in a CMR-managed job's rotation can now be marked 'Grow indefinitely': once none of the earlier crops need growing, it keeps growing forever instead of stopping once it reaches its own upper bound. Adding another crop below it automatically turns this back off, since it only applies to the last crop in the list.
 
+### Fixed
+
+- Fixed a CMR crop rotation bug where 'Wait for growth to finish' mode could protect every plant on a grower from being cut, not just the leftover crop it was meant to protect - so a completely unrelated plant left standing in an unsown cell wouldn't get cut to make room for the incoming crop.
+
 ## [0.12.1] - 2026-08-31
 
 ### Fixed

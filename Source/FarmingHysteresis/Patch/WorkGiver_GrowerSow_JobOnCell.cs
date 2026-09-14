@@ -23,7 +23,10 @@ internal static class WorkGiver_GrowerSow_JobOnCell
         var grower = plant.Position.GetPlantToGrowSettable(plant.Map);
         var protectLeftoverFromCut =
             grower != null
-            && FarmingHysteresisMod.HysteresisController.ShouldProtectLeftoverFromCut(grower);
+            && FarmingHysteresisMod.HysteresisController.ShouldProtectLeftoverFromCut(
+                grower,
+                plant
+            );
         if (ShouldSuppressCut(jobDef, protectLeftoverFromCut))
         {
             __result = null;

@@ -26,9 +26,12 @@ internal sealed class CmrHysteresisController : IHysteresisController
     /// Recomputed fresh from <paramref name="grower"/>'s current owning job (if any) rather than
     /// from any cached per-grower state, so a job being deleted, going dormant, or simply no
     /// longer including this grower in its scope stops the protection immediately - there's no
-    /// stored flag left over that a removal path would need to remember to clear.
+    /// stored flag left over that a removal path would need to remember to clear. Checked against
+    /// <paramref name="plant"/> itself, not just whether the grower has a leftover somewhere -
+    /// otherwise a single leftover cell would suppress cutting for every plant on the grower,
+    /// including ones that were never part of the rotation.
     /// </summary>
-    public bool ShouldProtectLeftoverFromCut(IPlantToGrowSettable grower)
+    public bool ShouldProtectLeftoverFromCut(IPlantToGrowSettable grower, Plant plant)
     {
         var manager = Manager.For(grower.Map);
         var job = ManagerJob_FarmingHysteresis.FindOwningJob(manager, grower);
@@ -39,8 +42,8 @@ internal sealed class CmrHysteresisController : IHysteresisController
 
         var targetPlantDef = job.TargetPlantDef;
         return targetPlantDef != null
-            && ManagerJob_FarmingHysteresis.GrowerHasLeftoverPlants(
-                grower.Cells.Select(c => c.GetPlant(grower.Map)?.def),
+            && ManagerJob_FarmingHysteresis.IsLeftoverPlant(
+                plant.def,
                 targetPlantDef,
                 [.. job.RotationEntries.Select(e => e.PlantDef).OfType<ThingDef>()]
             );

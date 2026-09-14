@@ -754,10 +754,21 @@ internal sealed class ManagerJob_FarmingHysteresis
         IEnumerable<ThingDef?> standingPlantDefs,
         ThingDef targetPlantDef,
         HashSet<ThingDef> rotationPlantDefs
-    ) =>
-        standingPlantDefs.Any(def =>
-            def != null && def != targetPlantDef && rotationPlantDefs.Contains(def)
-        );
+    ) => standingPlantDefs.Any(def => IsLeftoverPlant(def, targetPlantDef, rotationPlantDefs));
+
+    /// <summary>
+    /// Whether a single standing plant def is itself a rotation leftover - the per-plant test
+    /// backing <see cref="GrowerHasLeftoverPlants"/> above, and also used directly wherever a cut
+    /// decision is made about one specific plant (see
+    /// <see cref="CmrHysteresisController.ShouldProtectLeftoverFromCut"/>) rather than about a
+    /// grower as a whole - a grower having a leftover somewhere doesn't mean every plant on it is
+    /// one.
+    /// </summary>
+    internal static bool IsLeftoverPlant(
+        ThingDef? plantDef,
+        ThingDef targetPlantDef,
+        HashSet<ThingDef> rotationPlantDefs
+    ) => plantDef != null && plantDef != targetPlantDef && rotationPlantDefs.Contains(plantDef);
 
     /// <summary>
     /// Force-clears <paramref name="grower"/>'s not-yet-ripe leftover plants (any standing plant
