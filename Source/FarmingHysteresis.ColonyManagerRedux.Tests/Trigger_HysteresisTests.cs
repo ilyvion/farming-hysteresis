@@ -72,6 +72,96 @@ internal static class ComputeNextLatchModeTests
             .That(ComputeNextLatchMode(BetweenBoundsDisabled, count: 15, lower: 10, upper: 20))
             .Is.EqualTo(BetweenBoundsDisabled);
     }
+
+    // Regression guard for the "unbound" last-crop fallback: it must never latch into
+    // AboveUpperBound/BetweenBoundsDisabled, since both would turn growing off - the whole point
+    // is to keep growing forever once reached, rather than stopping once its stock passes upper.
+    [Test]
+    public static void UnboundNeverLatchesAboveUpperBoundRegardlessOfCount()
+    {
+        Assert
+            .That(
+                ComputeNextLatchMode(
+                    BetweenBoundsEnabled,
+                    count: 25,
+                    lower: 10,
+                    upper: 20,
+                    unbound: true
+                )
+            )
+            .Is.EqualTo(BetweenBoundsEnabled);
+        Assert
+            .That(ComputeNextLatchMode(Unknown, count: 25, lower: 10, upper: 20, unbound: true))
+            .Is.EqualTo(BetweenBoundsEnabled);
+    }
+
+    // An entry marked unbound after it had already latched above its own upper bound must
+    // immediately resume growing rather than staying stuck disabled - unbound is self-healing,
+    // not just forward-looking.
+    [Test]
+    public static void UnboundSelfHealsAnAlreadyDisabledLatch() =>
+        Assert
+            .That(
+                ComputeNextLatchMode(
+                    AboveUpperBound,
+                    count: 25,
+                    lower: 10,
+                    upper: 20,
+                    unbound: true
+                )
+            )
+            .Is.EqualTo(BetweenBoundsEnabled);
+
+    [Test]
+    public static void UnboundStillFallsToBelowLowerBoundWhenCountDropsUnderLower() =>
+        Assert
+            .That(
+                ComputeNextLatchMode(
+                    BetweenBoundsEnabled,
+                    count: 5,
+                    lower: 10,
+                    upper: 20,
+                    unbound: true
+                )
+            )
+            .Is.EqualTo(BelowLowerBound);
+}
+
+// Covers Trigger_Hysteresis.IsEffectivelyUnbound - CropRotationEntry.Unbound only takes effect
+// for the actual last rotation entry, so a stale flag left on an entry that used to be last (but
+// isn't anymore) must never be acted on.
+[HotSwappable]
+[TestSuite]
+internal static class IsEffectivelyUnboundTests
+{
+    [Test]
+    public static void TrueForTheLastEntryMarkedUnbound()
+    {
+        var first = new CropRotationEntry();
+        var last = new CropRotationEntry { Unbound = true };
+        List<CropRotationEntry> entries = [first, last];
+
+        Assert.That(IsEffectivelyUnbound(last, entries)).Is.True();
+    }
+
+    [Test]
+    public static void FalseForTheLastEntryNotMarkedUnbound()
+    {
+        var last = new CropRotationEntry();
+        List<CropRotationEntry> entries = [last];
+
+        Assert.That(IsEffectivelyUnbound(last, entries)).Is.False();
+    }
+
+    [Test]
+    public static void FalseForAnEarlierEntryEvenIfMarkedUnbound()
+    {
+        var earlier = new CropRotationEntry { Unbound = true };
+        var last = new CropRotationEntry();
+        List<CropRotationEntry> entries = [earlier, last];
+
+        Assert.That(IsEffectivelyUnbound(earlier, entries)).Is.False();
+    }
 }
 
 // Covers the pure scaling math shared by the lower/upper bound progress bar marks in

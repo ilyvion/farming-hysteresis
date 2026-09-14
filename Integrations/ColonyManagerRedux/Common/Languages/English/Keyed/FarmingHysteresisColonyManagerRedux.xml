@@ -41,6 +41,8 @@
     <FarmingHysteresis.CMR.CropRotation.BoundsTip>Start {1} {0} when there are fewer than the lower bound in storage; once there are more than the upper bound, {2}.</FarmingHysteresis.CMR.CropRotation.BoundsTip>
     <FarmingHysteresis.CMR.CropRotation.BoundsTip.NextCrop>the rotation moves on to the next crop</FarmingHysteresis.CMR.CropRotation.BoundsTip.NextCrop>
     <FarmingHysteresis.CMR.CropRotation.BoundsTip.Stop>the crop stops growing until stock drops back below the lower bound</FarmingHysteresis.CMR.CropRotation.BoundsTip.Stop>
+    <FarmingHysteresis.CMR.CropRotation.Unbound>Grow indefinitely</FarmingHysteresis.CMR.CropRotation.Unbound>
+    <FarmingHysteresis.CMR.CropRotation.Unbound.Tip>Ignore lower/upper bounds entirely and always grow this crop once none of the earlier crops in the rotation need growing. Automatically turned off if another crop is added below this one.</FarmingHysteresis.CMR.CropRotation.Unbound.Tip>
 
     <FarmingHysteresis.CMR.Trigger>Hysteresis bounds</FarmingHysteresis.CMR.Trigger>
     <FarmingHysteresis.CMR.Trigger.Lower>Lower bound</FarmingHysteresis.CMR.Trigger.Lower>

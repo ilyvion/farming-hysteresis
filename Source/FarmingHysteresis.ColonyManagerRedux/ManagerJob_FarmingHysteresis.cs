@@ -282,14 +282,33 @@ internal sealed class ManagerJob_FarmingHysteresis
     public ThingDef? TargetPlantDef => ActiveEntry?.PlantDef;
 
     /// <summary>
+    /// Pure decision behind <see cref="AddRotationEntry"/>'s auto-clear step, split out so it's
+    /// unit-testable without a live job: <see cref="CropRotationEntry.Unbound"/> is only
+    /// meaningful for the actual last entry, so whichever entry was previously last must give it
+    /// up as soon as a new entry is appended below it. A no-op on an empty list (nothing yet to
+    /// have been last).
+    /// </summary>
+    internal static void ClearUnboundOnCurrentLastEntry(IReadOnlyList<CropRotationEntry> entries)
+    {
+        if (entries.Count > 0)
+        {
+            entries[^1].Unbound = false;
+        }
+    }
+
+    /// <summary>
     /// Appends <paramref name="plantDef"/> as a new rotation entry, seeded with the mod's default
     /// bounds. The new entry syncs its own tracked filter to <paramref name="plantDef"/> itself
     /// (see <see cref="CropRotationEntry.PlantDef"/>'s setter) - no job-level resync needed now
     /// that tracked items live per entry rather than once per job. Becomes the active entry only
-    /// if the list was previously empty (nothing else to have been active).
+    /// if the list was previously empty (nothing else to have been active). See
+    /// <see cref="ClearUnboundOnCurrentLastEntry"/> for why whichever entry was previously last
+    /// has its <see cref="CropRotationEntry.Unbound"/> flag cleared here.
     /// </summary>
     public void AddRotationEntry(ThingDef plantDef)
     {
+        ClearUnboundOnCurrentLastEntry(RotationEntries);
+
         var entry = new CropRotationEntry { Id = AllocateNextEntryId(), PlantDef = plantDef };
         RotationEntries.Add(entry);
         ActiveEntryId ??= entry.Id;

@@ -64,6 +64,19 @@ internal sealed class CropRotationEntry : IExposable
         ?? Constants.DefaultHysteresisUpperBound;
 
     /// <summary>
+    /// Whether this entry keeps growing forever once none of the earlier entries in
+    /// <see cref="ManagerJob_FarmingHysteresis.RotationEntries"/> need growing, instead of
+    /// stopping once its own upper bound is reached - see
+    /// <see cref="Trigger_Hysteresis.ComputeNextLatchMode"/>'s <c>unbound</c> parameter, which
+    /// this feeds whenever this entry is the last one in its job's list. Only meaningful for the
+    /// last entry; <see cref="ManagerJob_FarmingHysteresis.AddRotationEntry"/> auto-clears it on
+    /// whichever entry was previously last as soon as a new entry is appended below it, so a
+    /// stale value left on a since-demoted entry is never actually acted on even without that
+    /// auto-clear (every consumer checks list position, not just this flag).
+    /// </summary>
+    public bool Unbound;
+
+    /// <summary>
     /// This entry's own hysteresis latch state, recomputed every manager job cycle regardless of
     /// whether it's currently the job's active entry (see
     /// <see cref="Trigger_Hysteresis.ComputeCycleUpdate"/>) - each crop's hysteresis
@@ -217,6 +230,7 @@ internal sealed class CropRotationEntry : IExposable
             (object)NoOpSettingsChangedCallback
         );
         Scribe_Values.Look(ref CountAllOnMap, "countAllOnMap");
+        Scribe_Values.Look(ref Unbound, "unbound");
         Scribe_Values.Look(ref Mode, "dualCropTrackingMode", DualCropTrackingMode.PrimaryOnly);
 
         if (Scribe.mode == LoadSaveMode.Saving)

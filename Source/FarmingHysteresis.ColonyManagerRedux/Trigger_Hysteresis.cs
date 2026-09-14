@@ -191,13 +191,27 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     /// grower/job. See <c>Source/FarmingHysteresis/FarmingHysteresisData.cs</c> for the
     /// original.
     /// </summary>
+    /// <param name="current">The latch's current state.</param>
+    /// <param name="count">The tracked thing count as of this cycle.</param>
+    /// <param name="lower">The entry's lower bound.</param>
+    /// <param name="upper">The entry's upper bound.</param>
+    /// <param name="unbound">
+    /// <see cref="CropRotationEntry.Unbound"/>, gated to only the actual last rotation entry -
+    /// while true, <paramref name="upper"/> is never reached: the latch can still fall to
+    /// <see cref="LatchMode.BelowLowerBound"/>, but never rises into
+    /// <see cref="LatchMode.AboveUpperBound"/>/<see cref="LatchMode.BetweenBoundsDisabled"/>, so
+    /// <see cref="State"/> (and thus growing) stays on unconditionally - self-healing even if the
+    /// entry was already latched above its upper bound before being marked unbound.
+    /// </param>
     internal static LatchMode ComputeNextLatchMode(
         LatchMode current,
         int count,
         int lower,
-        int upper
+        int upper,
+        bool unbound = false
     ) =>
-        count < lower ? LatchMode.BelowLowerBound
+        unbound ? (count < lower ? LatchMode.BelowLowerBound : LatchMode.BetweenBoundsEnabled)
+        : count < lower ? LatchMode.BelowLowerBound
         : count > upper ? LatchMode.AboveUpperBound
         : current switch
         {
@@ -243,6 +257,20 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
     }
 
     /// <summary>
+    /// Pure decision behind <see cref="ComputeCycleUpdate"/>'s per-entry <c>unbound</c> gate,
+    /// split out so it's unit-testable without a live job:
+    /// <see cref="CropRotationEntry.Unbound"/> is only meaningful for the actual last entry in
+    /// <paramref name="rotationEntries"/> - a stale value left on an entry that used to be last
+    /// (before another was appended below it) must never take effect just because it wasn't
+    /// cleared yet (see <see cref="ManagerJob_FarmingHysteresis.ClearUnboundOnCurrentLastEntry"/>,
+    /// which normally prevents this from ever being reached in the first place).
+    /// </summary>
+    internal static bool IsEffectivelyUnbound(
+        CropRotationEntry entry,
+        IReadOnlyList<CropRotationEntry> rotationEntries
+    ) => entry.Unbound && entry == rotationEntries[^1];
+
+    /// <summary>
     /// Computes what this cycle's latch/rotation update would be - every rotation entry's own
     /// <see cref="CropRotationEntry.TrackedThingCount"/>/<see cref="CropRotationEntry.LatchModeValue"/>
     /// (not just the active one's, since each crop's hysteresis is its own independent memory
@@ -277,7 +305,14 @@ internal sealed class Trigger_Hysteresis(ManagerJob job) : Trigger(job)
                 previousActiveLatch = entry.LatchModeValue;
             }
 
-            var latch = ComputeNextLatchMode(entry.LatchModeValue, count, entry.Lower, entry.Upper);
+            var unbound = IsEffectivelyUnbound(entry, rotationEntries);
+            var latch = ComputeNextLatchMode(
+                entry.LatchModeValue,
+                count,
+                entry.Lower,
+                entry.Upper,
+                unbound
+            );
             entryUpdates.Add((entry.Id, count, latch));
         }
 

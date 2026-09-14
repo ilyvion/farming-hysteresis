@@ -78,6 +78,40 @@ internal static class ManagerJobFarmingHysteresisScopeTests
     }
 }
 
+// Covers ClearUnboundOnCurrentLastEntry, AddRotationEntry's auto-clear step: a rotation entry's
+// Unbound flag is only meaningful for the actual last entry, so whichever entry was previously
+// last must give it up as soon as a new entry gets appended below it.
+[HotSwappable]
+[TestSuite]
+internal static class ClearUnboundOnCurrentLastEntryTests
+{
+    [Test]
+    public static void ClearsUnboundOnTheCurrentLastEntry()
+    {
+        List<CropRotationEntry> entries = [new(), new() { Unbound = true }];
+
+        ClearUnboundOnCurrentLastEntry(entries);
+
+        Assert.That(entries[^1].Unbound).Is.False();
+    }
+
+    [Test]
+    public static void LeavesEarlierEntriesUntouched()
+    {
+        var earlier = new CropRotationEntry { Unbound = true };
+        List<CropRotationEntry> entries = [earlier, new() { Unbound = true }];
+
+        ClearUnboundOnCurrentLastEntry(entries);
+
+        // Not a realistic state (Unbound should never be set on a non-last entry to begin with),
+        // but this confirms the clear is scoped to the last entry alone, not the whole list.
+        Assert.That(earlier.Unbound).Is.True();
+    }
+
+    [Test]
+    public static void NoOpsOnAnEmptyList() => ClearUnboundOnCurrentLastEntry([]);
+}
+
 // Regression guard: plants with no harvestedThingDef (e.g. purely decorative plants like roses)
 // must never appear in ValidTargetPlants, since Trigger_Hysteresis would have nothing to count
 // for them.

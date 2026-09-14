@@ -171,7 +171,7 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
 
     /// <summary>
     /// Per-job choice of which plant grower activities (see
-    /// <see cref="FarmingHysteresis.HysteresisMode"/>) this job's hysteresis latch controls - same
+    /// <see cref="HysteresisMode"/>) this job's hysteresis latch controls - same
     /// toggle-pair shape as <see cref="DrawRotationModeSelector"/>/<see cref="DrawSwitchModeSelector"/>.
     /// </summary>
     private static void DrawHysteresisModeSelector(
@@ -351,7 +351,7 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             );
 
             pos.y = rowRect.yMax;
-            pos.y += DrawRotationEntryBounds(job, entry, pos, width);
+            pos.y += DrawRotationEntryBounds(job, entry, bottom, pos, width);
             pos.y += DrawRotationEntryTrackedItems(job, entry, pos, width);
         }
 
@@ -377,10 +377,10 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         // affects DrawRotationEntries' cull-skip advancement (Widgets_Section.CanCull), not what
         // actually gets drawn.
         (3 * (TargetPlantIconSize + (2 * TargetPlantRowPadding)))
-        // Bounds (2 rows of label+field each) + storage amount + latch state + configure button.
-        // The latch state line can wrap onto a second line depending on translated text/width -
-        // same approximation caveat as above.
-        + (7 * ListEntryHeight)
+        // Bounds (2 rows of label+field each) + storage amount + latch state + configure button
+        // + the last entry's "grow indefinitely" toggle row. The latch state line can wrap onto
+        // a second line depending on translated text/width - same approximation caveat as above.
+        + (8 * ListEntryHeight)
         + Margin;
 
     /// <summary>
@@ -488,16 +488,41 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     /// An entry's own Lower/Upper bound editor - the same <see cref="Widgets.IntEntry"/> stepper
     /// used elsewhere for a job's bounds, minus the long per-row description paragraph
     /// (impractical once a job can have several entries) - a hover tooltip carries the same
-    /// explanation instead.
+    /// explanation instead. <paramref name="isLast"/> additionally shows the
+    /// <see cref="CropRotationEntry.Unbound"/> toggle above the bounds, which is only meaningful
+    /// for the actual last entry; while it's on, the bounds themselves have no effect (the entry
+    /// grows unconditionally whenever it's active), so they're hidden rather than shown disabled.
+    /// The toggle is drawn first so enabling it doesn't shift rows below it up and down.
     /// </summary>
     private static float DrawRotationEntryBounds(
         ManagerJob_FarmingHysteresis job,
         CropRotationEntry entry,
+        bool isLast,
         Vector2 pos,
         float width
     )
     {
         var start = pos;
+
+        if (isLast)
+        {
+            var unboundRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+            var unbound = entry.Unbound;
+            Utilities.DrawToggle(
+                unboundRect,
+                "FarmingHysteresis.CMR.CropRotation.Unbound".Translate(),
+                "FarmingHysteresis.CMR.CropRotation.Unbound.Tip".Translate(),
+                ref unbound
+            );
+            entry.Unbound = unbound;
+            pos.y += ListEntryHeight;
+
+            if (unbound)
+            {
+                return pos.y - start.y;
+            }
+        }
+
         var tip =
             entry.PlantDef == null
                 ? null
