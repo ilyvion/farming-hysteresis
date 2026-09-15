@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-09-15
+
 ### Added
 
 - The last crop in a CMR-managed job's rotation can now be marked 'Grow indefinitely': once none of the earlier crops need growing, it keeps growing forever instead of stopping once it reaches its own upper bound. Adding another crop below it automatically turns this back off, since it only applies to the last crop in the list.
@@ -239,7 +241,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First implementation of the mod.
 
-[Unreleased]: https://github.com/ilyvion/farming-hysteresis/compare/v0.12.1...HEAD
+[Unreleased]: https://github.com/ilyvion/farming-hysteresis/compare/v0.13.0...HEAD
+[0.13.0]: https://github.com/ilyvion/farming-hysteresis/compare/v0.12.1..v0.13.0
 [0.12.1]: https://github.com/ilyvion/farming-hysteresis/compare/v0.12.0..v0.12.1
 [0.12.0]: https://github.com/ilyvion/farming-hysteresis/compare/v0.11.0..v0.12.0
 [0.11.0]: https://github.com/ilyvion/farming-hysteresis/compare/v0.10.0..v0.11.0
