@@ -28,6 +28,10 @@ internal sealed class DefaultHysteresisController : IHysteresisController
 
     public bool ShouldProtectLeftoverFromCut(IPlantToGrowSettable grower, Plant plant) => false;
 
+    public bool IsCellSowAllowed(IPlantToGrowSettable grower, IntVec3 cell) => true;
+
+    public ThingDef? GetCellSowPlantOverride(IPlantToGrowSettable grower, IntVec3 cell) => null;
+
     public bool ShowGrowerUi => true;
 
     public bool ShowMainTab => true;

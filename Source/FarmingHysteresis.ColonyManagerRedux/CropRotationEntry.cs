@@ -86,7 +86,10 @@ internal sealed class CropRotationEntry : IExposable
     /// </summary>
     public LatchMode LatchModeValue = LatchMode.Unknown;
 
-    /// <summary>This entry's own tracked-thing count as of the last manager job cycle - not scribed, recomputed every cycle.</summary>
+    /// <summary>
+    /// This entry's own tracked-thing count as of the last manager job cycle. Scribed so a
+    /// save/load keeps showing and enforcing budgets against the count across saves.
+    /// </summary>
     public int TrackedThingCount;
 
     /// <summary>Not scribed — <see cref="Widgets.IntEntry"/> needs a stable buffer across frames, per-entry.</summary>
@@ -229,6 +232,7 @@ internal sealed class CropRotationEntry : IExposable
             "trackedThingFilter",
             (object)NoOpSettingsChangedCallback
         );
+        Scribe_Values.Look(ref TrackedThingCount, "trackedThingCount");
         Scribe_Values.Look(ref CountAllOnMap, "countAllOnMap");
         Scribe_Values.Look(ref Unbound, "unbound");
         Scribe_Values.Look(ref Mode, "dualCropTrackingMode", DualCropTrackingMode.PrimaryOnly);

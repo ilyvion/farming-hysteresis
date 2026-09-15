@@ -43,4 +43,70 @@ internal static class WorkGiverGrowerSowJobOnCellTests
                 )
             )
             .Is.False();
+
+    [Test]
+    public static void SowJobOutsideTheSowBudgetIsSuppressed() =>
+        Assert
+            .That(
+                WorkGiver_GrowerSow_JobOnCell.ShouldSuppressSow(
+                    jobDef: JobDefOf.Sow,
+                    cellSowAllowed: false
+                )
+            )
+            .Is.True();
+
+    [Test]
+    public static void SowJobWithinTheSowBudgetIsUntouched() =>
+        Assert
+            .That(
+                WorkGiver_GrowerSow_JobOnCell.ShouldSuppressSow(
+                    jobDef: JobDefOf.Sow,
+                    cellSowAllowed: true
+                )
+            )
+            .Is.False();
+
+    [Test]
+    public static void NonSowJobIsNeverSuppressedEvenOutsideTheSowBudget() =>
+        Assert
+            .That(
+                WorkGiver_GrowerSow_JobOnCell.ShouldSuppressSow(
+                    jobDef: JobDefOf.CutPlant,
+                    cellSowAllowed: false
+                )
+            )
+            .Is.False();
+
+    [Test]
+    public static void SowJobWithAnOverridePlantIsRetargeted() =>
+        Assert
+            .That(
+                WorkGiver_GrowerSow_JobOnCell.ShouldApplySowPlantOverride(
+                    jobDef: JobDefOf.Sow,
+                    plantOverride: new ThingDef { defName = "CascadedCrop" }
+                )
+            )
+            .Is.True();
+
+    [Test]
+    public static void SowJobWithNoOverridePlantIsUntouched() =>
+        Assert
+            .That(
+                WorkGiver_GrowerSow_JobOnCell.ShouldApplySowPlantOverride(
+                    jobDef: JobDefOf.Sow,
+                    plantOverride: null
+                )
+            )
+            .Is.False();
+
+    [Test]
+    public static void NonSowJobIsNeverRetargetedEvenWithAnOverridePlant() =>
+        Assert
+            .That(
+                WorkGiver_GrowerSow_JobOnCell.ShouldApplySowPlantOverride(
+                    jobDef: JobDefOf.CutPlant,
+                    plantOverride: new ThingDef { defName = "CascadedCrop" }
+                )
+            )
+            .Is.False();
 }

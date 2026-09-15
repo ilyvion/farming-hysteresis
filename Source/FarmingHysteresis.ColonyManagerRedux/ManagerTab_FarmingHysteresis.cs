@@ -6,6 +6,10 @@ using static ColonyManagerRedux.Constants;
 
 namespace FarmingHysteresis.ColonyManagerRedux;
 
+// A manager tab's UI-drawing code inherently touches a wide range of small RimWorld/UnityEngine
+// types (Rect, Vector2, Color, various Widgets/Text members, def types, etc.) - that breadth
+// isn't a maintainability smell here the way it would be for business logic coupling.
+#pragma warning disable CA1506
 internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
     : ManagerTab<ManagerJob_FarmingHysteresis, ManagerSettings_FarmingHysteresis>(manager)
 {
@@ -155,6 +159,7 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         DrawHysteresisModeSelector(job, ref pos, width);
         DrawRotationModeSelector(job, ref pos, width);
         DrawSwitchModeSelector(job, ref pos, width);
+        DrawSowLimitSelector(job, ref pos, width);
 
         // Ordered by label, matching vanilla's own plant-picker menus (e.g. the zone "add plant"
         // FloatMenu) - ValidTargetPlants itself comes back in DefDatabase/whatever-order-the-mods-
@@ -265,6 +270,76 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         }
 
         pos.y += ListEntryHeight;
+    }
+
+    private const float SowingSafetyMultiplierMin = 0.5f;
+    private const float SowingSafetyMultiplierMax = 2f;
+    private const float SowingSafetyMultiplierStep = 0.1f;
+
+    /// <summary>
+    /// The "limit sowing to computed need" toggle, plus (while it's on) the safety-multiplier
+    /// slider that inflates its cell estimate - see
+    /// <see cref="ManagerJob_FarmingHysteresis.LimitSowingToComputedNeed"/>/
+    /// <see cref="ManagerJob_FarmingHysteresis.SowingSafetyMultiplier"/> - and, whenever the job's
+    /// switch mode would otherwise force-cut the cells this mode sows ahead of need, a warning
+    /// explaining that combination (see <see cref="ManagerJob_FarmingHysteresis.SwitchMode"/>).
+    /// </summary>
+    private static void DrawSowLimitSelector(
+        ManagerJob_FarmingHysteresis job,
+        ref Vector2 pos,
+        float width
+    )
+    {
+        var toggleRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
+        var limitSowing = job.LimitSowingToComputedNeed;
+        Utilities.DrawToggle(
+            toggleRect,
+            "FarmingHysteresis.CMR.CropRotation.LimitSowingToComputedNeed".Translate(),
+            "FarmingHysteresis.CMR.CropRotation.LimitSowingToComputedNeed.Tip".Translate(),
+            ref limitSowing
+        );
+        job.LimitSowingToComputedNeed = limitSowing;
+        pos.y += ListEntryHeight;
+
+        if (!limitSowing)
+        {
+            return;
+        }
+
+        var labelRect = new Rect(pos.x, pos.y, width * 0.3f, ListEntryHeight);
+        Widgets.Label(
+            labelRect,
+            "FarmingHysteresis.CMR.CropRotation.SowingSafetyMultiplier".Translate()
+        );
+        var sliderRect = new Rect(labelRect.xMax, pos.y, width - labelRect.width, ListEntryHeight);
+        job.SowingSafetyMultiplier = Widgets.HorizontalSlider(
+            sliderRect,
+            job.SowingSafetyMultiplier,
+            SowingSafetyMultiplierMin,
+            SowingSafetyMultiplierMax,
+            middleAlignment: true,
+            job.SowingSafetyMultiplier.ToStringPercent(),
+            null,
+            null,
+            SowingSafetyMultiplierStep
+        );
+        TooltipHandler.TipRegion(
+            labelRect,
+            "FarmingHysteresis.CMR.CropRotation.SowingSafetyMultiplier.Tip".Translate()
+        );
+        pos.y += ListEntryHeight;
+
+        if (job.SwitchMode == RotationSwitchMode.SwitchImmediately)
+        {
+            var warning =
+                "FarmingHysteresis.CMR.CropRotation.LimitSowingToComputedNeed.SwitchImmediatelyWarning".Translate();
+            var warningHeight = Mathf.Max(ListEntryHeight, Text.CalcHeight(warning, width));
+            Widgets.Label(
+                new Rect(pos.x, pos.y, width, warningHeight),
+                warning.Colorize(Color.yellow)
+            );
+            pos.y += warningHeight;
+        }
     }
 
     /// <summary>
@@ -385,10 +460,12 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         // affects DrawRotationEntries' cull-skip advancement (Widgets_Section.CanCull), not what
         // actually gets drawn.
         (3 * (TargetPlantIconSize + (2 * TargetPlantRowPadding)))
-        // Bounds (2 rows of label+field each) + storage amount + latch state + configure button
-        // + the last entry's "grow indefinitely" toggle row. The latch state line can wrap onto
-        // a second line depending on translated text/width - same approximation caveat as above.
-        + (8 * ListEntryHeight)
+        // Bounds (2 rows of label+field each) + storage amount + latch state + computed-need
+        // stats (only shown while LimitSowingToComputedNeed is on) + configure button + the last
+        // entry's "grow indefinitely" toggle row. The latch state and computed-need stats lines
+        // can each wrap onto a second line depending on translated text/width - same
+        // approximation caveat as above.
+        + (9 * ListEntryHeight)
         + Margin;
 
     /// <summary>
@@ -625,12 +702,49 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         Widgets.Label(new Rect(pos.x, pos.y, width, latchHeight), latchDescription);
         pos.y += latchHeight;
 
+        pos.y += DrawComputedNeedStats(job, entry, pos, width);
+
         DrawConfigureTrackedButtonRow(job, entry, pos, width);
         pos.y += ListEntryHeight;
 
         pos.y += Margin;
 
         return pos.y - start.y;
+    }
+
+    /// <summary>
+    /// While <see cref="ManagerJob_FarmingHysteresis.LimitSowingToComputedNeed"/> is on, shows this
+    /// entry's own yield-per-cell, cells needed, and cells currently assigned (see
+    /// <see cref="ManagerJob_FarmingHysteresis.GetComputedNeedStats"/>) - without this, the mode's
+    /// per-crop cell math was entirely invisible to the player, who had no way to see what it was
+    /// actually deciding beyond watching sowing happen (or not) in the world.
+    /// </summary>
+    private static float DrawComputedNeedStats(
+        ManagerJob_FarmingHysteresis job,
+        CropRotationEntry entry,
+        Vector2 pos,
+        float width
+    )
+    {
+        if (!job.LimitSowingToComputedNeed || entry.PlantDef == null)
+        {
+            return 0f;
+        }
+
+        var (yieldPerCell, cellsNeeded, cellsPlanned) = job.GetComputedNeedStats(entry);
+        var text = cellsNeeded is { } needed
+            ? "FarmingHysteresis.CMR.CropRotation.ComputedNeedStats".Translate(
+                yieldPerCell,
+                needed,
+                cellsPlanned
+            )
+            : "FarmingHysteresis.CMR.CropRotation.ComputedNeedStatsUnbound".Translate(
+                yieldPerCell,
+                cellsPlanned
+            );
+        var height = Mathf.Max(ListEntryHeight, Text.CalcHeight(text, width));
+        Widgets.Label(new Rect(pos.x, pos.y, width, height), text);
+        return height;
     }
 
     private const float UntrackedProductHintIconSize = ListEntryHeight - 4f;
@@ -998,3 +1112,4 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         job.Notify_TargetsChanged();
     }
 }
+#pragma warning restore CA1506

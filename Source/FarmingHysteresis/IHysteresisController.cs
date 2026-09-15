@@ -32,6 +32,22 @@ public interface IHysteresisController
     bool ShouldProtectLeftoverFromCut(IPlantToGrowSettable grower, Plant plant);
 
     /// <summary>
+    /// Whether vanilla's sow work-giver should be allowed to sow <paramref name="cell"/>, one of
+    /// <paramref name="grower"/>'s cells - queried live (like <see cref="ShouldProtectLeftoverFromCut"/>)
+    /// rather than cached, so it tracks whatever cell budget is currently in effect with nothing
+    /// to go stale.
+    /// </summary>
+    bool IsCellSowAllowed(IPlantToGrowSettable grower, IntVec3 cell);
+
+    /// <summary>
+    /// Which plant <paramref name="cell"/> should actually be sown with, if different from
+    /// <paramref name="grower"/>'s own configured plant - queried live, like
+    /// <see cref="IsCellSowAllowed"/>. <see langword="null"/> means "use the grower's own plant as
+    /// normal" (the overwhelming common case).
+    /// </summary>
+    ThingDef? GetCellSowPlantOverride(IPlantToGrowSettable grower, IntVec3 cell);
+
+    /// <summary>
     /// Whether the default per-grower hysteresis UI (the enable/disable gizmo and
     /// <c>ITab_Hysteresis</c>) should render.
     /// </summary>

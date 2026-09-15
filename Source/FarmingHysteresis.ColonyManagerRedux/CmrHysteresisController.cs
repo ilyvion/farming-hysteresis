@@ -49,6 +49,31 @@ internal sealed class CmrHysteresisController : IHysteresisController
             );
     }
 
+    /// <summary>
+    /// Delegates to <paramref name="grower"/>'s owning job's own sow-cell budget (see
+    /// <see cref="ManagerJob_FarmingHysteresis.IsCellWithinSowBudget"/>) - unrestricted whenever
+    /// there's no owning job, the job isn't actually active, or the job's "limit sowing to
+    /// computed need" option is off.
+    /// </summary>
+    public bool IsCellSowAllowed(IPlantToGrowSettable grower, IntVec3 cell)
+    {
+        var manager = Manager.For(grower.Map);
+        var job = ManagerJob_FarmingHysteresis.FindOwningJob(manager, grower);
+        return job is not { IsManaged: true } || job.IsCellWithinSowBudget(cell);
+    }
+
+    /// <summary>
+    /// Delegates to <paramref name="grower"/>'s owning job's own cascading sow plan (see
+    /// <see cref="ManagerJob_FarmingHysteresis.GetCellSowPlantOverride"/>) - <see langword="null"/>
+    /// (no override) whenever there's no owning job or the job isn't actually active.
+    /// </summary>
+    public ThingDef? GetCellSowPlantOverride(IPlantToGrowSettable grower, IntVec3 cell)
+    {
+        var manager = Manager.For(grower.Map);
+        var job = ManagerJob_FarmingHysteresis.FindOwningJob(manager, grower);
+        return job is { IsManaged: true } ? job.GetCellSowPlantOverride(cell) : null;
+    }
+
     public bool ShowGrowerUi => false;
 
     public bool ShowMainTab => false;
