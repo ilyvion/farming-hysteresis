@@ -1,11 +1,10 @@
+using DevTools.Testing;
 using FarmingHysteresis.Patch;
-using RimTestRedux;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class ZoneGetInspectTabsComputeInspectTabsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ZoneGetInspectTabsComputeInspectTabsTests
 {
     private static readonly string[] ExtraTabs = ["extra"];
 
@@ -13,25 +12,24 @@ internal static class ZoneGetInspectTabsComputeInspectTabsTests
     public static void UncontrolledZoneTypeReturnsValuesUnchanged()
     {
         string[] values = ["existing"];
-        Assert
-            .ThatCollection(Zone_GetInspectTabs.ComputeInspectTabs(false, values, ExtraTabs))
-            .Has.Count(1);
-        Assert
-            .ThatCollection(Zone_GetInspectTabs.ComputeInspectTabs(false, values, ExtraTabs))
-            .Does.Contain("existing");
+        Expect.AreEqual(
+            1,
+            Zone_GetInspectTabs.ComputeInspectTabs(false, values, ExtraTabs).Count()
+        );
+        Expect.IsTrue(
+            Zone_GetInspectTabs.ComputeInspectTabs(false, values, ExtraTabs).Contains("existing")
+        );
     }
 
     [Test]
     public static void UncontrolledZoneTypeWithNullValuesStaysNull() =>
-        Assert
-            .That(Zone_GetInspectTabs.ComputeInspectTabs(false, null, ExtraTabs) == null)
-            .Is.True();
+        Expect.IsTrue(Zone_GetInspectTabs.ComputeInspectTabs(false, null, ExtraTabs) == null);
 
     [Test]
     public static void ControlledZoneTypeWithNullValuesReturnsExtraTabs() =>
-        Assert
-            .ThatCollection(Zone_GetInspectTabs.ComputeInspectTabs(true, null, ExtraTabs))
-            .Does.Contain("extra");
+        Expect.IsTrue(
+            Zone_GetInspectTabs.ComputeInspectTabs(true, null, ExtraTabs).Contains("extra")
+        );
 
     [Test]
     public static void ControlledZoneTypeConcatenatesExistingThenExtraTabs()
@@ -39,8 +37,8 @@ internal static class ZoneGetInspectTabsComputeInspectTabsTests
         string[] values = ["existing"];
         var result = Zone_GetInspectTabs.ComputeInspectTabs(true, values, ExtraTabs).ToList();
 
-        Assert.ThatCollection(result).Has.Count(2);
-        Assert.That(result[0]).Is.EqualTo("existing");
-        Assert.That(result[1]).Is.EqualTo("extra");
+        Expect.AreEqual(2, result.Count);
+        Expect.AreEqual("existing", result[0]);
+        Expect.AreEqual("extra", result[1]);
     }
 }

@@ -1,13 +1,12 @@
-using RimTestRedux;
+using DevTools.Testing;
 using static FarmingHysteresis.ColonyManagerRedux.CropRotationEntry;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
 // Covers how ComputeTrackedDefs resolves a crop rotation entry's primary/secondary product(s)
 // in isolation from any live PlantDef/mod-extension lookup.
-[HotSwappable]
-[TestSuite]
-internal static class ComputeTrackedDefsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeTrackedDefsTests
 {
     [Test]
     public static void PrimaryOnlyReturnsJustThePrimaryDef()
@@ -15,18 +14,19 @@ internal static class ComputeTrackedDefsTests
         var primary = new ThingDef();
         var secondary = new ThingDef();
 
-        var result = ComputeTrackedDefs(DualCropTrackingMode.PrimaryOnly, primary, [secondary]);
+        var result = ComputeTrackedDefs(DualCropTrackingMode.PrimaryOnly, primary, [secondary])
+            .ToList();
 
-        Assert.ThatCollection(result).Has.Count(1);
-        Assert.ThatCollection(result).Does.Contain(primary);
+        Expect.AreEqual(1, result.Count);
+        Expect.IsTrue(result.Contains(primary));
     }
 
     [Test]
     public static void PrimaryOnlyWithNoPrimaryReturnsEmpty()
     {
-        var result = ComputeTrackedDefs(DualCropTrackingMode.PrimaryOnly, null, []);
+        var result = ComputeTrackedDefs(DualCropTrackingMode.PrimaryOnly, null, []).ToList();
 
-        Assert.ThatCollection(result).Is.Empty();
+        Expect.IsEmpty(result);
     }
 
     [Test]
@@ -37,15 +37,16 @@ internal static class ComputeTrackedDefsTests
         var secondaryTwo = new ThingDef();
 
         var result = ComputeTrackedDefs(
-            DualCropTrackingMode.SecondaryOnly,
-            primary,
-            [secondaryOne, secondaryTwo]
-        );
+                DualCropTrackingMode.SecondaryOnly,
+                primary,
+                [secondaryOne, secondaryTwo]
+            )
+            .ToList();
 
-        Assert.ThatCollection(result).Has.Count(2);
-        Assert.ThatCollection(result).Does.Contain(secondaryOne);
-        Assert.ThatCollection(result).Does.Contain(secondaryTwo);
-        Assert.ThatCollection(result).Does.Not.Contain(primary);
+        Expect.AreEqual(2, result.Count);
+        Expect.IsTrue(result.Contains(secondaryOne));
+        Expect.IsTrue(result.Contains(secondaryTwo));
+        Expect.IsFalse(result.Contains(primary));
     }
 
     [Test]
@@ -53,9 +54,9 @@ internal static class ComputeTrackedDefsTests
     {
         var primary = new ThingDef();
 
-        var result = ComputeTrackedDefs(DualCropTrackingMode.SecondaryOnly, primary, []);
+        var result = ComputeTrackedDefs(DualCropTrackingMode.SecondaryOnly, primary, []).ToList();
 
-        Assert.ThatCollection(result).Is.Empty();
+        Expect.IsEmpty(result);
     }
 
     [Test]
@@ -64,11 +65,11 @@ internal static class ComputeTrackedDefsTests
         var primary = new ThingDef();
         var secondary = new ThingDef();
 
-        var result = ComputeTrackedDefs(DualCropTrackingMode.Both, primary, [secondary]);
+        var result = ComputeTrackedDefs(DualCropTrackingMode.Both, primary, [secondary]).ToList();
 
-        Assert.ThatCollection(result).Has.Count(2);
-        Assert.ThatCollection(result).Does.Contain(primary);
-        Assert.ThatCollection(result).Does.Contain(secondary);
+        Expect.AreEqual(2, result.Count);
+        Expect.IsTrue(result.Contains(primary));
+        Expect.IsTrue(result.Contains(secondary));
     }
 
     [Test]
@@ -76,9 +77,9 @@ internal static class ComputeTrackedDefsTests
     {
         var secondary = new ThingDef();
 
-        var result = ComputeTrackedDefs(DualCropTrackingMode.Both, null, [secondary]);
+        var result = ComputeTrackedDefs(DualCropTrackingMode.Both, null, [secondary]).ToList();
 
-        Assert.ThatCollection(result).Has.Count(1);
-        Assert.ThatCollection(result).Does.Contain(secondary);
+        Expect.AreEqual(1, result.Count);
+        Expect.IsTrue(result.Contains(secondary));
     }
 }

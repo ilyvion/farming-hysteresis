@@ -1,113 +1,100 @@
+using DevTools.Testing;
 using FarmingHysteresis.Defs;
 using FarmingHysteresis.Extensions;
-using RimTestRedux;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
 // Regression guard: forceHarvestEnabled must keep harvest allowed regardless of
 // ControlHarvesting/state, while sow gating is untouched by it - this prevents a crop the job
 // has rotated away from getting stranded unharvested.
-[HotSwappable]
-[TestSuite]
-internal static class PlantToGrowSettableExtensionsComputeAllowTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class PlantToGrowSettableExtensionsComputeAllowTests
 {
     [Test]
     public static void SowFollowsStateWheneverSowingIsControlled()
     {
-        Assert
-            .That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: true))
-            .Is.True();
-        Assert
-            .That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: false))
-            .Is.False();
+        Expect.IsTrue(
+            PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: true)
+        );
+        Expect.IsFalse(
+            PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: false)
+        );
     }
 
     [Test]
     public static void SowIsAlwaysAllowedWhenSowingIsUncontrolled() =>
-        Assert
-            .That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: false, state: false))
-            .Is.True();
+        Expect.IsTrue(
+            PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: false, state: false)
+        );
 
     // A registered soft-dependency veto (e.g. Smart Farming's "No petty jobs") can only ever turn
     // sowing off, never force it on over hysteresis's own decision.
     [Test]
     public static void VetoOverridesAnOtherwiseAllowedSow() =>
-        Assert
-            .That(
-                PlantToGrowSettableExtensions.ComputeAllowSow(
-                    controlSowing: true,
-                    state: true,
-                    vetoAllowsSow: false
-                )
+        Expect.IsFalse(
+            PlantToGrowSettableExtensions.ComputeAllowSow(
+                controlSowing: true,
+                state: true,
+                vetoAllowsSow: false
             )
-            .Is.False();
+        );
 
     [Test]
     public static void VetoCannotForceSowOnWhenHysteresisWouldDisallowIt() =>
-        Assert
-            .That(
-                PlantToGrowSettableExtensions.ComputeAllowSow(
-                    controlSowing: true,
-                    state: false,
-                    vetoAllowsSow: true
-                )
+        Expect.IsFalse(
+            PlantToGrowSettableExtensions.ComputeAllowSow(
+                controlSowing: true,
+                state: false,
+                vetoAllowsSow: true
             )
-            .Is.False();
+        );
 
     [Test]
     public static void NoVetoRegisteredDefaultsToNoVeto() =>
-        Assert
-            .That(PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: true))
-            .Is.True();
+        Expect.IsTrue(
+            PlantToGrowSettableExtensions.ComputeAllowSow(controlSowing: true, state: true)
+        );
 
     [Test]
     public static void HarvestFollowsStateWheneverHarvestingIsControlledAndNotForced()
     {
-        Assert
-            .That(
-                PlantToGrowSettableExtensions.ComputeAllowHarvest(
-                    controlHarvesting: true,
-                    state: true,
-                    forceHarvestEnabled: false
-                )
+        Expect.IsTrue(
+            PlantToGrowSettableExtensions.ComputeAllowHarvest(
+                controlHarvesting: true,
+                state: true,
+                forceHarvestEnabled: false
             )
-            .Is.True();
-        Assert
-            .That(
-                PlantToGrowSettableExtensions.ComputeAllowHarvest(
-                    controlHarvesting: true,
-                    state: false,
-                    forceHarvestEnabled: false
-                )
+        );
+        Expect.IsFalse(
+            PlantToGrowSettableExtensions.ComputeAllowHarvest(
+                controlHarvesting: true,
+                state: false,
+                forceHarvestEnabled: false
             )
-            .Is.False();
+        );
     }
 
     [Test]
     public static void HarvestIsAlwaysAllowedWhenHarvestingIsUncontrolled() =>
-        Assert
-            .That(
-                PlantToGrowSettableExtensions.ComputeAllowHarvest(
-                    controlHarvesting: false,
-                    state: false,
-                    forceHarvestEnabled: false
-                )
+        Expect.IsTrue(
+            PlantToGrowSettableExtensions.ComputeAllowHarvest(
+                controlHarvesting: false,
+                state: false,
+                forceHarvestEnabled: false
             )
-            .Is.True();
+        );
 
     // A crop the job has rotated away from must still get harvested even though the job's own
     // latch state now says "disabled" for it.
     [Test]
     public static void ForceHarvestEnabledOverridesAnOtherwiseDisabledState() =>
-        Assert
-            .That(
-                PlantToGrowSettableExtensions.ComputeAllowHarvest(
-                    controlHarvesting: true,
-                    state: false,
-                    forceHarvestEnabled: true
-                )
+        Expect.IsTrue(
+            PlantToGrowSettableExtensions.ComputeAllowHarvest(
+                controlHarvesting: true,
+                state: false,
+                forceHarvestEnabled: true
             )
-            .Is.True();
+        );
 }
 
 // Regression guard for the GetControlDefForPlantGrower cache added to fix the uncached LINQ
@@ -115,9 +102,8 @@ internal static class PlantToGrowSettableExtensionsComputeAllowTests
 // picking an exact controlledClass match over a broader IsAssignableFrom fallback, regardless
 // of def order, and must keep returning null (not throwing or matching wrongly) when nothing
 // controls the given type.
-[HotSwappable]
-[TestSuite]
-internal static class PlantToGrowSettableExtensionsResolveControlDefTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class PlantToGrowSettableExtensionsResolveControlDefTests
 {
     [Test]
     public static void ExactControlledClassMatchIsPreferredOverAssignableFromFallback()
@@ -138,7 +124,7 @@ internal static class PlantToGrowSettableExtensionsResolveControlDefTests
             typeof(Zone_Growing)
         );
 
-        Assert.That(result?.defName).Is.EqualTo("Exact");
+        Expect.AreEqual("Exact", result?.defName);
     }
 
     [Test]
@@ -155,7 +141,7 @@ internal static class PlantToGrowSettableExtensionsResolveControlDefTests
             typeof(Zone_Growing)
         );
 
-        Assert.That(result?.defName).Is.EqualTo("Fallback");
+        Expect.AreEqual("Fallback", result?.defName);
     }
 
     [Test]
@@ -172,7 +158,7 @@ internal static class PlantToGrowSettableExtensionsResolveControlDefTests
             typeof(Zone_Growing)
         );
 
-        Assert.That(result is null).Is.True();
+        Expect.IsTrue(result is null);
     }
 
     // Regression guard: two defs colliding on the same controlledClass must not crash
@@ -197,6 +183,6 @@ internal static class PlantToGrowSettableExtensionsResolveControlDefTests
             typeof(Zone_Growing)
         );
 
-        Assert.That(result?.defName).Is.EqualTo("First");
+        Expect.AreEqual("First", result?.defName);
     }
 }

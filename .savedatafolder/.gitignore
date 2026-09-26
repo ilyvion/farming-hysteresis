@@ -1,4 +1,5 @@
 */Config
 */Saves
 */RimSaves
-*/Player.log
+*/Player*.log
+*/Test.log

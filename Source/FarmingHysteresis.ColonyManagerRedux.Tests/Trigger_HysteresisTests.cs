@@ -1,4 +1,4 @@
-using RimTestRedux;
+using DevTools.Testing;
 using static FarmingHysteresis.ColonyManagerRedux.Trigger_Hysteresis;
 using static FarmingHysteresis.LatchMode;
 
@@ -6,71 +6,82 @@ namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
 // Covers Trigger_Hysteresis's latch transition table, which mirrors the same state machine used
 // by FarmingHysteresisData.UpdateLatchModeAndHandling in the default (non-CMR) engine.
-[HotSwappable]
-[TestSuite]
-internal static class ComputeNextLatchModeTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeNextLatchModeTests
 {
     [Test]
     public static void BelowLowerBoundIsAlwaysReachedRegardlessOfPreviousState()
     {
-        Assert
-            .That(ComputeNextLatchMode(Unknown, count: 5, lower: 10, upper: 20))
-            .Is.EqualTo(BelowLowerBound);
-        Assert
-            .That(ComputeNextLatchMode(BetweenBoundsEnabled, count: 5, lower: 10, upper: 20))
-            .Is.EqualTo(BelowLowerBound);
-        Assert
-            .That(ComputeNextLatchMode(AboveUpperBound, count: 5, lower: 10, upper: 20))
-            .Is.EqualTo(BelowLowerBound);
+        Expect.AreEqual(
+            BelowLowerBound,
+            ComputeNextLatchMode(Unknown, count: 5, lower: 10, upper: 20)
+        );
+        Expect.AreEqual(
+            BelowLowerBound,
+            ComputeNextLatchMode(BetweenBoundsEnabled, count: 5, lower: 10, upper: 20)
+        );
+        Expect.AreEqual(
+            BelowLowerBound,
+            ComputeNextLatchMode(AboveUpperBound, count: 5, lower: 10, upper: 20)
+        );
     }
 
     [Test]
     public static void AboveUpperBoundIsAlwaysReachedRegardlessOfPreviousState()
     {
-        Assert
-            .That(ComputeNextLatchMode(Unknown, count: 25, lower: 10, upper: 20))
-            .Is.EqualTo(AboveUpperBound);
-        Assert
-            .That(ComputeNextLatchMode(BetweenBoundsDisabled, count: 25, lower: 10, upper: 20))
-            .Is.EqualTo(AboveUpperBound);
-        Assert
-            .That(ComputeNextLatchMode(BelowLowerBound, count: 25, lower: 10, upper: 20))
-            .Is.EqualTo(AboveUpperBound);
+        Expect.AreEqual(
+            AboveUpperBound,
+            ComputeNextLatchMode(Unknown, count: 25, lower: 10, upper: 20)
+        );
+        Expect.AreEqual(
+            AboveUpperBound,
+            ComputeNextLatchMode(BetweenBoundsDisabled, count: 25, lower: 10, upper: 20)
+        );
+        Expect.AreEqual(
+            AboveUpperBound,
+            ComputeNextLatchMode(BelowLowerBound, count: 25, lower: 10, upper: 20)
+        );
     }
 
     [Test]
     public static void RisingFromBelowLowerBoundEntersEnabledOnceStrictlyAboveLower()
     {
         // still at the lower bound exactly: stays in the "was below" state, doesn't yet flip
-        Assert
-            .That(ComputeNextLatchMode(BelowLowerBound, count: 10, lower: 10, upper: 20))
-            .Is.EqualTo(BelowLowerBound);
+        Expect.AreEqual(
+            BelowLowerBound,
+            ComputeNextLatchMode(BelowLowerBound, count: 10, lower: 10, upper: 20)
+        );
         // strictly above lower: now enters the enabled latch
-        Assert
-            .That(ComputeNextLatchMode(BelowLowerBound, count: 11, lower: 10, upper: 20))
-            .Is.EqualTo(BetweenBoundsEnabled);
+        Expect.AreEqual(
+            BetweenBoundsEnabled,
+            ComputeNextLatchMode(BelowLowerBound, count: 11, lower: 10, upper: 20)
+        );
     }
 
     [Test]
     public static void FallingFromAboveUpperBoundEntersDisabledOnceStrictlyBelowUpper()
     {
-        Assert
-            .That(ComputeNextLatchMode(AboveUpperBound, count: 20, lower: 10, upper: 20))
-            .Is.EqualTo(AboveUpperBound);
-        Assert
-            .That(ComputeNextLatchMode(AboveUpperBound, count: 19, lower: 10, upper: 20))
-            .Is.EqualTo(BetweenBoundsDisabled);
+        Expect.AreEqual(
+            AboveUpperBound,
+            ComputeNextLatchMode(AboveUpperBound, count: 20, lower: 10, upper: 20)
+        );
+        Expect.AreEqual(
+            BetweenBoundsDisabled,
+            ComputeNextLatchMode(AboveUpperBound, count: 19, lower: 10, upper: 20)
+        );
     }
 
     [Test]
     public static void BetweenBoundsStatesAreSticky()
     {
-        Assert
-            .That(ComputeNextLatchMode(BetweenBoundsEnabled, count: 15, lower: 10, upper: 20))
-            .Is.EqualTo(BetweenBoundsEnabled);
-        Assert
-            .That(ComputeNextLatchMode(BetweenBoundsDisabled, count: 15, lower: 10, upper: 20))
-            .Is.EqualTo(BetweenBoundsDisabled);
+        Expect.AreEqual(
+            BetweenBoundsEnabled,
+            ComputeNextLatchMode(BetweenBoundsEnabled, count: 15, lower: 10, upper: 20)
+        );
+        Expect.AreEqual(
+            BetweenBoundsDisabled,
+            ComputeNextLatchMode(BetweenBoundsDisabled, count: 15, lower: 10, upper: 20)
+        );
     }
 
     // Regression guard for the "unbound" last-crop fallback: it must never latch into
@@ -79,20 +90,20 @@ internal static class ComputeNextLatchModeTests
     [Test]
     public static void UnboundNeverLatchesAboveUpperBoundRegardlessOfCount()
     {
-        Assert
-            .That(
-                ComputeNextLatchMode(
-                    BetweenBoundsEnabled,
-                    count: 25,
-                    lower: 10,
-                    upper: 20,
-                    unbound: true
-                )
+        Expect.AreEqual(
+            BetweenBoundsEnabled,
+            ComputeNextLatchMode(
+                BetweenBoundsEnabled,
+                count: 25,
+                lower: 10,
+                upper: 20,
+                unbound: true
             )
-            .Is.EqualTo(BetweenBoundsEnabled);
-        Assert
-            .That(ComputeNextLatchMode(Unknown, count: 25, lower: 10, upper: 20, unbound: true))
-            .Is.EqualTo(BetweenBoundsEnabled);
+        );
+        Expect.AreEqual(
+            BetweenBoundsEnabled,
+            ComputeNextLatchMode(Unknown, count: 25, lower: 10, upper: 20, unbound: true)
+        );
     }
 
     // An entry marked unbound after it had already latched above its own upper bound must
@@ -100,39 +111,30 @@ internal static class ComputeNextLatchModeTests
     // not just forward-looking.
     [Test]
     public static void UnboundSelfHealsAnAlreadyDisabledLatch() =>
-        Assert
-            .That(
-                ComputeNextLatchMode(
-                    AboveUpperBound,
-                    count: 25,
-                    lower: 10,
-                    upper: 20,
-                    unbound: true
-                )
-            )
-            .Is.EqualTo(BetweenBoundsEnabled);
+        Expect.AreEqual(
+            BetweenBoundsEnabled,
+            ComputeNextLatchMode(AboveUpperBound, count: 25, lower: 10, upper: 20, unbound: true)
+        );
 
     [Test]
     public static void UnboundStillFallsToBelowLowerBoundWhenCountDropsUnderLower() =>
-        Assert
-            .That(
-                ComputeNextLatchMode(
-                    BetweenBoundsEnabled,
-                    count: 5,
-                    lower: 10,
-                    upper: 20,
-                    unbound: true
-                )
+        Expect.AreEqual(
+            BelowLowerBound,
+            ComputeNextLatchMode(
+                BetweenBoundsEnabled,
+                count: 5,
+                lower: 10,
+                upper: 20,
+                unbound: true
             )
-            .Is.EqualTo(BelowLowerBound);
+        );
 }
 
 // Covers Trigger_Hysteresis.IsEffectivelyUnbound - CropRotationEntry.Unbound only takes effect
 // for the actual last rotation entry, so a stale flag left on an entry that used to be last (but
 // isn't anymore) must never be acted on.
-[HotSwappable]
-[TestSuite]
-internal static class IsEffectivelyUnboundTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class IsEffectivelyUnboundTests
 {
     [Test]
     public static void TrueForTheLastEntryMarkedUnbound()
@@ -141,7 +143,7 @@ internal static class IsEffectivelyUnboundTests
         var last = new CropRotationEntry { Unbound = true };
         List<CropRotationEntry> entries = [first, last];
 
-        Assert.That(IsEffectivelyUnbound(last, entries)).Is.True();
+        Expect.IsTrue(IsEffectivelyUnbound(last, entries));
     }
 
     [Test]
@@ -150,7 +152,7 @@ internal static class IsEffectivelyUnboundTests
         var last = new CropRotationEntry();
         List<CropRotationEntry> entries = [last];
 
-        Assert.That(IsEffectivelyUnbound(last, entries)).Is.False();
+        Expect.IsFalse(IsEffectivelyUnbound(last, entries));
     }
 
     [Test]
@@ -160,22 +162,22 @@ internal static class IsEffectivelyUnboundTests
         var last = new CropRotationEntry();
         List<CropRotationEntry> entries = [earlier, last];
 
-        Assert.That(IsEffectivelyUnbound(earlier, entries)).Is.False();
+        Expect.IsFalse(IsEffectivelyUnbound(earlier, entries));
     }
 }
 
 // Covers the pure scaling math shared by the lower/upper bound progress bar marks in
 // Trigger_Hysteresis.DrawVerticalProgressBars/DrawHorizontalProgressBars and the base bar fill,
 // in isolation from the live IMGUI draw calls it's normally fed by.
-[HotSwappable]
-[TestSuite]
-internal static class ComputeMarkPositionTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeMarkPositionTests
 {
     [Test]
     public static void ValueAtZeroIsAtTheStartOfTheBar() =>
-        Assert
-            .That(ComputeMarkPosition(value: 0, maxValue: 20, currentValue: 5, barLength: 100))
-            .Is.EqualTo(0f);
+        Expect.AreEqual(
+            0f,
+            ComputeMarkPosition(value: 0, maxValue: 20, currentValue: 5, barLength: 100)
+        );
 
     [Test]
     public static void MaxValueLandsBeforeTheEndOfTheBarToLeaveHeadroom()
@@ -190,8 +192,8 @@ internal static class ComputeMarkPositionTests
             barLength: 100
         );
 
-        Assert.That(markPosition).Is.LessThan(100f);
-        Assert.That(markPosition).Is.GreaterThan(0f);
+        Expect.LessThan(markPosition, 100f);
+        Expect.GreaterThan(markPosition, 0f);
     }
 
     [Test]
@@ -212,7 +214,7 @@ internal static class ComputeMarkPositionTests
             barLength: 100
         );
 
-        Assert.That(lowerMark).Is.EqualTo(upperMark / 2);
+        Expect.AreEqual(upperMark / 2, lowerMark);
     }
 
     [Test]
@@ -234,16 +236,15 @@ internal static class ComputeMarkPositionTests
             barLength: 100
         );
 
-        Assert.That(markWithOvershoot).Is.LessThan(markWithoutOvershoot);
+        Expect.LessThan(markWithOvershoot, markWithoutOvershoot);
     }
 }
 
 // Covers Trigger_Hysteresis's "tracked filter follows target plant" seeding - the filter's own
 // ThingFilter mutation logic, tested directly against a bare ThingFilter rather than a live
 // job/trigger/map.
-[HotSwappable]
-[TestSuite]
-internal static class SyncFilterToSingleDefTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class SyncFilterToSingleDefTests
 {
     [Test]
     public static void AllowsOnlyTheGivenDef()
@@ -253,8 +254,8 @@ internal static class SyncFilterToSingleDefTests
 
         SyncFilterToSingleDef(filter, beer);
 
-        Assert.ThatCollection(filter.AllowedThingDefs).Has.Count(1);
-        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(beer);
+        Expect.AreEqual(1, filter.AllowedThingDefs.Count());
+        Expect.IsTrue(filter.AllowedThingDefs.Contains(beer));
     }
 
     [Test]
@@ -267,9 +268,9 @@ internal static class SyncFilterToSingleDefTests
 
         SyncFilterToSingleDef(filter, beer);
 
-        Assert.ThatCollection(filter.AllowedThingDefs).Has.Count(1);
-        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(beer);
-        Assert.ThatCollection(filter.AllowedThingDefs).Does.Not.Contain(hops);
+        Expect.AreEqual(1, filter.AllowedThingDefs.Count());
+        Expect.IsTrue(filter.AllowedThingDefs.Contains(beer));
+        Expect.IsFalse(filter.AllowedThingDefs.Contains(hops));
     }
 
     [Test]
@@ -281,15 +282,14 @@ internal static class SyncFilterToSingleDefTests
 
         SyncFilterToSingleDef(filter, null);
 
-        Assert.ThatCollection(filter.AllowedThingDefs).Is.Empty();
+        Expect.IsEmpty(filter.AllowedThingDefs);
     }
 }
 
 // Covers SyncFilterToDefs, the multi-def generalization that SyncFilterToSingleDef is a one-def
 // special case of.
-[HotSwappable]
-[TestSuite]
-internal static class SyncFilterToDefsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class SyncFilterToDefsTests
 {
     [Test]
     public static void AllowsEveryGivenDef()
@@ -300,9 +300,9 @@ internal static class SyncFilterToDefsTests
 
         SyncFilterToDefs(filter, [hops, beer]);
 
-        Assert.ThatCollection(filter.AllowedThingDefs).Has.Count(2);
-        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(hops);
-        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(beer);
+        Expect.AreEqual(2, filter.AllowedThingDefs.Count());
+        Expect.IsTrue(filter.AllowedThingDefs.Contains(hops));
+        Expect.IsTrue(filter.AllowedThingDefs.Contains(beer));
     }
 
     [Test]
@@ -315,9 +315,9 @@ internal static class SyncFilterToDefsTests
 
         SyncFilterToDefs(filter, [beer]);
 
-        Assert.ThatCollection(filter.AllowedThingDefs).Has.Count(1);
-        Assert.ThatCollection(filter.AllowedThingDefs).Does.Contain(beer);
-        Assert.ThatCollection(filter.AllowedThingDefs).Does.Not.Contain(hops);
+        Expect.AreEqual(1, filter.AllowedThingDefs.Count());
+        Expect.IsTrue(filter.AllowedThingDefs.Contains(beer));
+        Expect.IsFalse(filter.AllowedThingDefs.Contains(hops));
     }
 
     [Test]
@@ -329,7 +329,7 @@ internal static class SyncFilterToDefsTests
 
         SyncFilterToDefs(filter, []);
 
-        Assert.ThatCollection(filter.AllowedThingDefs).Is.Empty();
+        Expect.IsEmpty(filter.AllowedThingDefs);
     }
 }
 
@@ -337,59 +337,49 @@ internal static class SyncFilterToDefsTests
 // AboveUpperBound should advance the rotation, and only when there's more than one crop to
 // rotate through - otherwise a single-crop job must sit disabled once over Upper, indefinitely,
 // rather than advancing.
-[HotSwappable]
-[TestSuite]
-internal static class ShouldAdvanceRotationTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ShouldAdvanceRotationTests
 {
     [Test]
     public static void DoesNotAdvanceWithoutMultipleRotationEntries()
     {
-        Assert
-            .That(
-                ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 0)
-            )
-            .Is.False();
-        Assert
-            .That(
-                ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 1)
-            )
-            .Is.False();
+        Expect.IsFalse(
+            ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 0)
+        );
+        Expect.IsFalse(
+            ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 1)
+        );
     }
 
     [Test]
     public static void AdvancesOnFreshTransitionIntoAboveUpperBoundWithMultipleEntries()
     {
-        Assert
-            .That(
-                ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 2)
-            )
-            .Is.True();
-        Assert
-            .That(ShouldAdvanceRotation(BelowLowerBound, AboveUpperBound, rotationEntryCount: 2))
-            .Is.True();
+        Expect.IsTrue(
+            ShouldAdvanceRotation(BetweenBoundsEnabled, AboveUpperBound, rotationEntryCount: 2)
+        );
+        Expect.IsTrue(
+            ShouldAdvanceRotation(BelowLowerBound, AboveUpperBound, rotationEntryCount: 2)
+        );
     }
 
     // Sticky - already over the bound last cycle too, so this isn't a fresh transition.
     [Test]
     public static void DoesNotAdvanceWhenAlreadyAboveUpperBound() =>
-        Assert
-            .That(ShouldAdvanceRotation(AboveUpperBound, AboveUpperBound, rotationEntryCount: 2))
-            .Is.False();
+        Expect.IsFalse(
+            ShouldAdvanceRotation(AboveUpperBound, AboveUpperBound, rotationEntryCount: 2)
+        );
 
     [Test]
     public static void DoesNotAdvanceWhenNotAboveUpperBound() =>
-        Assert
-            .That(
-                ShouldAdvanceRotation(BelowLowerBound, BetweenBoundsEnabled, rotationEntryCount: 2)
-            )
-            .Is.False();
+        Expect.IsFalse(
+            ShouldAdvanceRotation(BelowLowerBound, BetweenBoundsEnabled, rotationEntryCount: 2)
+        );
 }
 
 // Covers DescribeTrackedCountNoun's pluralizable-noun logic, tested directly against a bare
 // ThingFilter rather than a live job/trigger.
-[HotSwappable]
-[TestSuite]
-internal static class DescribeTrackedCountNounTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class DescribeTrackedCountNounTests
 {
     [Test]
     public static void SingleAllowedDefReturnsItsLabel()
@@ -400,7 +390,7 @@ internal static class DescribeTrackedCountNounTests
 
         var result = DescribeTrackedCountNoun(filter);
 
-        Assert.That(result).Is.EqualTo("beer");
+        Expect.AreEqual("beer", result);
     }
 
     [Test]
@@ -410,8 +400,8 @@ internal static class DescribeTrackedCountNounTests
 
         var result = DescribeTrackedCountNoun(filter);
 
-        Assert.That(result).Is.Not.Null();
-        Assert.That(result).Is.Not.EqualTo("");
+        Expect.IsNotNull(result);
+        Expect.AreNotEqual("", result);
     }
 
     [Test]
@@ -424,8 +414,8 @@ internal static class DescribeTrackedCountNounTests
 
         var result = DescribeTrackedCountNoun(filter);
 
-        Assert.That(result).Is.Not.EqualTo("hops");
-        Assert.That(result).Is.Not.EqualTo("beer");
+        Expect.AreNotEqual("hops", result);
+        Expect.AreNotEqual("beer", result);
     }
 }
 
@@ -433,9 +423,8 @@ internal static class DescribeTrackedCountNounTests
 // committed active entry id when a rotation entry was removed during the real multi-tick
 // gather->execute window, so the cycle's computed NewActiveEntryId can point at an id that no
 // longer exists (regression guard: this used to be a bare First(e => e.Id == id) that threw).
-[HotSwappable]
-[TestSuite]
-internal static class ResolveActiveEntryIdAfterCycleUpdateTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ResolveActiveEntryIdAfterCycleUpdateTests
 {
     [Test]
     public static void KeepsTheComputedIdWhenItStillExists()
@@ -446,7 +435,7 @@ internal static class ResolveActiveEntryIdAfterCycleUpdateTests
             remainingEntryIds: [1, 2, 3]
         );
 
-        Assert.That(result).Is.EqualTo(2);
+        Expect.AreEqual(2, result);
     }
 
     [Test]
@@ -458,7 +447,7 @@ internal static class ResolveActiveEntryIdAfterCycleUpdateTests
             remainingEntryIds: [1, 3]
         );
 
-        Assert.That(result).Is.EqualTo(1);
+        Expect.AreEqual(1, result);
     }
 
     [Test]
@@ -470,7 +459,7 @@ internal static class ResolveActiveEntryIdAfterCycleUpdateTests
             remainingEntryIds: [3, 4]
         );
 
-        Assert.That(result).Is.EqualTo(3);
+        Expect.AreEqual(3, result);
     }
 
     [Test]
@@ -482,7 +471,7 @@ internal static class ResolveActiveEntryIdAfterCycleUpdateTests
             remainingEntryIds: []
         );
 
-        Assert.That(result).Is.Null();
+        Expect.IsTrue(result == null);
     }
 
     [Test]
@@ -494,15 +483,14 @@ internal static class ResolveActiveEntryIdAfterCycleUpdateTests
             remainingEntryIds: [1, 2]
         );
 
-        Assert.That(result).Is.EqualTo(1);
+        Expect.AreEqual(1, result);
     }
 }
 
 // Covers DescribeTrackedFilter's 3-way None/single-label/Multiple summary, tested directly
 // against a bare ThingFilter rather than a live job/trigger.
-[HotSwappable]
-[TestSuite]
-internal static class DescribeTrackedFilterTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class DescribeTrackedFilterTests
 {
     [Test]
     public static void NoAllowedDefsReturnsTheNoneSummary()
@@ -511,8 +499,8 @@ internal static class DescribeTrackedFilterTests
 
         var result = DescribeTrackedFilter(filter);
 
-        Assert.That(result).Is.Not.Null();
-        Assert.That(result).Is.Not.EqualTo("");
+        Expect.IsNotNull(result);
+        Expect.AreNotEqual("", result);
     }
 
     [Test]
@@ -524,7 +512,7 @@ internal static class DescribeTrackedFilterTests
 
         var result = DescribeTrackedFilter(filter);
 
-        Assert.That(result).Is.EqualTo("beer");
+        Expect.AreEqual("beer", result);
     }
 
     [Test]
@@ -538,9 +526,9 @@ internal static class DescribeTrackedFilterTests
 
         var result = DescribeTrackedFilter(filter);
 
-        Assert.That(result).Is.Not.EqualTo("hops");
-        Assert.That(result).Is.Not.EqualTo("beer");
-        Assert.That(result).Is.Not.EqualTo("rice");
-        Assert.ThatCollection(result.Split(' ')).Does.Contain("3");
+        Expect.AreNotEqual("hops", result);
+        Expect.AreNotEqual("beer", result);
+        Expect.AreNotEqual("rice", result);
+        Expect.IsTrue(result.Split(' ').Contains("3"));
     }
 }

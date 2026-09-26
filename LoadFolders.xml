@@ -46,6 +46,5 @@
         <li IfModActive="OskarPotocki.VanillaFactionsExpanded.Core"
             >Integrations/VanillaExpandedFramework/1.6</li>
         <li IfModActive="Owlchemist.SmartFarming">Integrations/SmartFarming/1.6</li>
-        <li IfModActive="ilyvion.rimtestredux">Integrations/RimTestRedux/1.6</li>
     </v1.6>
 </loadFolders>

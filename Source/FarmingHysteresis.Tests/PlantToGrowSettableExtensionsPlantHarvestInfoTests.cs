@@ -1,5 +1,5 @@
+using DevTools.Testing;
 using FarmingHysteresis.Extensions;
-using RimTestRedux;
 
 namespace FarmingHysteresis.Tests;
 
@@ -19,9 +19,8 @@ file sealed class FakeGrower(ThingDef? plantDef) : IPlantToGrowSettable
     public Map Map => throw new NotImplementedException();
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class PlantToGrowSettableExtensionsPlantHarvestInfoTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class PlantToGrowSettableExtensionsPlantHarvestInfoTests
 {
     // Regression test: a misbehaving mod that sets a non-plant ThingDef as a grower's
     // plant-to-grow used to NRE here, since only the outer GetPlantDefToGrow() null was guarded,
@@ -33,8 +32,8 @@ internal static class PlantToGrowSettableExtensionsPlantHarvestInfoTests
 
         var (harvestedThingDef, count) = grower.PlantHarvestInfo();
 
-        Assert.That(harvestedThingDef == null).Is.True();
-        Assert.That(count).Is.EqualTo(0);
+        Expect.IsTrue(harvestedThingDef == null);
+        Expect.AreEqual(0, count);
     }
 
     [Test]
@@ -44,7 +43,7 @@ internal static class PlantToGrowSettableExtensionsPlantHarvestInfoTests
 
         var (harvestedThingDef, count) = grower.PlantHarvestInfo();
 
-        Assert.That(harvestedThingDef == null).Is.True();
-        Assert.That(count).Is.EqualTo(0);
+        Expect.IsTrue(harvestedThingDef == null);
+        Expect.AreEqual(0, count);
     }
 }

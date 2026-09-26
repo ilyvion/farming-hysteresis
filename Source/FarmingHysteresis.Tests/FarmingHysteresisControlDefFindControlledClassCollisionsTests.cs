@@ -1,14 +1,13 @@
+using DevTools.Testing;
 using FarmingHysteresis.Defs;
-using RimTestRedux;
 
 namespace FarmingHysteresis.Tests;
 
 // Regression guard for BUG-1: two FarmingHysteresisControlDefs claiming the same controlledClass
 // must be surfaced as a ConfigErrors error (the modder-facing signal), since ResolveControlDef
 // itself now silently picks one instead of throwing.
-[HotSwappable]
-[TestSuite]
-internal static class FarmingHysteresisControlDefFindControlledClassCollisionsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class FarmingHysteresisControlDefFindControlledClassCollisionsTests
 {
     [Test]
     public static void NoErrorWhenAllControlledClassesAreDistinct()
@@ -29,7 +28,7 @@ internal static class FarmingHysteresisControlDefFindControlledClassCollisionsTe
             first
         );
 
-        Assert.ThatCollection(result).Is.Empty();
+        Expect.IsEmpty(result);
     }
 
     [Test]
@@ -56,7 +55,7 @@ internal static class FarmingHysteresisControlDefFindControlledClassCollisionsTe
             first
         );
 
-        Assert.ThatCollection(result).Has.Count(2);
+        Expect.AreEqual(2, result.Count());
     }
 
     [Test]
@@ -70,6 +69,6 @@ internal static class FarmingHysteresisControlDefFindControlledClassCollisionsTe
 
         var result = FarmingHysteresisControlDef.FindControlledClassCollisions([only], only);
 
-        Assert.ThatCollection(result).Is.Empty();
+        Expect.IsEmpty(result);
     }
 }

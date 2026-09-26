@@ -1,4 +1,4 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace FarmingHysteresis.SmartFarming.Tests;
 
@@ -22,11 +22,10 @@ file sealed class FakeGrower : IPlantToGrowSettable
 // this is what keeps SmartFarmingIntegration safe to register as
 // FarmingHysteresisMod.AllowSowVeto for every controlled grower, not just Smart Farming's own
 // growing zones.
-[HotSwappable]
-[TestSuite]
-internal static class SmartFarmingIntegrationTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class SmartFarmingIntegrationTests
 {
     [Test]
     public static void NonZoneGrowingGrowerIsNeverVetoed() =>
-        Assert.That(SmartFarmingIntegration.AllowSow(new FakeGrower())).Is.True();
+        Expect.IsTrue(SmartFarmingIntegration.AllowSow(new FakeGrower()));
 }

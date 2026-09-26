@@ -1,17 +1,16 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class BoundValuesLookupHasBoundsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class BoundValuesLookupHasBoundsTests
 {
     [Test]
     public static void NullDictionaryHasNoBounds()
     {
         var hops = new ThingDef();
 
-        Assert.That(BoundValuesLookup.HasBounds(null, hops)).Is.False();
+        Expect.IsFalse(BoundValuesLookup.HasBounds(null, hops));
     }
 
     [Test]
@@ -20,7 +19,7 @@ internal static class BoundValuesLookupHasBoundsTests
         var hops = new ThingDef();
         var values = new Dictionary<ThingDef, BoundValues>();
 
-        Assert.That(BoundValuesLookup.HasBounds(values, hops)).Is.False();
+        Expect.IsFalse(BoundValuesLookup.HasBounds(values, hops));
     }
 
     [Test]
@@ -29,7 +28,7 @@ internal static class BoundValuesLookupHasBoundsTests
         var hops = new ThingDef();
         var values = new Dictionary<ThingDef, BoundValues> { [hops] = new() };
 
-        Assert.That(BoundValuesLookup.HasBounds(values, hops)).Is.True();
+        Expect.IsTrue(BoundValuesLookup.HasBounds(values, hops));
     }
 
     [Test]
@@ -39,7 +38,7 @@ internal static class BoundValuesLookupHasBoundsTests
         var beer = new ThingDef();
         var values = new Dictionary<ThingDef, BoundValues> { [beer] = new() };
 
-        Assert.That(BoundValuesLookup.HasBounds(values, hops)).Is.False();
+        Expect.IsFalse(BoundValuesLookup.HasBounds(values, hops));
     }
 
     [Test]
@@ -49,8 +48,8 @@ internal static class BoundValuesLookupHasBoundsTests
 
         var peeked = BoundValuesLookup.Peek(null, hops, 10, 20);
 
-        Assert.That(peeked.Lower).Is.EqualTo(10);
-        Assert.That(peeked.Upper).Is.EqualTo(20);
+        Expect.AreEqual(10, peeked.Lower);
+        Expect.AreEqual(20, peeked.Upper);
     }
 
     [Test]
@@ -61,7 +60,7 @@ internal static class BoundValuesLookupHasBoundsTests
 
         _ = BoundValuesLookup.Peek(values, hops, 10, 20);
 
-        Assert.That(BoundValuesLookup.HasBounds(values, hops)).Is.False();
+        Expect.IsFalse(BoundValuesLookup.HasBounds(values, hops));
     }
 
     [Test]
@@ -73,7 +72,7 @@ internal static class BoundValuesLookupHasBoundsTests
 
         var peeked = BoundValuesLookup.Peek(values, hops, 10, 20);
 
-        Assert.That(ReferenceEquals(peeked, existing)).Is.True();
+        Expect.IsTrue(ReferenceEquals(peeked, existing));
     }
 
     [Test]
@@ -85,8 +84,8 @@ internal static class BoundValuesLookupHasBoundsTests
 
         BoundValuesLookup.Commit(values, hops, peeked);
 
-        Assert.That(BoundValuesLookup.HasBounds(values, hops)).Is.True();
-        Assert.That(ReferenceEquals(values[hops], peeked)).Is.True();
+        Expect.IsTrue(BoundValuesLookup.HasBounds(values, hops));
+        Expect.IsTrue(ReferenceEquals(values[hops], peeked));
     }
 
     [Test]
@@ -99,6 +98,6 @@ internal static class BoundValuesLookupHasBoundsTests
 
         BoundValuesLookup.Commit(values, hops, other);
 
-        Assert.That(ReferenceEquals(values[hops], existing)).Is.True();
+        Expect.IsTrue(ReferenceEquals(values[hops], existing));
     }
 }

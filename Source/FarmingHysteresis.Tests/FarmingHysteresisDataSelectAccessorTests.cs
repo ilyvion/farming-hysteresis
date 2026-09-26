@@ -1,10 +1,9 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class FarmingHysteresisDataSelectAccessorTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class FarmingHysteresisDataSelectAccessorTests
 {
     private sealed class FakeAccessor : IBoundedValueAccessor
     {
@@ -39,7 +38,7 @@ internal static class FarmingHysteresisDataSelectAccessorTests
             () => throw new InvalidOperationException("map factory should not be invoked"),
             () => throw new InvalidOperationException("game factory should not be invoked")
         );
-        Assert.That(result.BoundValueRaw.Lower).Is.EqualTo(1);
+        Expect.AreEqual(1, result.BoundValueRaw.Lower);
     }
 
     [Test]
@@ -51,7 +50,7 @@ internal static class FarmingHysteresisDataSelectAccessorTests
             () => MapAccessor,
             () => throw new InvalidOperationException("game factory should not be invoked")
         );
-        Assert.That(result.BoundValueRaw.Lower).Is.EqualTo(3);
+        Expect.AreEqual(3, result.BoundValueRaw.Lower);
     }
 
     [Test]
@@ -63,16 +62,17 @@ internal static class FarmingHysteresisDataSelectAccessorTests
             () => throw new InvalidOperationException("map factory should not be invoked"),
             () => GameAccessor
         );
-        Assert.That(result.BoundValueRaw.Lower).Is.EqualTo(5);
+        Expect.AreEqual(5, result.BoundValueRaw.Lower);
     }
 
     [Test]
-    [ShouldThrow(typeof(InvalidOperationException))]
     public static void UncoveredBoundsSourceThrows() =>
-        FarmingHysteresisData.SelectAccessor(
-            (BoundsSource)99,
-            SelfAccessor,
-            () => MapAccessor,
-            () => GameAccessor
+        Expect.Throws<InvalidOperationException>(() =>
+            FarmingHysteresisData.SelectAccessor(
+                (BoundsSource)99,
+                SelfAccessor,
+                () => MapAccessor,
+                () => GameAccessor
+            )
         );
 }

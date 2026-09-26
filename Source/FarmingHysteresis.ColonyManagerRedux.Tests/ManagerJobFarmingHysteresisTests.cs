@@ -1,89 +1,59 @@
-using RimTestRedux;
+using DevTools.Testing;
 using static FarmingHysteresis.ColonyManagerRedux.ManagerJob_FarmingHysteresis;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
 // A grower must never end up managed by more than one Farming Hysteresis manager job at once.
-[HotSwappable]
-[TestSuite]
-internal static class ManagerJobFarmingHysteresisScopeTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ManagerJobFarmingHysteresisScopeTests
 {
     [Test]
     public static void AllModeIgnoresAreaAndSpecificSelection()
     {
-        Assert
-            .That(
-                IsGrowerInScope(
-                    GrowerAssignmentMode.All,
-                    inArea: false,
-                    isSpecificallySelected: false
-                )
-            )
-            .Is.True();
-        Assert
-            .That(
-                IsGrowerInScope(
-                    GrowerAssignmentMode.All,
-                    inArea: true,
-                    isSpecificallySelected: true
-                )
-            )
-            .Is.True();
+        Expect.IsTrue(
+            IsGrowerInScope(GrowerAssignmentMode.All, inArea: false, isSpecificallySelected: false)
+        );
+        Expect.IsTrue(
+            IsGrowerInScope(GrowerAssignmentMode.All, inArea: true, isSpecificallySelected: true)
+        );
     }
 
     [Test]
     public static void AreaModeFollowsAreaMembership()
     {
-        Assert
-            .That(
-                IsGrowerInScope(
-                    GrowerAssignmentMode.Area,
-                    inArea: true,
-                    isSpecificallySelected: false
-                )
-            )
-            .Is.True();
-        Assert
-            .That(
-                IsGrowerInScope(
-                    GrowerAssignmentMode.Area,
-                    inArea: false,
-                    isSpecificallySelected: true
-                )
-            )
-            .Is.False();
+        Expect.IsTrue(
+            IsGrowerInScope(GrowerAssignmentMode.Area, inArea: true, isSpecificallySelected: false)
+        );
+        Expect.IsFalse(
+            IsGrowerInScope(GrowerAssignmentMode.Area, inArea: false, isSpecificallySelected: true)
+        );
     }
 
     [Test]
     public static void SpecificModeFollowsExplicitSelection()
     {
-        Assert
-            .That(
-                IsGrowerInScope(
-                    GrowerAssignmentMode.Specific,
-                    inArea: true,
-                    isSpecificallySelected: false
-                )
+        Expect.IsFalse(
+            IsGrowerInScope(
+                GrowerAssignmentMode.Specific,
+                inArea: true,
+                isSpecificallySelected: false
             )
-            .Is.False();
-        Assert
-            .That(
-                IsGrowerInScope(
-                    GrowerAssignmentMode.Specific,
-                    inArea: false,
-                    isSpecificallySelected: true
-                )
+        );
+        Expect.IsTrue(
+            IsGrowerInScope(
+                GrowerAssignmentMode.Specific,
+                inArea: false,
+                isSpecificallySelected: true
             )
-            .Is.True();
+        );
     }
 }
 
 // Covers ClearUnboundOnCurrentLastEntry, AddRotationEntry's auto-clear step: a rotation entry's
 // Unbound flag is only meaningful for the actual last entry, so whichever entry was previously
 // last must give it up as soon as a new entry gets appended below it.
-[HotSwappable]
-[TestSuite]
-internal static class ClearUnboundOnCurrentLastEntryTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ClearUnboundOnCurrentLastEntryTests
 {
     [Test]
     public static void ClearsUnboundOnTheCurrentLastEntry()
@@ -92,7 +62,7 @@ internal static class ClearUnboundOnCurrentLastEntryTests
 
         ClearUnboundOnCurrentLastEntry(entries);
 
-        Assert.That(entries[^1].Unbound).Is.False();
+        Expect.IsFalse(entries[^1].Unbound);
     }
 
     [Test]
@@ -105,7 +75,7 @@ internal static class ClearUnboundOnCurrentLastEntryTests
 
         // Not a realistic state (Unbound should never be set on a non-last entry to begin with),
         // but this confirms the clear is scoped to the last entry alone, not the whole list.
-        Assert.That(earlier.Unbound).Is.True();
+        Expect.IsTrue(earlier.Unbound);
     }
 
     [Test]
@@ -115,16 +85,15 @@ internal static class ClearUnboundOnCurrentLastEntryTests
 // Regression guard: plants with no harvestedThingDef (e.g. purely decorative plants like roses)
 // must never appear in ValidTargetPlants, since Trigger_Hysteresis would have nothing to count
 // for them.
-[HotSwappable]
-[TestSuite]
-internal static class ValidTargetPlantCandidateTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ValidTargetPlantCandidateTests
 {
     [Test]
     public static void PlantWithNoHarvestedThingDefIsNeverValidRegardlessOfAvailability()
     {
         var plantDef = new ThingDef { plant = new PlantProperties { harvestedThingDef = null } };
 
-        Assert.That(IsValidTargetPlantCandidate(plantDef, _ => true)).Is.False();
+        Expect.IsFalse(IsValidTargetPlantCandidate(plantDef, _ => true));
     }
 
     [Test]
@@ -135,17 +104,16 @@ internal static class ValidTargetPlantCandidateTests
             plant = new PlantProperties { harvestedThingDef = new ThingDef() },
         };
 
-        Assert.That(IsValidTargetPlantCandidate(plantDef, _ => true)).Is.True();
-        Assert.That(IsValidTargetPlantCandidate(plantDef, _ => false)).Is.False();
+        Expect.IsTrue(IsValidTargetPlantCandidate(plantDef, _ => true));
+        Expect.IsFalse(IsValidTargetPlantCandidate(plantDef, _ => false));
     }
 }
 
 // FindOwningJob/ManagedGrowers themselves need a live Manager/JobTracker to exercise end to end,
 // but the "first claim wins" exclusion they're built on is plain set arithmetic - covered here
 // with plain fakes standing in for growers and per-job scopes.
-[HotSwappable]
-[TestSuite]
-internal static class GrowerClaimResolutionTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class GrowerClaimResolutionTests
 {
     private static List<string> ManagedByFirstClaim(params IReadOnlyList<string>[] jobScopesInOrder)
     {
@@ -167,8 +135,8 @@ internal static class GrowerClaimResolutionTests
     {
         var managed = ManagedByFirstClaim(["zoneA"], ["zoneB"]);
 
-        Assert.ThatCollection(managed).Has.Count(1);
-        Assert.ThatCollection(managed).Does.Contain("zoneB");
+        Expect.AreEqual(1, managed.Count);
+        Expect.IsTrue(managed.Contains("zoneB"));
     }
 
     [Test]
@@ -176,64 +144,59 @@ internal static class GrowerClaimResolutionTests
     {
         var laterJobManaged = ManagedByFirstClaim(["zoneA", "zoneB"], ["zoneB", "zoneC"]);
 
-        Assert.ThatCollection(laterJobManaged).Does.Not.Contain("zoneB");
-        Assert.ThatCollection(laterJobManaged).Does.Contain("zoneC");
+        Expect.IsFalse(laterJobManaged.Contains("zoneB"));
+        Expect.IsTrue(laterJobManaged.Contains("zoneC"));
     }
 }
 
 // Covers ManagerJob_FarmingHysteresis.History's per-chapter selection logic: stock, lower bound,
 // and upper bound are each their own flat/varying chapter, and none of them ever draw a target
 // line.
-[HotSwappable]
-[TestSuite]
-internal static class ManagerJobFarmingHysteresisHistoryTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ManagerJobFarmingHysteresisHistoryTests
 {
     [Test]
     public static void StockChapterCountIsTheTrackedThingCount() =>
-        Assert
-            .That(
-                ManagerJob_FarmingHysteresis.History.SelectCount(
-                    ManagerJobHistoryChapterDefOf.FH_HistoryStock,
-                    trackedThingCount: 42,
-                    lower: 10,
-                    upper: 20
-                )
+        Expect.AreEqual(
+            42,
+            ManagerJob_FarmingHysteresis.History.SelectCount(
+                ManagerJobHistoryChapterDefOf.FH_HistoryStock,
+                trackedThingCount: 42,
+                lower: 10,
+                upper: 20
             )
-            .Is.EqualTo(42);
+        );
 
     [Test]
     public static void LowerChapterCountIsTheLowerBound() =>
-        Assert
-            .That(
-                ManagerJob_FarmingHysteresis.History.SelectCount(
-                    ManagerJobHistoryChapterDefOf.FH_HistoryLower,
-                    trackedThingCount: 42,
-                    lower: 10,
-                    upper: 20
-                )
+        Expect.AreEqual(
+            10,
+            ManagerJob_FarmingHysteresis.History.SelectCount(
+                ManagerJobHistoryChapterDefOf.FH_HistoryLower,
+                trackedThingCount: 42,
+                lower: 10,
+                upper: 20
             )
-            .Is.EqualTo(10);
+        );
 
     [Test]
     public static void UpperChapterCountIsTheUpperBound() =>
-        Assert
-            .That(
-                ManagerJob_FarmingHysteresis.History.SelectCount(
-                    ManagerJobHistoryChapterDefOf.FH_HistoryUpper,
-                    trackedThingCount: 42,
-                    lower: 10,
-                    upper: 20
-                )
+        Expect.AreEqual(
+            20,
+            ManagerJob_FarmingHysteresis.History.SelectCount(
+                ManagerJobHistoryChapterDefOf.FH_HistoryUpper,
+                trackedThingCount: 42,
+                lower: 10,
+                upper: 20
             )
-            .Is.EqualTo(20);
+        );
 }
 
 // Regression guard: reordering/removing entries other than the active one must never silently
 // change which crop is considered active - the active entry must be tracked by identity, not by
 // list position.
-[HotSwappable]
-[TestSuite]
-internal static class ComputeActiveEntryIdAfterRemovalTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeActiveEntryIdAfterRemovalTests
 {
     [Test]
     public static void RemovingANonActiveEntryLeavesActiveIdUntouched()
@@ -247,7 +210,7 @@ internal static class ComputeActiveEntryIdAfterRemovalTests
             remainingEntryIds: [2, 3]
         );
 
-        Assert.That(result).Is.EqualTo(2);
+        Expect.AreEqual(2, result);
     }
 
     [Test]
@@ -260,7 +223,7 @@ internal static class ComputeActiveEntryIdAfterRemovalTests
             remainingEntryIds: [2, 3]
         );
 
-        Assert.That(result).Is.EqualTo(2);
+        Expect.AreEqual(2, result);
     }
 
     [Test]
@@ -273,7 +236,7 @@ internal static class ComputeActiveEntryIdAfterRemovalTests
             remainingEntryIds: [1, 2]
         );
 
-        Assert.That(result).Is.EqualTo(2);
+        Expect.AreEqual(2, result);
     }
 
     [Test]
@@ -286,93 +249,87 @@ internal static class ComputeActiveEntryIdAfterRemovalTests
             remainingEntryIds: []
         );
 
-        Assert.That(result).Is.Null();
+        Expect.IsTrue(result == null);
     }
 }
 
 // Regression guard for the round-robin advance's position-based lookup: it must resolve the
 // active entry's *current* list position (which reordering may have changed) rather than
 // assuming it's stayed put, and degrade gracefully rather than throwing if it can't find a match.
-[HotSwappable]
-[TestSuite]
-internal static class ComputeNextActiveEntryIdTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeNextActiveEntryIdTests
 {
     [Test]
     public static void AdvancesToTheNextEntryByCurrentPosition() =>
-        Assert.That(ComputeNextActiveEntryId([1, 2, 3], activeEntryId: 1)).Is.EqualTo(2);
+        Expect.AreEqual(2, ComputeNextActiveEntryId([1, 2, 3], activeEntryId: 1));
 
     [Test]
     public static void CyclesBackToTheFirstEntryAfterTheLast() =>
-        Assert.That(ComputeNextActiveEntryId([1, 2, 3], activeEntryId: 3)).Is.EqualTo(1);
+        Expect.AreEqual(1, ComputeNextActiveEntryId([1, 2, 3], activeEntryId: 3));
 
     // Entries reordered from [1, 2, 3] to [2, 1, 3] (1 and 2 swapped) - entry 1 is still active,
     // now at position 1 instead of 0, so the next entry should be 3, not 2.
     [Test]
     public static void FollowsTheActiveEntryToItsNewPositionAfterReordering() =>
-        Assert.That(ComputeNextActiveEntryId([2, 1, 3], activeEntryId: 1)).Is.EqualTo(3);
+        Expect.AreEqual(3, ComputeNextActiveEntryId([2, 1, 3], activeEntryId: 1));
 
     [Test]
     public static void FallsBackToTheFirstEntryWhenActiveIdIsMissingOrUnset()
     {
-        Assert.That(ComputeNextActiveEntryId([1, 2, 3], activeEntryId: null)).Is.EqualTo(1);
-        Assert.That(ComputeNextActiveEntryId([1, 2, 3], activeEntryId: 99)).Is.EqualTo(1);
+        Expect.AreEqual(1, ComputeNextActiveEntryId([1, 2, 3], activeEntryId: null));
+        Expect.AreEqual(1, ComputeNextActiveEntryId([1, 2, 3], activeEntryId: 99));
     }
 }
 
 // Covers RotationMode.Priority's active-entry selection: list order is a priority order, so the
 // winner is the first entry that isn't already satisfied (AboveUpperBound), skipping over any
 // that are - not whichever entry was active before.
-[HotSwappable]
-[TestSuite]
-internal static class ComputePriorityActiveEntryIdTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputePriorityActiveEntryIdTests
 {
     [Test]
     public static void FirstUnsatisfiedEntryByListOrderWins() =>
-        Assert
-            .That(
-                ComputePriorityActiveEntryId(
-                    [
-                        (1, LatchMode.AboveUpperBound),
-                        (2, LatchMode.BelowLowerBound),
-                        (3, LatchMode.BelowLowerBound),
-                    ],
-                    previousActiveEntryId: 3
-                )
+        Expect.AreEqual(
+            2,
+            ComputePriorityActiveEntryId(
+                [
+                    (1, LatchMode.AboveUpperBound),
+                    (2, LatchMode.BelowLowerBound),
+                    (3, LatchMode.BelowLowerBound),
+                ],
+                previousActiveEntryId: 3
             )
-            .Is.EqualTo(2);
+        );
 
     [Test]
     public static void EarlierUnsatisfiedEntryTakesPriorityOverThePreviouslyActiveOne() =>
-        Assert
-            .That(
-                ComputePriorityActiveEntryId(
-                    [(1, LatchMode.BetweenBoundsEnabled), (2, LatchMode.BelowLowerBound)],
-                    previousActiveEntryId: 2
-                )
+        Expect.AreEqual(
+            1,
+            ComputePriorityActiveEntryId(
+                [(1, LatchMode.BetweenBoundsEnabled), (2, LatchMode.BelowLowerBound)],
+                previousActiveEntryId: 2
             )
-            .Is.EqualTo(1);
+        );
 
     [Test]
     public static void FallsBackToThePreviouslyActiveEntryWhenEverythingIsSatisfied() =>
-        Assert
-            .That(
-                ComputePriorityActiveEntryId(
-                    [(1, LatchMode.AboveUpperBound), (2, LatchMode.AboveUpperBound)],
-                    previousActiveEntryId: 2
-                )
+        Expect.AreEqual(
+            2,
+            ComputePriorityActiveEntryId(
+                [(1, LatchMode.AboveUpperBound), (2, LatchMode.AboveUpperBound)],
+                previousActiveEntryId: 2
             )
-            .Is.EqualTo(2);
+        );
 
     [Test]
     public static void FallsBackToTheFirstEntryWhenEverythingIsSatisfiedAndThereWasNoPreviousActiveEntry() =>
-        Assert
-            .That(
-                ComputePriorityActiveEntryId(
-                    [(1, LatchMode.AboveUpperBound), (2, LatchMode.AboveUpperBound)],
-                    previousActiveEntryId: null
-                )
+        Expect.AreEqual(
+            1,
+            ComputePriorityActiveEntryId(
+                [(1, LatchMode.AboveUpperBound), (2, LatchMode.AboveUpperBound)],
+                previousActiveEntryId: null
             )
-            .Is.EqualTo(1);
+        );
 
     // Regression test: an entry that dropped back under its upper bound without reaching its
     // lower bound (BetweenBoundsDisabled) must still be treated as disallowed, same as
@@ -381,81 +338,73 @@ internal static class ComputePriorityActiveEntryIdTests
     // instead of waiting for it to drop below the lower bound like the hysteresis rule requires.
     [Test]
     public static void StaysOnTheLowerPriorityEntryWhileTheHigherPriorityOneIsBetweenBoundsDisabled() =>
-        Assert
-            .That(
-                ComputePriorityActiveEntryId(
-                    [(1, LatchMode.BetweenBoundsDisabled), (2, LatchMode.BelowLowerBound)],
-                    previousActiveEntryId: 2
-                )
+        Expect.AreEqual(
+            2,
+            ComputePriorityActiveEntryId(
+                [(1, LatchMode.BetweenBoundsDisabled), (2, LatchMode.BelowLowerBound)],
+                previousActiveEntryId: 2
             )
-            .Is.EqualTo(2);
+        );
 }
 
 // Covers RotationMode.RoundRobin's active-entry selection: stays on the active entry unless *its
 // own* latch just made a fresh transition into AboveUpperBound this cycle - a latch that was
 // already AboveUpperBound going into the cycle must not re-trigger an advance every cycle
 // thereafter.
-[HotSwappable]
-[TestSuite]
-internal static class ComputeRoundRobinActiveEntryIdTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeRoundRobinActiveEntryIdTests
 {
     [Test]
     public static void StaysOnTheActiveEntryWhenItsLatchHasNotJustTransitioned() =>
-        Assert
-            .That(
-                ComputeRoundRobinActiveEntryId(
-                    [(1, LatchMode.BetweenBoundsEnabled), (2, LatchMode.Unknown)],
-                    activeEntryId: 1,
-                    previousActiveLatch: LatchMode.BetweenBoundsEnabled
-                )
+        Expect.AreEqual(
+            1,
+            ComputeRoundRobinActiveEntryId(
+                [(1, LatchMode.BetweenBoundsEnabled), (2, LatchMode.Unknown)],
+                activeEntryId: 1,
+                previousActiveLatch: LatchMode.BetweenBoundsEnabled
             )
-            .Is.EqualTo(1);
+        );
 
     [Test]
     public static void AdvancesToTheNextEntryWhenTheActiveEntryJustBecameSatisfied() =>
-        Assert
-            .That(
-                ComputeRoundRobinActiveEntryId(
-                    [(1, LatchMode.AboveUpperBound), (2, LatchMode.Unknown)],
-                    activeEntryId: 1,
-                    previousActiveLatch: LatchMode.BetweenBoundsEnabled
-                )
+        Expect.AreEqual(
+            2,
+            ComputeRoundRobinActiveEntryId(
+                [(1, LatchMode.AboveUpperBound), (2, LatchMode.Unknown)],
+                activeEntryId: 1,
+                previousActiveLatch: LatchMode.BetweenBoundsEnabled
             )
-            .Is.EqualTo(2);
+        );
 
     [Test]
     public static void DoesNotReAdvanceWhenTheActiveEntryWasAlreadySatisfiedLastCycle() =>
-        Assert
-            .That(
-                ComputeRoundRobinActiveEntryId(
-                    [(1, LatchMode.AboveUpperBound), (2, LatchMode.Unknown)],
-                    activeEntryId: 1,
-                    previousActiveLatch: LatchMode.AboveUpperBound
-                )
+        Expect.AreEqual(
+            1,
+            ComputeRoundRobinActiveEntryId(
+                [(1, LatchMode.AboveUpperBound), (2, LatchMode.Unknown)],
+                activeEntryId: 1,
+                previousActiveLatch: LatchMode.AboveUpperBound
             )
-            .Is.EqualTo(1);
+        );
 
     [Test]
     public static void DoesNothingWithoutAPreviousLatchOrActiveEntry()
     {
-        Assert
-            .That(
-                ComputeRoundRobinActiveEntryId(
-                    [(1, LatchMode.AboveUpperBound)],
-                    activeEntryId: null,
-                    previousActiveLatch: LatchMode.BetweenBoundsEnabled
-                )
+        Expect.IsTrue(
+            ComputeRoundRobinActiveEntryId(
+                [(1, LatchMode.AboveUpperBound)],
+                activeEntryId: null,
+                previousActiveLatch: LatchMode.BetweenBoundsEnabled
+            ) == null
+        );
+        Expect.AreEqual(
+            1,
+            ComputeRoundRobinActiveEntryId(
+                [(1, LatchMode.AboveUpperBound)],
+                activeEntryId: 1,
+                previousActiveLatch: null
             )
-            .Is.Null();
-        Assert
-            .That(
-                ComputeRoundRobinActiveEntryId(
-                    [(1, LatchMode.AboveUpperBound)],
-                    activeEntryId: 1,
-                    previousActiveLatch: null
-                )
-            )
-            .Is.EqualTo(1);
+        );
     }
 }
 
@@ -475,16 +424,15 @@ file sealed class FakeGrower : IPlantToGrowSettable
 }
 
 // Covers GrowerLabel's fallback branch for a grower that's neither a Zone nor a Thing.
-[HotSwappable]
-[TestSuite]
-internal static class GrowerLabelTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class GrowerLabelTests
 {
     [Test]
     public static void FallsBackToTheGrowerTypeNameForAnUnrecognizedGrowerType()
     {
         var grower = new FakeGrower();
 
-        Assert.That(GrowerLabel(grower)).Is.EqualTo(grower.GetType().Name);
+        Expect.AreEqual(grower.GetType().Name, GrowerLabel(grower));
     }
 }
 
@@ -493,16 +441,15 @@ internal static class GrowerLabelTests
 // stranded during a rotation switch - but only when that other plant is itself one of this job's
 // rotation crops, not any incidental non-rotation plant (e.g. a wild filler plant sprouting in an
 // unsown cell), which must never count as a leftover.
-[HotSwappable]
-[TestSuite]
-internal static class GrowerHasLeftoverPlantsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class GrowerHasLeftoverPlantsTests
 {
     [Test]
     public static void NoLeftoversWhenEveryCellMatchesTheTarget()
     {
         var target = new ThingDef();
 
-        Assert.That(GrowerHasLeftoverPlants([target, target], target, [target])).Is.False();
+        Expect.IsFalse(GrowerHasLeftoverPlants([target, target], target, [target]));
     }
 
     [Test]
@@ -510,7 +457,7 @@ internal static class GrowerHasLeftoverPlantsTests
     {
         var target = new ThingDef();
 
-        Assert.That(GrowerHasLeftoverPlants([target, null, null], target, [target])).Is.False();
+        Expect.IsFalse(GrowerHasLeftoverPlants([target, null, null], target, [target]));
     }
 
     [Test]
@@ -519,9 +466,9 @@ internal static class GrowerHasLeftoverPlantsTests
         var target = new ThingDef();
         var outgoing = new ThingDef();
 
-        Assert
-            .That(GrowerHasLeftoverPlants([target, outgoing, null], target, [target, outgoing]))
-            .Is.True();
+        Expect.IsTrue(
+            GrowerHasLeftoverPlants([target, outgoing, null], target, [target, outgoing])
+        );
     }
 
     [Test]
@@ -530,9 +477,7 @@ internal static class GrowerHasLeftoverPlantsTests
         var target = new ThingDef();
         var wildPlant = new ThingDef();
 
-        Assert
-            .That(GrowerHasLeftoverPlants([target, wildPlant, null], target, [target]))
-            .Is.False();
+        Expect.IsFalse(GrowerHasLeftoverPlants([target, wildPlant, null], target, [target]));
     }
 }
 
@@ -540,16 +485,15 @@ internal static class GrowerHasLeftoverPlantsTests
 // plant on that grower look like a leftover too - CmrHysteresisController.ShouldProtectLeftoverFromCut
 // checks the specific plant being targeted for cutting via this method, not GrowerHasLeftoverPlants,
 // so a non-rotation plant elsewhere on the same grower is never protected from being cut.
-[HotSwappable]
-[TestSuite]
-internal static class IsLeftoverPlantTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class IsLeftoverPlantTests
 {
     [Test]
     public static void TargetPlantIsNeverALeftover()
     {
         var target = new ThingDef();
 
-        Assert.That(IsLeftoverPlant(target, target, [target])).Is.False();
+        Expect.IsFalse(IsLeftoverPlant(target, target, [target]));
     }
 
     [Test]
@@ -557,7 +501,7 @@ internal static class IsLeftoverPlantTests
     {
         var target = new ThingDef();
 
-        Assert.That(IsLeftoverPlant(null, target, [target])).Is.False();
+        Expect.IsFalse(IsLeftoverPlant(null, target, [target]));
     }
 
     [Test]
@@ -566,7 +510,7 @@ internal static class IsLeftoverPlantTests
         var target = new ThingDef();
         var outgoing = new ThingDef();
 
-        Assert.That(IsLeftoverPlant(outgoing, target, [target, outgoing])).Is.True();
+        Expect.IsTrue(IsLeftoverPlant(outgoing, target, [target, outgoing]));
     }
 
     [Test]
@@ -575,90 +519,76 @@ internal static class IsLeftoverPlantTests
         var target = new ThingDef();
         var wildPlant = new ThingDef();
 
-        Assert.That(IsLeftoverPlant(wildPlant, target, [target])).Is.False();
+        Expect.IsFalse(IsLeftoverPlant(wildPlant, target, [target]));
     }
 }
 
 // Regression guard: PostLoadInit must prune unresolved (null) scribed references instead of
 // dereferencing them, since an unresolved LookMode.Reference is ordinary (the referenced
 // building/zone was already gone at save time), not corruption.
-[HotSwappable]
-[TestSuite]
-internal static class UnresolvedSpecificGrowerReferenceCleanupTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class UnresolvedSpecificGrowerReferenceCleanupTests
 {
     [Test]
     public static void UnresolvedGrowingZoneIsRemoved() =>
-        Assert.That(ShouldRemoveUnresolvedGrowingZone(isNull: true, cellCount: 0)).Is.True();
+        Expect.IsTrue(ShouldRemoveUnresolvedGrowingZone(isNull: true, cellCount: 0));
 
     [Test]
     public static void EmptyGrowingZoneIsRemoved() =>
-        Assert.That(ShouldRemoveUnresolvedGrowingZone(isNull: false, cellCount: 0)).Is.True();
+        Expect.IsTrue(ShouldRemoveUnresolvedGrowingZone(isNull: false, cellCount: 0));
 
     [Test]
     public static void NonEmptyResolvedGrowingZoneIsKept() =>
-        Assert.That(ShouldRemoveUnresolvedGrowingZone(isNull: false, cellCount: 1)).Is.False();
+        Expect.IsFalse(ShouldRemoveUnresolvedGrowingZone(isNull: false, cellCount: 1));
 
     [Test]
     public static void UnresolvedPlantGrowerBuildingIsRemoved() =>
-        Assert
-            .That(
-                ShouldRemoveUnresolvedPlantGrowerBuilding(
-                    isNull: true,
-                    destroyed: false,
-                    spawned: true
-                )
-            )
-            .Is.True();
+        Expect.IsTrue(
+            ShouldRemoveUnresolvedPlantGrowerBuilding(isNull: true, destroyed: false, spawned: true)
+        );
 
     [Test]
     public static void DestroyedPlantGrowerBuildingIsRemoved() =>
-        Assert
-            .That(
-                ShouldRemoveUnresolvedPlantGrowerBuilding(
-                    isNull: false,
-                    destroyed: true,
-                    spawned: false
-                )
+        Expect.IsTrue(
+            ShouldRemoveUnresolvedPlantGrowerBuilding(
+                isNull: false,
+                destroyed: true,
+                spawned: false
             )
-            .Is.True();
+        );
 
     [Test]
     public static void UnspawnedPlantGrowerBuildingIsRemoved() =>
-        Assert
-            .That(
-                ShouldRemoveUnresolvedPlantGrowerBuilding(
-                    isNull: false,
-                    destroyed: false,
-                    spawned: false
-                )
+        Expect.IsTrue(
+            ShouldRemoveUnresolvedPlantGrowerBuilding(
+                isNull: false,
+                destroyed: false,
+                spawned: false
             )
-            .Is.True();
+        );
 
     [Test]
     public static void ResolvedSpawnedPlantGrowerBuildingIsKept() =>
-        Assert
-            .That(
-                ShouldRemoveUnresolvedPlantGrowerBuilding(
-                    isNull: false,
-                    destroyed: false,
-                    spawned: true
-                )
+        Expect.IsFalse(
+            ShouldRemoveUnresolvedPlantGrowerBuilding(
+                isNull: false,
+                destroyed: false,
+                spawned: true
             )
-            .Is.False();
+        );
 }
 
 // Regression guard: a deleted Area used as GrowerArea must be cleared out via
 // Notify_AreaRemoved, not left dangling until the next save/load cycle re-resolves the reference
 // as null.
-[HotSwappable]
-[TestSuite]
-internal static class IsRemovedAreaTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class IsRemovedAreaTests
 {
     [Test]
     public static void MatchingGrowerAreaIsRecognizedAsRemoved()
     {
         var area = new Area_Home();
-        Assert.That(IsRemovedArea(area, area)).Is.True();
+        Expect.IsTrue(IsRemovedArea(area, area));
     }
 
     [Test]
@@ -666,12 +596,12 @@ internal static class IsRemovedAreaTests
     {
         var growerArea = new Area_Home();
         var removedArea = new Area_Home();
-        Assert.That(IsRemovedArea(growerArea, removedArea)).Is.False();
+        Expect.IsFalse(IsRemovedArea(growerArea, removedArea));
     }
 
     [Test]
     public static void NoGrowerAreaIsNotRecognizedAsRemoved() =>
-        Assert.That(IsRemovedArea(null, new Area_Home())).Is.False();
+        Expect.IsFalse(IsRemovedArea(null, new Area_Home()));
 }
 
 // A job saved before per-job HysteresisMode existed has no scribed node for
@@ -679,31 +609,28 @@ internal static class IsRemovedAreaTests
 // which must pick up the old global HysteresisMode setting instead of whatever
 // HysteresisMode.Sowing default the (missing) node would otherwise have resolved to. A job saved
 // after the field existed must keep exactly what it loaded, regardless of the legacy value.
-[HotSwappable]
-[TestSuite]
-internal static class ResolveHysteresisModeAfterLoadTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ResolveHysteresisModeAfterLoadTests
 {
     [Test]
     public static void AlreadyMigratedJobKeepsItsLoadedMode() =>
-        Assert
-            .That(
-                ResolveHysteresisModeAfterLoad(
-                    hasMigratedHysteresisMode: true,
-                    loadedHysteresisMode: HysteresisMode.Harvesting,
-                    legacyHysteresisMode: HysteresisMode.SowingAndHarvesting
-                )
+        Expect.AreEqual(
+            HysteresisMode.Harvesting,
+            ResolveHysteresisModeAfterLoad(
+                hasMigratedHysteresisMode: true,
+                loadedHysteresisMode: HysteresisMode.Harvesting,
+                legacyHysteresisMode: HysteresisMode.SowingAndHarvesting
             )
-            .Is.EqualTo(HysteresisMode.Harvesting);
+        );
 
     [Test]
     public static void UnmigratedJobAdoptsTheLegacyGlobalMode() =>
-        Assert
-            .That(
-                ResolveHysteresisModeAfterLoad(
-                    hasMigratedHysteresisMode: false,
-                    loadedHysteresisMode: HysteresisMode.Sowing,
-                    legacyHysteresisMode: HysteresisMode.SowingAndHarvesting
-                )
+        Expect.AreEqual(
+            HysteresisMode.SowingAndHarvesting,
+            ResolveHysteresisModeAfterLoad(
+                hasMigratedHysteresisMode: false,
+                loadedHysteresisMode: HysteresisMode.Sowing,
+                legacyHysteresisMode: HysteresisMode.SowingAndHarvesting
             )
-            .Is.EqualTo(HysteresisMode.SowingAndHarvesting);
+        );
 }

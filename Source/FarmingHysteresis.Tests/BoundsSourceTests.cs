@@ -1,86 +1,78 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class BoundsSourceMigrationTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class BoundsSourceMigrationTests
 {
     [Test]
     public static void OldTrueMigratesToMap() =>
-        Assert
-            .That(BoundsSourceMigration.FromOldUseGlobalValues(true))
-            .Is.EqualTo(BoundsSource.Map);
+        Expect.AreEqual(BoundsSource.Map, BoundsSourceMigration.FromOldUseGlobalValues(true));
 
     [Test]
     public static void OldFalseMigratesToSelf() =>
-        Assert
-            .That(BoundsSourceMigration.FromOldUseGlobalValues(false))
-            .Is.EqualTo(BoundsSource.Self);
+        Expect.AreEqual(BoundsSource.Self, BoundsSourceMigration.FromOldUseGlobalValues(false));
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class BoundsSourceUiShouldSeedOnSwitchTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class BoundsSourceUiShouldSeedOnSwitchTests
 {
     [Test]
     public static void SelfIsNeverSeeded()
     {
-        Assert.That(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Self, false)).Is.False();
-        Assert.That(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Self, true)).Is.False();
+        Expect.IsFalse(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Self, false));
+        Expect.IsFalse(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Self, true));
     }
 
     [Test]
     public static void MapIsSeededOnlyWhenDestinationHasNoExistingBounds()
     {
-        Assert.That(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Map, false)).Is.True();
-        Assert.That(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Map, true)).Is.False();
+        Expect.IsTrue(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Map, false));
+        Expect.IsFalse(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Map, true));
     }
 
     [Test]
     public static void GameIsSeededOnlyWhenDestinationHasNoExistingBounds()
     {
-        Assert.That(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Game, false)).Is.True();
-        Assert.That(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Game, true)).Is.False();
+        Expect.IsTrue(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Game, false));
+        Expect.IsFalse(BoundsSourceUi.ShouldSeedOnSwitch(BoundsSource.Game, true));
     }
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class BoundsSourceUiLabelTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class BoundsSourceUiLabelTests
 {
     [Test]
     public static void SelfReturnsNonEmptyString()
     {
         var result = BoundsSourceUi.Label(BoundsSource.Self);
-        Assert.That(result).Is.Not.Null();
-        Assert.That(result).Is.Not.EqualTo("");
+        Expect.IsNotNull(result);
+        Expect.AreNotEqual("", result);
     }
 
     [Test]
     public static void MapReturnsNonEmptyString()
     {
         var result = BoundsSourceUi.Label(BoundsSource.Map);
-        Assert.That(result).Is.Not.Null();
-        Assert.That(result).Is.Not.EqualTo("");
+        Expect.IsNotNull(result);
+        Expect.AreNotEqual("", result);
     }
 
     [Test]
     public static void GameReturnsNonEmptyString()
     {
         var result = BoundsSourceUi.Label(BoundsSource.Game);
-        Assert.That(result).Is.Not.Null();
-        Assert.That(result).Is.Not.EqualTo("");
+        Expect.IsNotNull(result);
+        Expect.AreNotEqual("", result);
     }
 
     [Test]
-    [ShouldThrow(typeof(InvalidOperationException))]
-    public static void UncoveredBoundsSourceThrows() => BoundsSourceUi.Label((BoundsSource)99);
+    public static void UncoveredBoundsSourceThrows() =>
+        Expect.Throws<InvalidOperationException>(() => BoundsSourceUi.Label((BoundsSource)99));
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class FarmingHysteresisDataSeedBoundsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class FarmingHysteresisDataSeedBoundsTests
 {
     // Regression test: switching to a fresh Map/Game tier used to seed it by
     // assigning LowerBound then UpperBound through the clamped property setters. Since a
@@ -96,7 +88,7 @@ internal static class FarmingHysteresisDataSeedBoundsTests
 
         data.SeedBounds(seededLower, seededUpper);
 
-        Assert.That(data.LowerBound).Is.EqualTo(seededLower);
-        Assert.That(data.UpperBound).Is.EqualTo(seededUpper);
+        Expect.AreEqual(seededLower, data.LowerBound);
+        Expect.AreEqual(seededUpper, data.UpperBound);
     }
 }

@@ -3,10 +3,9 @@
         <UseLaboratory>true</UseLaboratory>
         <RootNamespace>FarmingHysteresis.Tests</RootNamespace>
         <AssemblyName>FarmingHysteresis.Tests</AssemblyName>
-        <OutputPath>../../Integrations/RimTestRedux/$(RimWorldVersion)/Assemblies</OutputPath>
     </PropertyGroup>
     <!--
-        Without the RimTestRedux reference (see below), this project has no Publicize items of
+        Without the DevTools reference (see below), this project has no Publicize items of
         its own, so Krafs.Publicizer's generated IgnoresAccessChecksToAttribute merely shadows
         the one already made public inside the referenced FarmingHysteresis assembly; CS0436 is
         harmless here.
@@ -15,11 +14,8 @@
         <NoWarn>$(NoWarn);CS0436</NoWarn>
     </PropertyGroup>
     <!--
-        Dev-only test assembly, built and run in-game via RimTest Redux (see
-        https://github.com/ilyvion/rimtest-redux). Its output is placed in
-        Integrations/RimTestRedux/<version>/Assemblies, which LoadFolders.xml only loads when
-        RimTest Redux (ilyvion.rimtestredux) is active, so launching FarmingHysteresis without
-        RimTest Redux never touches this assembly.
+        Dev-only test assembly, built and run in-game via DevTools. Its output goes to the
+        default <version>/Assemblies next to FarmingHysteresis.dll, alongside DevTools.dll.
 
         It's listed in FarmingHysteresis.sln so it always builds locally (default Configuration
         is Debug, see .vscode/build_config.sh), but FarmingHysteresis.sln deliberately omits a
@@ -27,8 +23,8 @@
         (what CI/release always use, per rimworld-utils' build_mod.yml) skips building it
         entirely; its output never lands in a shipped release.
 
-        RimTest Redux only supports RimWorld 1.6, so for any other RimWorldVersion this project
-        builds as an empty assembly: both the test sources and the RimTestRedux reference are
+        DevTools only supports RimWorld 1.6, so for any other RimWorldVersion this project
+        builds as an empty assembly: both the test sources and the DevTools reference are
         excluded below.
     -->
     <ItemGroup>
@@ -38,7 +34,10 @@
         </ProjectReference>
     </ItemGroup>
     <ItemGroup Condition="'$(RimWorldVersion)' == '1.6'">
-        <ProjectReference Include="$(ProjectDependenciesBasePath)\RimTest\Source\RimTestRedux\RimTestRedux.csproj">
+        <ProjectReference
+            Include="$(ProjectDependenciesBasePath)\Third-Party\DevTools\DevTools\DevTools.csproj"
+            AdditionalProperties="OutDir=$(MSBuildThisFileDirectory)..\..\1.6\Assemblies\"
+        >
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
         </ProjectReference>

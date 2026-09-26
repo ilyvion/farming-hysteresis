@@ -1,4 +1,4 @@
-using RimTestRedux;
+using DevTools.Testing;
 using static FarmingHysteresis.ColonyManagerRedux.ManagerTab_FarmingHysteresis;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
@@ -6,9 +6,8 @@ namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 // Covers DescribeUntrackedProductHint's null-returning branches - the entry-detached, already-
 // tracking-both, and no-resolvable-secondary-product cases - in isolation from any live VEF
 // dual-crop extension.
-[HotSwappable]
-[TestSuite]
-internal static class DescribeUntrackedProductHintTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class DescribeUntrackedProductHintTests
 {
     private static ThingDef PlantWithHarvestedProduct() =>
         new()
@@ -27,7 +26,7 @@ internal static class DescribeUntrackedProductHintTests
             Mode = DualCropTrackingMode.PrimaryOnly,
         };
 
-        Assert.That(DescribeUntrackedProductHint(entry)).Is.Null();
+        Expect.IsNull(DescribeUntrackedProductHint(entry));
     }
 
     [Test]
@@ -40,7 +39,7 @@ internal static class DescribeUntrackedProductHintTests
             Mode = DualCropTrackingMode.Both,
         };
 
-        Assert.That(DescribeUntrackedProductHint(entry)).Is.Null();
+        Expect.IsNull(DescribeUntrackedProductHint(entry));
     }
 
     [Test]
@@ -53,7 +52,7 @@ internal static class DescribeUntrackedProductHintTests
             Mode = DualCropTrackingMode.PrimaryOnly,
         };
 
-        Assert.That(DescribeUntrackedProductHint(entry)).Is.Null();
+        Expect.IsNull(DescribeUntrackedProductHint(entry));
     }
 
     [Test]
@@ -66,26 +65,24 @@ internal static class DescribeUntrackedProductHintTests
             Mode = DualCropTrackingMode.SecondaryOnly,
         };
 
-        Assert.That(DescribeUntrackedProductHint(entry)).Is.Null();
+        Expect.IsNull(DescribeUntrackedProductHint(entry));
     }
 }
 
 // Covers AddCropButtonLabelKey's branch selection - a player with no rotation entries yet read
 // the "additional crop" wording as implying one already existed, so the empty-rotation case must
 // resolve to a distinct key.
-[HotSwappable]
-[TestSuite]
-internal static class AddCropButtonLabelKeyTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class AddCropButtonLabelKeyTests
 {
     [Test]
     public static void ReturnsFirstCropKeyWhenNoEntriesExist() =>
-        Assert
-            .That(AddCropButtonLabelKey(0))
-            .Is.EqualTo("FarmingHysteresis.CMR.CropRotation.AddFirstCrop");
+        Expect.AreEqual(
+            "FarmingHysteresis.CMR.CropRotation.AddFirstCrop",
+            AddCropButtonLabelKey(0)
+        );
 
     [Test]
     public static void ReturnsAdditionalCropKeyWhenEntriesExist() =>
-        Assert
-            .That(AddCropButtonLabelKey(1))
-            .Is.EqualTo("FarmingHysteresis.CMR.CropRotation.AddCrop");
+        Expect.AreEqual("FarmingHysteresis.CMR.CropRotation.AddCrop", AddCropButtonLabelKey(1));
 }

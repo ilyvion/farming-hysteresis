@@ -6,7 +6,7 @@
         <OutputPath>../../Integrations/VanillaExpandedFramework/$(RimWorldVersion)/Assemblies</OutputPath>
     </PropertyGroup>
     <!--
-        Without the RimTestRedux reference (see below), this project has no Publicize items of
+        Without the DevTools reference (see below), this project has no Publicize items of
         its own, so Krafs.Publicizer's generated IgnoresAccessChecksToAttribute merely shadows
         the one already made public inside the referenced
         FarmingHysteresis.VanillaExpandedFramework assembly; CS0436 is harmless here.
@@ -16,8 +16,8 @@
     </PropertyGroup>
     <!--
         Dev-only test assembly for the Vanilla Expanded Framework integration, built and run
-        in-game via RimTest Redux (see https://github.com/ilyvion/rimtest-redux). Its output is
-        deployed alongside FarmingHysteresis.VanillaExpandedFramework.dll into
+        in-game via DevTools. Its output is deployed alongside
+        FarmingHysteresis.VanillaExpandedFramework.dll into
         Integrations/VanillaExpandedFramework/<version>/Assemblies, which LoadFolders.xml only
         loads when Vanilla Expanded Framework (OskarPotocki.VanillaFactionsExpanded.Core) is
         active, so these tests are only discovered when there's a VEF install for them to
@@ -30,8 +30,8 @@
         (what CI/release always use, per rimworld-utils' build_mod.yml) skips building it
         entirely; its output never lands in a shipped release.
 
-        RimTest Redux only supports RimWorld 1.6, so for any other RimWorldVersion this project
-        builds as an empty assembly: both the test sources and the RimTestRedux reference are
+        DevTools only supports RimWorld 1.6, so for any other RimWorldVersion this project
+        builds as an empty assembly: both the test sources and the DevTools reference are
         excluded below.
     -->
     <ItemGroup>
@@ -45,7 +45,10 @@
         </ProjectReference>
     </ItemGroup>
     <ItemGroup Condition="'$(RimWorldVersion)' == '1.6'">
-        <ProjectReference Include="$(ProjectDependenciesBasePath)\RimTest\Source\RimTestRedux\RimTestRedux.csproj">
+        <ProjectReference
+            Include="$(ProjectDependenciesBasePath)\Third-Party\DevTools\DevTools\DevTools.csproj"
+            AdditionalProperties="OutDir=$(MSBuildThisFileDirectory)..\..\1.6\Assemblies\"
+        >
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
         </ProjectReference>

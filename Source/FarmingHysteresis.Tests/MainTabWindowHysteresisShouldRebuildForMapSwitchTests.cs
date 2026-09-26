@@ -1,10 +1,9 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class MainTabWindowHysteresisShouldRebuildForMapSwitchTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class MainTabWindowHysteresisShouldRebuildForMapSwitchTests
 {
     // Regression test: RebuildBoundsList() used to resolve Find.CurrentMap only from PreOpen
     // and the source-selector float menu, so switching maps with the tab open (e.g. via dev
@@ -15,15 +14,13 @@ internal static class MainTabWindowHysteresisShouldRebuildForMapSwitchTests
         var boundMap = new object();
         var currentMap = new object();
 
-        Assert
-            .That(
-                MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(
-                    BoundsSource.Map,
-                    boundMap,
-                    currentMap
-                )
+        Expect.IsTrue(
+            MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(
+                BoundsSource.Map,
+                boundMap,
+                currentMap
             )
-            .Is.True();
+        );
     }
 
     [Test]
@@ -31,15 +28,9 @@ internal static class MainTabWindowHysteresisShouldRebuildForMapSwitchTests
     {
         var boundMap = new object();
 
-        Assert
-            .That(
-                MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(
-                    BoundsSource.Map,
-                    boundMap,
-                    boundMap
-                )
-            )
-            .Is.False();
+        Expect.IsFalse(
+            MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(BoundsSource.Map, boundMap, boundMap)
+        );
     }
 
     [Test]
@@ -48,18 +39,16 @@ internal static class MainTabWindowHysteresisShouldRebuildForMapSwitchTests
         var boundMap = new object();
         var currentMap = new object();
 
-        Assert
-            .That(
-                MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(
-                    BoundsSource.Game,
-                    boundMap,
-                    currentMap
-                )
+        Expect.IsFalse(
+            MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(
+                BoundsSource.Game,
+                boundMap,
+                currentMap
             )
-            .Is.False();
-        Assert
-            .That(MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(BoundsSource.Game, null, null))
-            .Is.False();
+        );
+        Expect.IsFalse(
+            MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(BoundsSource.Game, null, null)
+        );
     }
 
     [Test]
@@ -68,14 +57,12 @@ internal static class MainTabWindowHysteresisShouldRebuildForMapSwitchTests
         var boundMap = new object();
         var currentMap = new object();
 
-        Assert
-            .That(
-                MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(
-                    BoundsSource.Self,
-                    boundMap,
-                    currentMap
-                )
+        Expect.IsFalse(
+            MainTabWindow_Hysteresis.ShouldRebuildForMapSwitch(
+                BoundsSource.Self,
+                boundMap,
+                currentMap
             )
-            .Is.False();
+        );
     }
 }

@@ -1,11 +1,10 @@
+using DevTools.Testing;
 using FarmingHysteresis.Patch;
-using RimTestRedux;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class WorkGiverGrowerHarvestHasJobOnCellTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class WorkGiverGrowerHarvestHasJobOnCellTests
 {
     // Regression test: a grower whose hysteresis was disabled while its persisted
     // allowHarvest flag happened to be false used to stay permanently blocked from
@@ -14,36 +13,30 @@ internal static class WorkGiverGrowerHarvestHasJobOnCellTests
     // route through this same ComputeResult, so this suite guards those too.
     [Test]
     public static void DisabledGrowerLeavesOriginalResultUntouched() =>
-        Assert
-            .That(
-                WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
-                    originalResult: true,
-                    enabled: false,
-                    allowHarvest: false
-                )
+        Expect.IsTrue(
+            WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
+                originalResult: true,
+                enabled: false,
+                allowHarvest: false
             )
-            .Is.True();
+        );
 
     [Test]
     public static void EnabledGrowerAppliesAllowHarvestFlag()
     {
-        Assert
-            .That(
-                WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
-                    originalResult: true,
-                    enabled: true,
-                    allowHarvest: false
-                )
+        Expect.IsFalse(
+            WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
+                originalResult: true,
+                enabled: true,
+                allowHarvest: false
             )
-            .Is.False();
-        Assert
-            .That(
-                WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
-                    originalResult: true,
-                    enabled: true,
-                    allowHarvest: true
-                )
+        );
+        Expect.IsTrue(
+            WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
+                originalResult: true,
+                enabled: true,
+                allowHarvest: true
             )
-            .Is.True();
+        );
     }
 }

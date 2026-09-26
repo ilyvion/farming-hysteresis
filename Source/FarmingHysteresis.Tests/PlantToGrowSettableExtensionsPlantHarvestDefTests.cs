@@ -1,5 +1,5 @@
+using DevTools.Testing;
 using FarmingHysteresis.Extensions;
-using RimTestRedux;
 
 namespace FarmingHysteresis.Tests;
 
@@ -19,9 +19,8 @@ file sealed class FakeGrower(ThingDef? plantDef) : IPlantToGrowSettable
     public Map Map => throw new NotImplementedException();
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class PlantToGrowSettableExtensionsPlantHarvestDefTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class PlantToGrowSettableExtensionsPlantHarvestDefTests
 {
     // Regression test for BUG-10: ITab_Hysteresis.RefreshFields used to call PlantHarvestInfo
     // (which computes the map-wide harvested count) only to discard the count. PlantHarvestDef
@@ -40,7 +39,7 @@ internal static class PlantToGrowSettableExtensionsPlantHarvestDefTests
 
         var result = grower.PlantHarvestDef();
 
-        Assert.That(result == harvestedThingDef).Is.True();
+        Expect.IsTrue(result == harvestedThingDef);
     }
 
     [Test]
@@ -50,7 +49,7 @@ internal static class PlantToGrowSettableExtensionsPlantHarvestDefTests
 
         var result = grower.PlantHarvestDef();
 
-        Assert.That(result == null).Is.True();
+        Expect.IsTrue(result == null);
     }
 
     [Test]
@@ -60,6 +59,6 @@ internal static class PlantToGrowSettableExtensionsPlantHarvestDefTests
 
         var result = grower.PlantHarvestDef();
 
-        Assert.That(result == null).Is.True();
+        Expect.IsTrue(result == null);
     }
 }

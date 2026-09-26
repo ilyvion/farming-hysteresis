@@ -1,45 +1,36 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class MainButtonWorkerHysteresisComputeVisibleTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class MainButtonWorkerHysteresisComputeVisibleTests
 {
     [Test]
     public static void VisibleOnlyWhenBothFlagsAreTrue()
     {
-        Assert
-            .That(
-                MainButtonWorker_Hysteresis.ComputeVisible(
-                    showHysteresisMainTab: true,
-                    controllerShowMainTab: true
-                )
+        Expect.IsTrue(
+            MainButtonWorker_Hysteresis.ComputeVisible(
+                showHysteresisMainTab: true,
+                controllerShowMainTab: true
             )
-            .Is.True();
-        Assert
-            .That(
-                MainButtonWorker_Hysteresis.ComputeVisible(
-                    showHysteresisMainTab: true,
-                    controllerShowMainTab: false
-                )
+        );
+        Expect.IsFalse(
+            MainButtonWorker_Hysteresis.ComputeVisible(
+                showHysteresisMainTab: true,
+                controllerShowMainTab: false
             )
-            .Is.False();
-        Assert
-            .That(
-                MainButtonWorker_Hysteresis.ComputeVisible(
-                    showHysteresisMainTab: false,
-                    controllerShowMainTab: true
-                )
+        );
+        Expect.IsFalse(
+            MainButtonWorker_Hysteresis.ComputeVisible(
+                showHysteresisMainTab: false,
+                controllerShowMainTab: true
             )
-            .Is.False();
-        Assert
-            .That(
-                MainButtonWorker_Hysteresis.ComputeVisible(
-                    showHysteresisMainTab: false,
-                    controllerShowMainTab: false
-                )
+        );
+        Expect.IsFalse(
+            MainButtonWorker_Hysteresis.ComputeVisible(
+                showHysteresisMainTab: false,
+                controllerShowMainTab: false
             )
-            .Is.False();
+        );
     }
 }

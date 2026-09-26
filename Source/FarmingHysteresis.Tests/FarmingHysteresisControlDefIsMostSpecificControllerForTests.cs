@@ -1,5 +1,5 @@
+using DevTools.Testing;
 using FarmingHysteresis.Defs;
-using RimTestRedux;
 
 namespace FarmingHysteresis.Tests;
 
@@ -15,9 +15,8 @@ file sealed class FakeDerivedGrower : FakeBaseGrower;
 
 file sealed class FakeUnrelatedGrower;
 
-[HotSwappable]
-[TestSuite]
-internal static class FarmingHysteresisControlDefIsMostSpecificControllerForTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class FarmingHysteresisControlDefIsMostSpecificControllerForTests
 {
     [Test]
     public static void BroaderDefIsNotTheControllerForATypeAMoreSpecificDefExactlyMatches()
@@ -39,7 +38,7 @@ internal static class FarmingHysteresisControlDefIsMostSpecificControllerForTest
             broad
         );
 
-        Assert.That(result).Is.False();
+        Expect.IsFalse(result);
     }
 
     [Test]
@@ -62,7 +61,7 @@ internal static class FarmingHysteresisControlDefIsMostSpecificControllerForTest
             specific
         );
 
-        Assert.That(result).Is.True();
+        Expect.IsTrue(result);
     }
 
     [Test]
@@ -85,7 +84,7 @@ internal static class FarmingHysteresisControlDefIsMostSpecificControllerForTest
             broad
         );
 
-        Assert.That(result).Is.True();
+        Expect.IsTrue(result);
     }
 
     [Test]
@@ -103,6 +102,6 @@ internal static class FarmingHysteresisControlDefIsMostSpecificControllerForTest
             broad
         );
 
-        Assert.That(result).Is.False();
+        Expect.IsFalse(result);
     }
 }

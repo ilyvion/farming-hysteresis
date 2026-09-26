@@ -1,87 +1,71 @@
-using RimTestRedux;
+using DevTools.Testing;
 using static FarmingHysteresis.ColonyManagerRedux.ManagerJob_FarmingHysteresis;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
 // Covers the "limit sowing to computed need" cell-count/cell-selection math in isolation from any
 // live job/map - see ManagerJob_FarmingHysteresis.RecomputeSowBudget for the live glue.
-[HotSwappable]
-[TestSuite]
-internal static class ComputeRequiredCellCountTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeRequiredCellCountTests
 {
     [Test]
     public static void NoRemainingNeedRequiresNoCells() =>
-        Assert
-            .That(
-                ComputeRequiredCellCount(remainingNeed: 0, yieldPerCell: 5, safetyMultiplier: 1.2f)
-            )
-            .Is.EqualTo(0);
+        Expect.AreEqual(
+            0,
+            ComputeRequiredCellCount(remainingNeed: 0, yieldPerCell: 5, safetyMultiplier: 1.2f)
+        );
 
     [Test]
     public static void NegativeRemainingNeedRequiresNoCells() =>
-        Assert
-            .That(
-                ComputeRequiredCellCount(
-                    remainingNeed: -10,
-                    yieldPerCell: 5,
-                    safetyMultiplier: 1.2f
-                )
-            )
-            .Is.EqualTo(0);
+        Expect.AreEqual(
+            0,
+            ComputeRequiredCellCount(remainingNeed: -10, yieldPerCell: 5, safetyMultiplier: 1.2f)
+        );
 
     [Test]
     public static void RemainingNeedIsDividedByYieldAndRoundedUp() =>
         // 400 / 5 = 80, * 1.0 safety = 80
-        Assert
-            .That(
-                ComputeRequiredCellCount(remainingNeed: 400, yieldPerCell: 5, safetyMultiplier: 1f)
-            )
-            .Is.EqualTo(80);
+        Expect.AreEqual(
+            80,
+            ComputeRequiredCellCount(remainingNeed: 400, yieldPerCell: 5, safetyMultiplier: 1f)
+        );
 
     [Test]
     public static void PartialCellIsRoundedUpRatherThanTruncated() =>
         // 401 / 5 = 80.2, rounded up to 81
-        Assert
-            .That(
-                ComputeRequiredCellCount(remainingNeed: 401, yieldPerCell: 5, safetyMultiplier: 1f)
-            )
-            .Is.EqualTo(81);
+        Expect.AreEqual(
+            81,
+            ComputeRequiredCellCount(remainingNeed: 401, yieldPerCell: 5, safetyMultiplier: 1f)
+        );
 
     [Test]
     public static void SafetyMultiplierInflatesTheResult() =>
         // 400 / 5 = 80, * 1.2 safety = 96 mathematically, but 1.2f's float imprecision (stored as
         // ~1.2000000477) pushes the product just over 96, so the ceiling correctly rounds up to 97.
-        Assert
-            .That(
-                ComputeRequiredCellCount(
-                    remainingNeed: 400,
-                    yieldPerCell: 5,
-                    safetyMultiplier: 1.2f
-                )
-            )
-            .Is.EqualTo(97);
+        Expect.AreEqual(
+            97,
+            ComputeRequiredCellCount(remainingNeed: 400, yieldPerCell: 5, safetyMultiplier: 1.2f)
+        );
 
     [Test]
     public static void ZeroOrNegativeYieldPerCellIsTreatedAsOne() =>
         // A plant with no meaningful yield still costs one cell per unit of remaining need,
         // rather than dividing by zero/going negative.
-        Assert
-            .That(
-                ComputeRequiredCellCount(remainingNeed: 10, yieldPerCell: 0, safetyMultiplier: 1f)
-            )
-            .Is.EqualTo(10);
+        Expect.AreEqual(
+            10,
+            ComputeRequiredCellCount(remainingNeed: 10, yieldPerCell: 0, safetyMultiplier: 1f)
+        );
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class OrderEntryIdsStartingAtActiveTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class OrderEntryIdsStartingAtActiveTests
 {
     private static void AssertSequence(IReadOnlyList<int> actual, params int[] expected)
     {
-        Assert.ThatCollection(actual).Has.Count(expected.Length);
+        Expect.AreEqual(expected.Length, actual.Count);
         for (var i = 0; i < expected.Length; i++)
         {
-            Assert.That(actual[i]).Is.EqualTo(expected[i]);
+            Expect.AreEqual(expected[i], actual[i]);
         }
     }
 
@@ -103,12 +87,11 @@ internal static class OrderEntryIdsStartingAtActiveTests
 
     [Test]
     public static void EmptyListStaysEmpty() =>
-        Assert.ThatCollection(OrderEntryIdsStartingAtActive([], activeEntryId: 1)).Has.Count(0);
+        Expect.AreEqual(0, OrderEntryIdsStartingAtActive([], activeEntryId: 1).Count);
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class ComputeCascadingSowPlanTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeCascadingSowPlanTests
 {
     [Test]
     public static void AlreadyGrowingCellsAreAlwaysIncludedAndCountAgainstTheRequirement()
@@ -129,9 +112,9 @@ internal static class ComputeCascadingSowPlanTests
             safetyMultiplier: 1f
         );
 
-        Assert.ThatCollection(plan.Keys).Has.Count(2);
-        Assert.That(plan[new IntVec3(0, 0, 0)] == cropA).Is.True();
-        Assert.That(plan[new IntVec3(1, 0, 0)] == cropA).Is.True();
+        Expect.AreEqual(2, plan.Count);
+        Expect.IsTrue(plan[new IntVec3(0, 0, 0)] == cropA);
+        Expect.IsTrue(plan[new IntVec3(1, 0, 0)] == cropA);
     }
 
     [Test]
@@ -152,10 +135,10 @@ internal static class ComputeCascadingSowPlanTests
             safetyMultiplier: 1f
         );
 
-        Assert.ThatCollection(plan.Keys).Has.Count(2);
-        Assert.That(plan[new IntVec3(1, 0, 0)] == cropA).Is.True();
-        Assert.That(plan[new IntVec3(2, 0, 0)] == cropA).Is.True();
-        Assert.ThatCollection(plan.Keys).Does.Not.Contain(new IntVec3(0, 0, 0));
+        Expect.AreEqual(2, plan.Count);
+        Expect.IsTrue(plan[new IntVec3(1, 0, 0)] == cropA);
+        Expect.IsTrue(plan[new IntVec3(2, 0, 0)] == cropA);
+        Expect.IsFalse(plan.ContainsKey(new IntVec3(0, 0, 0)));
     }
 
     [Test]
@@ -175,8 +158,8 @@ internal static class ComputeCascadingSowPlanTests
             safetyMultiplier: 1f
         );
 
-        Assert.ThatCollection(plan.Keys).Has.Count(1);
-        Assert.That(plan[new IntVec3(1, 0, 0)] == cropA).Is.True();
+        Expect.AreEqual(1, plan.Count);
+        Expect.IsTrue(plan[new IntVec3(1, 0, 0)] == cropA);
     }
 
     [Test]
@@ -203,9 +186,9 @@ internal static class ComputeCascadingSowPlanTests
             safetyMultiplier: 1f
         );
 
-        Assert.ThatCollection(plan.Keys).Has.Count(3);
-        Assert.That(plan.Values.Count(def => def == cropA)).Is.EqualTo(1);
-        Assert.That(plan.Values.Count(def => def == cropB)).Is.EqualTo(2);
+        Expect.AreEqual(3, plan.Count);
+        Expect.AreEqual(1, plan.Values.Count(def => def == cropA));
+        Expect.AreEqual(2, plan.Values.Count(def => def == cropB));
     }
 
     [Test]
@@ -229,7 +212,7 @@ internal static class ComputeCascadingSowPlanTests
             safetyMultiplier: 1f
         );
 
-        Assert.ThatCollection(plan.Keys).Has.Count(0);
+        Expect.AreEqual(0, plan.Count);
     }
 
     [Test]
@@ -254,9 +237,9 @@ internal static class ComputeCascadingSowPlanTests
             safetyMultiplier: 1f
         );
 
-        Assert.ThatCollection(plan.Keys).Has.Count(3);
-        Assert.That(plan.Values.Count(def => def == cropA)).Is.EqualTo(1);
-        Assert.That(plan.Values.Count(def => def == cropB)).Is.EqualTo(2);
+        Expect.AreEqual(3, plan.Count);
+        Expect.AreEqual(1, plan.Values.Count(def => def == cropA));
+        Expect.AreEqual(2, plan.Values.Count(def => def == cropB));
     }
 
     [Test]
@@ -281,14 +264,13 @@ internal static class ComputeCascadingSowPlanTests
             safetyMultiplier: 1f
         );
 
-        Assert.ThatCollection(plan.Keys).Does.Not.Contain(new IntVec3(0, 0, 0));
-        Assert.ThatCollection(plan.Keys).Has.Count(1);
+        Expect.IsFalse(plan.ContainsKey(new IntVec3(0, 0, 0)));
+        Expect.AreEqual(1, plan.Count);
     }
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class ComputeNeedStatsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeNeedStatsTests
 {
     private static ThingDef MakePlantDef(int harvestYield) =>
         new()
@@ -299,19 +281,17 @@ internal static class ComputeNeedStatsTests
 
     [Test]
     public static void NoPlantDefYetReturnsAllZeroes() =>
-        Assert
-            .That(
-                ComputeNeedStats(
-                    plantDef: null,
-                    trackedThingCount: 0,
-                    upper: 100,
-                    safetyMultiplier: 1.2f,
-                    unbound: false,
-                    cellSowPlan: null
-                )
-                    is (0, 0, 0)
+        Expect.IsTrue(
+            ComputeNeedStats(
+                plantDef: null,
+                trackedThingCount: 0,
+                upper: 100,
+                safetyMultiplier: 1.2f,
+                unbound: false,
+                cellSowPlan: null
             )
-            .Is.True();
+                is (0, 0, 0)
+        );
 
     [Test]
     public static void BoundEntryReportsRequiredCellCount()
@@ -325,9 +305,9 @@ internal static class ComputeNeedStatsTests
             cellSowPlan: null
         );
 
-        Assert.That(yieldPerCell).Is.EqualTo(5);
+        Expect.AreEqual(5, yieldPerCell);
         // (1000 - 600) / 5 = 80
-        Assert.That(cellsNeeded!.Value).Is.EqualTo(80);
+        Expect.AreEqual(80, cellsNeeded!.Value);
     }
 
     [Test]
@@ -342,7 +322,7 @@ internal static class ComputeNeedStatsTests
             cellSowPlan: null
         );
 
-        Assert.That(cellsNeeded is null).Is.True();
+        Expect.IsTrue(cellsNeeded is null);
     }
 
     [Test]
@@ -370,39 +350,34 @@ internal static class ComputeNeedStatsTests
             cellSowPlan: cellSowPlan
         );
 
-        Assert.That(cellsPlanned).Is.EqualTo(2);
+        Expect.AreEqual(2, cellsPlanned);
     }
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class ComputeIsCellWithinSowBudgetTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeIsCellWithinSowBudgetTests
 {
     [Test]
     public static void UnrestrictedWhenLimitIsOff() =>
-        Assert
-            .That(
-                ComputeIsCellWithinSowBudget(
-                    limitSowingToComputedNeed: false,
-                    cellSowPlan: null,
-                    cell: new IntVec3(0, 0, 0)
-                )
+        Expect.IsTrue(
+            ComputeIsCellWithinSowBudget(
+                limitSowingToComputedNeed: false,
+                cellSowPlan: null,
+                cell: new IntVec3(0, 0, 0)
             )
-            .Is.True();
+        );
 
     [Test]
     public static void DisallowedEverywhereWhenLimitIsOnButNoPlanHasBeenComputedYet() =>
         // e.g. right after a save load, or before this job's first cycle since the setting was
         // enabled - a missing plan means the manager hasn't decided yet, not "no limit".
-        Assert
-            .That(
-                ComputeIsCellWithinSowBudget(
-                    limitSowingToComputedNeed: true,
-                    cellSowPlan: null,
-                    cell: new IntVec3(0, 0, 0)
-                )
+        Expect.IsFalse(
+            ComputeIsCellWithinSowBudget(
+                limitSowingToComputedNeed: true,
+                cellSowPlan: null,
+                cell: new IntVec3(0, 0, 0)
             )
-            .Is.False();
+        );
 
     [Test]
     public static void AllowedOnlyForCellsThePlanAssigns()
@@ -414,23 +389,19 @@ internal static class ComputeIsCellWithinSowBudgetTests
         };
         Dictionary<IntVec3, ThingDef> plan = new() { [new IntVec3(0, 0, 0)] = cropA };
 
-        Assert
-            .That(
-                ComputeIsCellWithinSowBudget(
-                    limitSowingToComputedNeed: true,
-                    cellSowPlan: plan,
-                    cell: new IntVec3(0, 0, 0)
-                )
+        Expect.IsTrue(
+            ComputeIsCellWithinSowBudget(
+                limitSowingToComputedNeed: true,
+                cellSowPlan: plan,
+                cell: new IntVec3(0, 0, 0)
             )
-            .Is.True();
-        Assert
-            .That(
-                ComputeIsCellWithinSowBudget(
-                    limitSowingToComputedNeed: true,
-                    cellSowPlan: plan,
-                    cell: new IntVec3(1, 0, 0)
-                )
+        );
+        Expect.IsFalse(
+            ComputeIsCellWithinSowBudget(
+                limitSowingToComputedNeed: true,
+                cellSowPlan: plan,
+                cell: new IntVec3(1, 0, 0)
             )
-            .Is.False();
+        );
     }
 }

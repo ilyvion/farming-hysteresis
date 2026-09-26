@@ -7,7 +7,7 @@
         <SupportedRimWorldVersions>1.5;1.6</SupportedRimWorldVersions>
     </PropertyGroup>
     <!--
-        Without the RimTestRedux reference (see below), this project has no Publicize items of
+        Without the DevTools reference (see below), this project has no Publicize items of
         its own, so Krafs.Publicizer's generated IgnoresAccessChecksToAttribute merely shadows
         the one already made public inside the referenced FarmingHysteresis.ColonyManagerRedux
         assembly; CS0436 is harmless here.
@@ -16,8 +16,7 @@
         <NoWarn>$(NoWarn);CS0436</NoWarn>
     </PropertyGroup>
     <!--
-        Dev-only test assembly for the Colony Manager Redux integration, built and run in-game
-        via RimTest Redux (see https://github.com/ilyvion/rimtest-redux). Its output is deployed
+        Dev-only test assembly for the Colony Manager Redux integration, built and run in-game via DevTools. Its output is deployed
         alongside FarmingHysteresis.ColonyManagerRedux.dll into
         Integrations/ColonyManagerRedux/<version>/Assemblies, which LoadFolders.xml only loads
         when Colony Manager Redux (ilyvion.colonymanagerredux) is active, so these tests are only
@@ -30,8 +29,8 @@
         (what CI/release always use, per rimworld-utils' build_mod.yml) skips building it
         entirely; its output never lands in a shipped release.
 
-        RimTest Redux only supports RimWorld 1.6, so for any other RimWorldVersion this project
-        builds as an empty assembly: both the test sources and the RimTestRedux reference are
+        DevTools only supports RimWorld 1.6, so for any other RimWorldVersion this project
+        builds as an empty assembly: both the test sources and the DevTools reference are
         excluded below.
     -->
     <ItemGroup>
@@ -59,7 +58,10 @@
         </ProjectReference>
     </ItemGroup>
     <ItemGroup Condition="'$(RimWorldVersion)' == '1.6'">
-        <ProjectReference Include="$(ProjectDependenciesBasePath)\RimTest\Source\RimTestRedux\RimTestRedux.csproj">
+        <ProjectReference
+            Include="$(ProjectDependenciesBasePath)\Third-Party\DevTools\DevTools\DevTools.csproj"
+            AdditionalProperties="OutDir=$(MSBuildThisFileDirectory)..\..\1.6\Assemblies\"
+        >
             <CopyLocal>False</CopyLocal>
             <Private>false</Private>
         </ProjectReference>

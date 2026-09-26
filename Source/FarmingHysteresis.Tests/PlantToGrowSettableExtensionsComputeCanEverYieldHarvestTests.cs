@@ -1,18 +1,17 @@
+using DevTools.Testing;
 using FarmingHysteresis.Extensions;
-using RimTestRedux;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class PlantToGrowSettableExtensionsComputeCanEverYieldHarvestTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class PlantToGrowSettableExtensionsComputeCanEverYieldHarvestTests
 {
     [Test]
     public static void FalseWhenNoValidPlantTypes()
     {
         var result = PlantToGrowSettableExtensions.ComputeCanEverYieldHarvest([]);
 
-        Assert.That(result).Is.False();
+        Expect.IsFalse(result);
     }
 
     // Regression guard for plant pots: their sowTag only matches purely decorative plants (e.g.
@@ -28,7 +27,7 @@ internal static class PlantToGrowSettableExtensionsComputeCanEverYieldHarvestTes
 
         var result = PlantToGrowSettableExtensions.ComputeCanEverYieldHarvest([rose]);
 
-        Assert.That(result).Is.False();
+        Expect.IsFalse(result);
     }
 
     [Test]
@@ -50,6 +49,6 @@ internal static class PlantToGrowSettableExtensionsComputeCanEverYieldHarvestTes
 
         var result = PlantToGrowSettableExtensions.ComputeCanEverYieldHarvest([rose, rice]);
 
-        Assert.That(result).Is.True();
+        Expect.IsTrue(result);
     }
 }

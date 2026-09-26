@@ -1,10 +1,9 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class FarmingHysteresisMapComponentResolveLoadedIdTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class FarmingHysteresisMapComponentResolveLoadedIdTests
 {
     [Test]
     public static void UnresolvedIdFallsBackToMapUniqueId()
@@ -13,7 +12,7 @@ internal static class FarmingHysteresisMapComponentResolveLoadedIdTests
         // (no "id" node to read); FinalizeInit must fix it up to the map's own id.
         var resolved = FarmingHysteresisMapComponent.ResolveLoadedId(-1, 7);
 
-        Assert.That(resolved).Is.EqualTo(7);
+        Expect.AreEqual(7, resolved);
     }
 
     [Test]
@@ -21,6 +20,6 @@ internal static class FarmingHysteresisMapComponentResolveLoadedIdTests
     {
         var resolved = FarmingHysteresisMapComponent.ResolveLoadedId(3, 7);
 
-        Assert.That(resolved).Is.EqualTo(3);
+        Expect.AreEqual(3, resolved);
     }
 }

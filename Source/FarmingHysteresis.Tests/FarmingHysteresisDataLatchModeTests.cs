@@ -1,10 +1,9 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class FarmingHysteresisDataLatchModeTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class FarmingHysteresisDataLatchModeTests
 {
     [Test]
     public static void UnknownLatchWithCountEqualToLowerStaysUnknownRatherThanEnabling()
@@ -18,7 +17,7 @@ internal static class FarmingHysteresisDataLatchModeTests
             lower: 5,
             upper: 10
         );
-        Assert.That(result).Is.EqualTo(LatchMode.Unknown);
+        Expect.AreEqual(LatchMode.Unknown, result);
     }
 
     // Regression test: an unresolved Unknown latch (e.g. count == lower on first
@@ -26,7 +25,7 @@ internal static class FarmingHysteresisDataLatchModeTests
     // behavior of throwing InvalidOperationException every tick.
     [Test]
     public static void UnresolvedUnknownLatchResolvesToDisabledInsteadOfThrowing() =>
-        Assert.That(FarmingHysteresisData.ResolveControlState(LatchMode.Unknown)).Is.False();
+        Expect.IsFalse(FarmingHysteresisData.ResolveControlState(LatchMode.Unknown));
 
     [Test]
     public static void UnknownLatchWithCountAboveLowerBecomesEnabled()
@@ -37,7 +36,7 @@ internal static class FarmingHysteresisDataLatchModeTests
             lower: 5,
             upper: 10
         );
-        Assert.That(result).Is.EqualTo(LatchMode.BetweenBoundsEnabled);
+        Expect.AreEqual(LatchMode.BetweenBoundsEnabled, result);
     }
 
     [Test]
@@ -49,7 +48,7 @@ internal static class FarmingHysteresisDataLatchModeTests
             lower: 5,
             upper: 10
         );
-        Assert.That(result).Is.EqualTo(LatchMode.BelowLowerBound);
+        Expect.AreEqual(LatchMode.BelowLowerBound, result);
     }
 
     [Test]
@@ -61,26 +60,20 @@ internal static class FarmingHysteresisDataLatchModeTests
             lower: 5,
             upper: 10
         );
-        Assert.That(result).Is.EqualTo(LatchMode.AboveUpperBound);
+        Expect.AreEqual(LatchMode.AboveUpperBound, result);
     }
 
     [Test]
     public static void ResolveControlStateEnablesForBelowLowerAndBetweenBoundsEnabled()
     {
-        Assert.That(FarmingHysteresisData.ResolveControlState(LatchMode.BelowLowerBound)).Is.True();
-        Assert
-            .That(FarmingHysteresisData.ResolveControlState(LatchMode.BetweenBoundsEnabled))
-            .Is.True();
+        Expect.IsTrue(FarmingHysteresisData.ResolveControlState(LatchMode.BelowLowerBound));
+        Expect.IsTrue(FarmingHysteresisData.ResolveControlState(LatchMode.BetweenBoundsEnabled));
     }
 
     [Test]
     public static void ResolveControlStateDisablesForAboveUpperAndBetweenBoundsDisabled()
     {
-        Assert
-            .That(FarmingHysteresisData.ResolveControlState(LatchMode.AboveUpperBound))
-            .Is.False();
-        Assert
-            .That(FarmingHysteresisData.ResolveControlState(LatchMode.BetweenBoundsDisabled))
-            .Is.False();
+        Expect.IsFalse(FarmingHysteresisData.ResolveControlState(LatchMode.AboveUpperBound));
+        Expect.IsFalse(FarmingHysteresisData.ResolveControlState(LatchMode.BetweenBoundsDisabled));
     }
 }

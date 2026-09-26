@@ -1,13 +1,12 @@
-using RimTestRedux;
+using DevTools.Testing;
 using static FarmingHysteresis.ColonyManagerRedux.HysteresisMigration;
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
 
 // Covers the migration gate's "most common bounds win, tie broken randomly" mode-selection/
 // tie-break logic in isolation from the live grower scan it's normally fed by.
-[HotSwappable]
-[TestSuite]
-internal static class SelectMostCommonBoundsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class SelectMostCommonBoundsTests
 {
     private static int FailIfCalled(int min, int max) =>
         throw new InvalidOperationException(
@@ -21,8 +20,8 @@ internal static class SelectMostCommonBoundsTests
     {
         var (lower, upper) = SelectMostCommonBounds([(10, 20)], FailIfCalled);
 
-        Assert.That(lower).Is.EqualTo(10);
-        Assert.That(upper).Is.EqualTo(20);
+        Expect.AreEqual(10, lower);
+        Expect.AreEqual(20, upper);
     }
 
     [Test]
@@ -33,8 +32,8 @@ internal static class SelectMostCommonBoundsTests
             FailIfCalled
         );
 
-        Assert.That(lower).Is.EqualTo(10);
-        Assert.That(upper).Is.EqualTo(20);
+        Expect.AreEqual(10, lower);
+        Expect.AreEqual(20, upper);
     }
 
     [Test]
@@ -42,38 +41,31 @@ internal static class SelectMostCommonBoundsTests
     {
         var (lower, upper) = SelectMostCommonBounds([(10, 20), (0, 100)], PickSecond);
 
-        Assert.That(lower).Is.EqualTo(0);
-        Assert.That(upper).Is.EqualTo(100);
+        Expect.AreEqual(0, lower);
+        Expect.AreEqual(100, upper);
     }
 }
 
 // Regression guard for the migration gate's suppression rule: takeover must stay suppressed
 // while the one-time dialog is unanswered or was declined, and only stop being suppressed once
 // the save has actually migrated (or was never gated in the first place).
-[HotSwappable]
-[TestSuite]
-internal static class CmrMigrationGateStatusTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class CmrMigrationGateStatusTests
 {
     [Test]
     public static void AwaitingChoiceAndDeclinedSuppressTakeover()
     {
-        Assert
-            .That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.AwaitingChoice))
-            .Is.True();
-        Assert
-            .That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.Declined))
-            .Is.True();
+        Expect.IsTrue(
+            CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.AwaitingChoice)
+        );
+        Expect.IsTrue(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.Declined));
     }
 
     [Test]
     public static void NotGatedAndMigratedDoNotSuppressTakeover()
     {
-        Assert
-            .That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.NotGated))
-            .Is.False();
-        Assert
-            .That(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.Migrated))
-            .Is.False();
+        Expect.IsFalse(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.NotGated));
+        Expect.IsFalse(CmrMigrationGameComponent.IsSuppressing(CmrMigrationGateStatus.Migrated));
     }
 }
 
@@ -83,45 +75,38 @@ internal static class CmrMigrationGateStatusTests
 // gated, or beginning a fresh gate), so a save with nothing to migrate - the exact case where
 // ShouldBeginMigrationGate is false - never resynced the controller to the current "take over
 // Farming Hysteresis control" setting at all on load.
-[HotSwappable]
-[TestSuite]
-internal static class ShouldBeginMigrationGateTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ShouldBeginMigrationGateTests
 {
     [Test]
     public static void BeginsGateOnlyWhenNotGatedAndTakeoverOnAndLegacyDataExists() =>
-        Assert
-            .That(
-                CmrMigrationGate.ShouldBeginMigrationGate(
-                    CmrMigrationGateStatus.NotGated,
-                    takeoverHysteresisControl: true,
-                    hasLegacyHysteresisDataConfigured: true
-                )
+        Expect.IsTrue(
+            CmrMigrationGate.ShouldBeginMigrationGate(
+                CmrMigrationGateStatus.NotGated,
+                takeoverHysteresisControl: true,
+                hasLegacyHysteresisDataConfigured: true
             )
-            .Is.True();
+        );
 
     [Test]
     public static void DoesNotBeginGateWhenTakeoverIsOff() =>
-        Assert
-            .That(
-                CmrMigrationGate.ShouldBeginMigrationGate(
-                    CmrMigrationGateStatus.NotGated,
-                    takeoverHysteresisControl: false,
-                    hasLegacyHysteresisDataConfigured: true
-                )
+        Expect.IsFalse(
+            CmrMigrationGate.ShouldBeginMigrationGate(
+                CmrMigrationGateStatus.NotGated,
+                takeoverHysteresisControl: false,
+                hasLegacyHysteresisDataConfigured: true
             )
-            .Is.False();
+        );
 
     [Test]
     public static void DoesNotBeginGateWhenThereIsNoLegacyData() =>
-        Assert
-            .That(
-                CmrMigrationGate.ShouldBeginMigrationGate(
-                    CmrMigrationGateStatus.NotGated,
-                    takeoverHysteresisControl: true,
-                    hasLegacyHysteresisDataConfigured: false
-                )
+        Expect.IsFalse(
+            CmrMigrationGate.ShouldBeginMigrationGate(
+                CmrMigrationGateStatus.NotGated,
+                takeoverHysteresisControl: true,
+                hasLegacyHysteresisDataConfigured: false
             )
-            .Is.False();
+        );
 
     [Test]
     public static void DoesNotBeginGateWhenAlreadyGated()
@@ -135,15 +120,13 @@ internal static class ShouldBeginMigrationGateTests
             }
         )
         {
-            Assert
-                .That(
-                    CmrMigrationGate.ShouldBeginMigrationGate(
-                        status,
-                        takeoverHysteresisControl: true,
-                        hasLegacyHysteresisDataConfigured: true
-                    )
+            Expect.IsFalse(
+                CmrMigrationGate.ShouldBeginMigrationGate(
+                    status,
+                    takeoverHysteresisControl: true,
+                    hasLegacyHysteresisDataConfigured: true
                 )
-                .Is.False();
+            );
         }
     }
 }
@@ -151,45 +134,38 @@ internal static class ShouldBeginMigrationGateTests
 // Regression guard for the "nothing to migrate" case: a save with no legacy setup shouldn't ever
 // see the dialog, but it still needs to end up Migrated rather than staying NotGated forever
 // (which would keep re-running the legacy-data scan on every single load).
-[HotSwappable]
-[TestSuite]
-internal static class ShouldSilentlyMarkMigratedTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ShouldSilentlyMarkMigratedTests
 {
     [Test]
     public static void MarksMigratedWhenNotGatedAndTakeoverOnAndNoLegacyData() =>
-        Assert
-            .That(
-                CmrMigrationGate.ShouldSilentlyMarkMigrated(
-                    CmrMigrationGateStatus.NotGated,
-                    takeoverHysteresisControl: true,
-                    hasLegacyHysteresisDataConfigured: false
-                )
+        Expect.IsTrue(
+            CmrMigrationGate.ShouldSilentlyMarkMigrated(
+                CmrMigrationGateStatus.NotGated,
+                takeoverHysteresisControl: true,
+                hasLegacyHysteresisDataConfigured: false
             )
-            .Is.True();
+        );
 
     [Test]
     public static void DoesNotMarkMigratedWhenLegacyDataExists() =>
-        Assert
-            .That(
-                CmrMigrationGate.ShouldSilentlyMarkMigrated(
-                    CmrMigrationGateStatus.NotGated,
-                    takeoverHysteresisControl: true,
-                    hasLegacyHysteresisDataConfigured: true
-                )
+        Expect.IsFalse(
+            CmrMigrationGate.ShouldSilentlyMarkMigrated(
+                CmrMigrationGateStatus.NotGated,
+                takeoverHysteresisControl: true,
+                hasLegacyHysteresisDataConfigured: true
             )
-            .Is.False();
+        );
 
     [Test]
     public static void DoesNotMarkMigratedWhenTakeoverIsOff() =>
-        Assert
-            .That(
-                CmrMigrationGate.ShouldSilentlyMarkMigrated(
-                    CmrMigrationGateStatus.NotGated,
-                    takeoverHysteresisControl: false,
-                    hasLegacyHysteresisDataConfigured: false
-                )
+        Expect.IsFalse(
+            CmrMigrationGate.ShouldSilentlyMarkMigrated(
+                CmrMigrationGateStatus.NotGated,
+                takeoverHysteresisControl: false,
+                hasLegacyHysteresisDataConfigured: false
             )
-            .Is.False();
+        );
 
     [Test]
     public static void DoesNotMarkMigratedWhenAlreadyGated()
@@ -203,15 +179,13 @@ internal static class ShouldSilentlyMarkMigratedTests
             }
         )
         {
-            Assert
-                .That(
-                    CmrMigrationGate.ShouldSilentlyMarkMigrated(
-                        status,
-                        takeoverHysteresisControl: true,
-                        hasLegacyHysteresisDataConfigured: false
-                    )
+            Expect.IsFalse(
+                CmrMigrationGate.ShouldSilentlyMarkMigrated(
+                    status,
+                    takeoverHysteresisControl: true,
+                    hasLegacyHysteresisDataConfigured: false
                 )
-                .Is.False();
+            );
         }
     }
 }
@@ -219,53 +193,44 @@ internal static class ShouldSilentlyMarkMigratedTests
 // Regression guard for the rule ApplyControllerState uses to pick between CmrHysteresisController
 // and DefaultHysteresisController - the CMR controller should only ever be active when takeover is
 // on and the current save isn't still being suppressed by the migration gate.
-[HotSwappable]
-[TestSuite]
-internal static class ComputeShouldUseCmrControllerTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ComputeShouldUseCmrControllerTests
 {
     [Test]
     public static void UsesCmrOnlyWhenTakeoverIsOnAndNotSuppressed() =>
-        Assert
-            .That(
-                ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
-                    takeOverHysteresisControl: true,
-                    isCurrentSaveSuppressingTakeover: false
-                )
+        Expect.IsTrue(
+            ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
+                takeOverHysteresisControl: true,
+                isCurrentSaveSuppressingTakeover: false
             )
-            .Is.True();
+        );
 
     [Test]
     public static void DoesNotUseCmrWhenTakeoverIsOff() =>
-        Assert
-            .That(
-                ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
-                    takeOverHysteresisControl: false,
-                    isCurrentSaveSuppressingTakeover: false
-                )
+        Expect.IsFalse(
+            ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
+                takeOverHysteresisControl: false,
+                isCurrentSaveSuppressingTakeover: false
             )
-            .Is.False();
+        );
 
     [Test]
     public static void DoesNotUseCmrWhenSuppressed() =>
-        Assert
-            .That(
-                ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
-                    takeOverHysteresisControl: true,
-                    isCurrentSaveSuppressingTakeover: true
-                )
+        Expect.IsFalse(
+            ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
+                takeOverHysteresisControl: true,
+                isCurrentSaveSuppressingTakeover: true
             )
-            .Is.False();
+        );
 
     [Test]
     public static void DoesNotUseCmrWhenTakeoverIsOffAndSuppressed() =>
-        Assert
-            .That(
-                ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
-                    takeOverHysteresisControl: false,
-                    isCurrentSaveSuppressingTakeover: true
-                )
+        Expect.IsFalse(
+            ManagerSettings_FarmingHysteresis.ComputeShouldUseCmrController(
+                takeOverHysteresisControl: false,
+                isCurrentSaveSuppressingTakeover: true
             )
-            .Is.False();
+        );
 }
 
 // Regression guard for a bug where a save that had used CMR from the very start still got the
@@ -276,42 +241,43 @@ internal static class ComputeShouldUseCmrControllerTests
 // that matches its own default), so the decision had to be re-derived on every single load.
 // Splitting the two defaults means any status other than NotGated now always gets scribed
 // explicitly, so a save only ever sees NotGated again if it truly never resolved this gate before.
-[HotSwappable]
-[TestSuite]
-internal static class CmrMigrationGameComponentStatusDefaultTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class CmrMigrationGameComponentStatusDefaultTests
 {
     [Test]
     public static void FreshComponentDefaultsToMigratedNotNotGated() =>
-        Assert
-            .That(new CmrMigrationGameComponent(null!).Status)
-            .Is.EqualTo(CmrMigrationGateStatus.Migrated);
+        Expect.AreEqual(
+            CmrMigrationGateStatus.Migrated,
+            new CmrMigrationGameComponent(null!).Status
+        );
 
     [Test]
     public static void ComputeDefaultStatusIsMigratedWhenTakeoverStartsOn() =>
-        Assert
-            .That(CmrMigrationGameComponent.ComputeDefaultStatus(takeoverHysteresisControl: true))
-            .Is.EqualTo(CmrMigrationGateStatus.Migrated);
+        Expect.AreEqual(
+            CmrMigrationGateStatus.Migrated,
+            CmrMigrationGameComponent.ComputeDefaultStatus(takeoverHysteresisControl: true)
+        );
 
     [Test]
     public static void ComputeDefaultStatusIsDeclinedWhenTakeoverStartsOff() =>
-        Assert
-            .That(CmrMigrationGameComponent.ComputeDefaultStatus(takeoverHysteresisControl: false))
-            .Is.EqualTo(CmrMigrationGateStatus.Declined);
+        Expect.AreEqual(
+            CmrMigrationGateStatus.Declined,
+            CmrMigrationGameComponent.ComputeDefaultStatus(takeoverHysteresisControl: false)
+        );
 }
 
 // A Farming Hysteresis job must never be allowed to act on its growers while CMR isn't genuinely
 // the active controller, even if the job itself would otherwise be managed.
-[HotSwappable]
-[TestSuite]
-internal static class ManagerJobFarmingHysteresisIsManagedTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class ManagerJobFarmingHysteresisIsManagedTests
 {
     [Test]
     public static void ManagedOnlyWhenBaseManagedAndCmrIsActiveController()
     {
-        Assert.That(ManagerJob_FarmingHysteresis.ComputeIsManaged(true, true)).Is.True();
-        Assert.That(ManagerJob_FarmingHysteresis.ComputeIsManaged(true, false)).Is.False();
-        Assert.That(ManagerJob_FarmingHysteresis.ComputeIsManaged(false, true)).Is.False();
-        Assert.That(ManagerJob_FarmingHysteresis.ComputeIsManaged(false, false)).Is.False();
+        Expect.IsTrue(ManagerJob_FarmingHysteresis.ComputeIsManaged(true, true));
+        Expect.IsFalse(ManagerJob_FarmingHysteresis.ComputeIsManaged(true, false));
+        Expect.IsFalse(ManagerJob_FarmingHysteresis.ComputeIsManaged(false, true));
+        Expect.IsFalse(ManagerJob_FarmingHysteresis.ComputeIsManaged(false, false));
     }
 }
 
@@ -333,9 +299,8 @@ file sealed class FakeGrower(ThingDef? plantDef) : IPlantToGrowSettable
 
 // Covers HysteresisMigration.GroupByTargetPlant's dropping/grouping rules in isolation from the
 // live map scan it's normally fed by.
-[HotSwappable]
-[TestSuite]
-internal static class GroupByTargetPlantTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class GroupByTargetPlantTests
 {
     private static ThingDef HarvestablePlant(string defName) =>
         new()
@@ -355,7 +320,7 @@ internal static class GroupByTargetPlantTests
 
         var groups = GroupByTargetPlant([grower]).ToList();
 
-        Assert.ThatCollection(groups).Is.Empty();
+        Expect.IsEmpty(groups);
     }
 
     [Test]
@@ -365,7 +330,7 @@ internal static class GroupByTargetPlantTests
 
         var groups = GroupByTargetPlant([grower]).ToList();
 
-        Assert.ThatCollection(groups).Is.Empty();
+        Expect.IsEmpty(groups);
     }
 
     [Test]
@@ -375,7 +340,7 @@ internal static class GroupByTargetPlantTests
 
         var groups = GroupByTargetPlant([grower]).ToList();
 
-        Assert.ThatCollection(groups).Is.Empty();
+        Expect.IsEmpty(groups);
     }
 
     [Test]
@@ -387,11 +352,11 @@ internal static class GroupByTargetPlantTests
 
         var groups = GroupByTargetPlant([growerA, growerB]).ToList();
 
-        Assert.ThatCollection(groups).Has.Count(1);
-        Assert.That(groups[0].PlantDef.defName).Is.EqualTo(hops.defName);
-        Assert.ThatCollection(groups[0].Growers).Has.Count(2);
-        Assert.That(ReferenceEquals(groups[0].Growers[0], growerA)).Is.True();
-        Assert.That(ReferenceEquals(groups[0].Growers[1], growerB)).Is.True();
+        Expect.AreEqual(1, groups.Count);
+        Expect.AreEqual(hops.defName, groups[0].PlantDef.defName);
+        Expect.AreEqual(2, groups[0].Growers.Count);
+        Expect.IsTrue(ReferenceEquals(groups[0].Growers[0], growerA));
+        Expect.IsTrue(ReferenceEquals(groups[0].Growers[1], growerB));
     }
 
     [Test]
@@ -404,8 +369,8 @@ internal static class GroupByTargetPlantTests
 
         var groups = GroupByTargetPlant([hopsGrower, riceGrower]).ToList();
 
-        Assert.ThatCollection(groups).Has.Count(2);
-        Assert.ThatCollection(groups.Select(g => g.PlantDef)).Does.Contain(hops);
-        Assert.ThatCollection(groups.Select(g => g.PlantDef)).Does.Contain(rice);
+        Expect.AreEqual(2, groups.Count);
+        Expect.IsTrue(groups.Select(g => g.PlantDef).Contains(hops));
+        Expect.IsTrue(groups.Select(g => g.PlantDef).Contains(rice));
     }
 }

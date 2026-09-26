@@ -1,62 +1,60 @@
-using RimTestRedux;
+using DevTools.Testing;
 
 namespace FarmingHysteresis.Tests;
 
-[HotSwappable]
-[TestSuite]
-internal static class HysteresisModeExtensionsAsStringTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class HysteresisModeExtensionsAsStringTests
 {
     [Test]
     public static void SowingReturnsNonEmptyString()
     {
         var result = HysteresisMode.Sowing.AsString();
-        Assert.That(result).Is.Not.Null();
-        Assert.That(result).Is.Not.EqualTo("");
+        Expect.IsNotNull(result);
+        Expect.AreNotEqual("", result);
     }
 
     [Test]
     public static void HarvestingReturnsNonEmptyString()
     {
         var result = HysteresisMode.Harvesting.AsString();
-        Assert.That(result).Is.Not.Null();
-        Assert.That(result).Is.Not.EqualTo("");
+        Expect.IsNotNull(result);
+        Expect.AreNotEqual("", result);
     }
 
     [Test]
     public static void SowingAndHarvestingReturnsNonEmptyString()
     {
         var result = HysteresisMode.SowingAndHarvesting.AsString();
-        Assert.That(result).Is.Not.Null();
-        Assert.That(result).Is.Not.EqualTo("");
+        Expect.IsNotNull(result);
+        Expect.AreNotEqual("", result);
     }
 
     [Test]
-    [ShouldThrow(typeof(InvalidOperationException))]
-    public static void UncoveredHysteresisModeThrows() => _ = ((HysteresisMode)99).AsString();
+    public static void UncoveredHysteresisModeThrows() =>
+        Expect.Throws<InvalidOperationException>(() => _ = ((HysteresisMode)99).AsString());
 }
 
-[HotSwappable]
-[TestSuite]
-internal static class HysteresisModeExtensionsControlsTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class HysteresisModeExtensionsControlsTests
 {
     [Test]
     public static void SowingControlsSowingOnly()
     {
-        Assert.That(HysteresisMode.Sowing.ControlsSowing()).Is.True();
-        Assert.That(HysteresisMode.Sowing.ControlsHarvesting()).Is.False();
+        Expect.IsTrue(HysteresisMode.Sowing.ControlsSowing());
+        Expect.IsFalse(HysteresisMode.Sowing.ControlsHarvesting());
     }
 
     [Test]
     public static void HarvestingControlsHarvestingOnly()
     {
-        Assert.That(HysteresisMode.Harvesting.ControlsSowing()).Is.False();
-        Assert.That(HysteresisMode.Harvesting.ControlsHarvesting()).Is.True();
+        Expect.IsFalse(HysteresisMode.Harvesting.ControlsSowing());
+        Expect.IsTrue(HysteresisMode.Harvesting.ControlsHarvesting());
     }
 
     [Test]
     public static void SowingAndHarvestingControlsBoth()
     {
-        Assert.That(HysteresisMode.SowingAndHarvesting.ControlsSowing()).Is.True();
-        Assert.That(HysteresisMode.SowingAndHarvesting.ControlsHarvesting()).Is.True();
+        Expect.IsTrue(HysteresisMode.SowingAndHarvesting.ControlsSowing());
+        Expect.IsTrue(HysteresisMode.SowingAndHarvesting.ControlsHarvesting());
     }
 }

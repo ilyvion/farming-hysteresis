@@ -1,5 +1,5 @@
+using DevTools.Testing;
 using FarmingHysteresis.VanillaExpandedFramework.Defs;
-using RimTestRedux;
 #if v1_6
 using VEF.Plants;
 #else
@@ -10,9 +10,8 @@ namespace FarmingHysteresis.VanillaExpandedFramework.Tests;
 
 // Covers DualCropSecondaryProductResolverWorker.ResolveSecondaryProducts' handling of the three
 // DualCropExtension shapes it can find on a plant, plus the no-extension-at-all case.
-[HotSwappable]
-[TestSuite]
-internal static class DualCropSecondaryProductResolverWorkerTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class DualCropSecondaryProductResolverWorkerTests
 {
     private static readonly DualCropSecondaryProductResolverWorker Worker = new();
 
@@ -33,7 +32,7 @@ internal static class DualCropSecondaryProductResolverWorkerTests
 
         var result = Worker.ResolveSecondaryProducts(plantDef).ToList();
 
-        Assert.ThatCollection(result).Is.Empty();
+        Expect.IsEmpty(result);
     }
 
     [Test]
@@ -44,8 +43,8 @@ internal static class DualCropSecondaryProductResolverWorkerTests
 
         var result = Worker.ResolveSecondaryProducts(plantDef).ToList();
 
-        Assert.ThatCollection(result).Has.Count(1);
-        Assert.ThatCollection(result).Does.Contain(secondary);
+        Expect.AreEqual(1, result.Count);
+        Expect.IsTrue(result.Contains(secondary));
     }
 
     [Test]
@@ -59,9 +58,9 @@ internal static class DualCropSecondaryProductResolverWorkerTests
 
         var result = Worker.ResolveSecondaryProducts(plantDef).ToList();
 
-        Assert.ThatCollection(result).Has.Count(2);
-        Assert.ThatCollection(result).Does.Contain(randomOne);
-        Assert.ThatCollection(result).Does.Contain(randomTwo);
+        Expect.AreEqual(2, result.Count);
+        Expect.IsTrue(result.Contains(randomOne));
+        Expect.IsTrue(result.Contains(randomTwo));
     }
 
     [Test]
@@ -80,9 +79,9 @@ internal static class DualCropSecondaryProductResolverWorkerTests
 
         var result = Worker.ResolveSecondaryProducts(plantDef).ToList();
 
-        Assert.ThatCollection(result).Has.Count(3);
-        Assert.That(ReferenceEquals(result[0], secondary)).Is.True();
-        Assert.That(ReferenceEquals(result[1], randomOne)).Is.True();
-        Assert.That(ReferenceEquals(result[2], randomTwo)).Is.True();
+        Expect.AreEqual(3, result.Count);
+        Expect.IsTrue(ReferenceEquals(result[0], secondary));
+        Expect.IsTrue(ReferenceEquals(result[1], randomOne));
+        Expect.IsTrue(ReferenceEquals(result[2], randomTwo));
     }
 }

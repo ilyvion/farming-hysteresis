@@ -1,36 +1,31 @@
+using DevTools.Testing;
 using FarmingHysteresis.VanillaPlantsExpandedMorePlants.Defs;
-using RimTestRedux;
 
 namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants.Tests;
 
 // Covers the null guards on GetAllowSow/SetAllowSow, added to match the ArgumentNullException
 // behavior of the core FarmingHysteresisControlWorker_Zone_Growing worker (previously these threw
 // an uninformative NullReferenceException instead).
-[HotSwappable]
-[TestSuite]
-internal static class FarmingHysteresisControlWorkersTests
+[TestFixture(TestType.MainMenu)]
+internal sealed class FarmingHysteresisControlWorkersTests
 {
     private static readonly FarmingHysteresisControlWorker_Zone_GrowingAquatic AquaticWorker =
         new();
     private static readonly FarmingHysteresisControlWorker_Zone_GrowingSandy SandyWorker = new();
 
     [Test]
-    [ShouldThrow(typeof(ArgumentNullException))]
     public static void AquaticGetAllowSowThrowsArgumentNullExceptionOnNullPlantGrower() =>
-        AquaticWorker.GetAllowSow(null!);
+        Expect.Throws<ArgumentNullException>(() => AquaticWorker.GetAllowSow(null!));
 
     [Test]
-    [ShouldThrow(typeof(ArgumentNullException))]
     public static void AquaticSetAllowSowThrowsArgumentNullExceptionOnNullPlantGrower() =>
-        AquaticWorker.SetAllowSow(null!, true);
+        Expect.Throws<ArgumentNullException>(() => AquaticWorker.SetAllowSow(null!, true));
 
     [Test]
-    [ShouldThrow(typeof(ArgumentNullException))]
     public static void SandyGetAllowSowThrowsArgumentNullExceptionOnNullPlantGrower() =>
-        SandyWorker.GetAllowSow(null!);
+        Expect.Throws<ArgumentNullException>(() => SandyWorker.GetAllowSow(null!));
 
     [Test]
-    [ShouldThrow(typeof(ArgumentNullException))]
     public static void SandySetAllowSowThrowsArgumentNullExceptionOnNullPlantGrower() =>
-        SandyWorker.SetAllowSow(null!, true);
+        Expect.Throws<ArgumentNullException>(() => SandyWorker.SetAllowSow(null!, true));
 }
