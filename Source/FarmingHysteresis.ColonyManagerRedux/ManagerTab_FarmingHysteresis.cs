@@ -169,7 +169,11 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
             .ToList();
         if (validTargetPlants.Count == 0 && job.RotationEntries.Count == 0)
         {
-            var message = "FarmingHysteresis.CMR.TargetPlant.NoneAvailable".Translate();
+            var message = (
+                job.ManagedGrowers.Count == 0
+                    ? "FarmingHysteresis.CMR.TargetPlant.NoGrowers"
+                    : "FarmingHysteresis.CMR.TargetPlant.NoneAvailable"
+            ).Translate();
             var emptyHeight = Mathf.Max(ListEntryHeight, Text.CalcHeight(message, width));
             Widgets.Label(new Rect(pos.x, pos.y, width, emptyHeight), message);
             pos.y += emptyHeight;
