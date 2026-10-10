@@ -19,7 +19,7 @@
 
         &lt;size=24&gt;Legacy per-grower controls&lt;/size&gt;
 
-        Without CMR (or with CMR-managed hysteresis turned off), the mod adds an "Enable farming hysteresis" toggle to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported. When you enable this setting, the "Allow sowing" button is removed, and sowing and harvesting are instead controlled by the hysteresis bounds described above, editable per-grower. Hydroponics basins typically don't have these settings, but with this mod and hysteresis enabled, sowing and/or cutting also stops on those when appropriate.
+        Without CMR (or with CMR-managed hysteresis turned off), the mod adds an "Enable hysteresis" toggle to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported. When you enable this setting, the "Allow sowing" button is removed, and sowing and harvesting are instead controlled by the hysteresis bounds described above, editable per-grower. Hydroponics basins typically don't have these settings, but with this mod and hysteresis enabled, sowing and/or cutting also stops on those when appropriate.
 
         This mode still works and isn't going away, but it's no longer where new features are added - see the section above.
     </description>
@@ -29,7 +29,7 @@
         <li>1.5</li>
         <li>1.6</li>
     </supportedVersions>
-    <modVersion IgnoreIfNoMatchingField="True">0.13.0</modVersion>
+    <modVersion IgnoreIfNoMatchingField="True">0.13.1</modVersion>
     <modDependencies>
         <li>
             <packageId>brrainz.harmony</packageId>
