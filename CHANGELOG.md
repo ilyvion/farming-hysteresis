@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - CMR-managed jobs with no growers selected no longer claim that none of the growers can grow the same plant; they now say that no growers are selected. The mixed-growers warning only shows when there actually are incompatible growers.
+- Hydroponics basins and other plant grower buildings picked with 'Managed growers: Specific' in a CMR-managed job are no longer dropped from the job when you load a save.
 
 ## [0.13.0] - 2026-09-15
 

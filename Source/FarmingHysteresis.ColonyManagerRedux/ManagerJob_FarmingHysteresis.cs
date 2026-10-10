@@ -1190,13 +1190,29 @@ internal sealed class ManagerJob_FarmingHysteresis
 
     /// <summary>
     /// Pure decision logic behind the <see cref="SpecificPlantGrowerBuildings"/> post-load
-    /// cleanup — see <see cref="ShouldRemoveUnresolvedGrowingZone"/>.
+    /// cleanup — see <see cref="ShouldRemoveUnresolvedGrowingZone"/>. Must not consider
+    /// <see cref="Thing.Spawned"/>: <c>PostLoadInit</c> runs before <c>Map.FinalizeLoading</c>
+    /// spawns any loaded thing, so every building is still unspawned at that point.
     /// </summary>
-    internal static bool ShouldRemoveUnresolvedPlantGrowerBuilding(
-        bool isNull,
-        bool destroyed,
-        bool spawned
-    ) => isNull || destroyed || !spawned;
+    internal static bool ShouldRemoveUnresolvedPlantGrowerBuilding(bool isNull, bool destroyed) =>
+        isNull || destroyed;
+
+    /// <summary>
+    /// <see cref="ExposeData"/>'s <c>PostLoadInit</c> cleanup of <see cref="SpecificGrowingZones"/>
+    /// and <see cref="SpecificPlantGrowerBuildings"/>.
+    /// </summary>
+    internal void PruneUnresolvedSpecificGrowers()
+    {
+        _ = SpecificGrowingZones.RemoveWhere(zone =>
+            ShouldRemoveUnresolvedGrowingZone(zone == null, zone?.Cells.Count ?? 0)
+        );
+        _ = SpecificPlantGrowerBuildings.RemoveWhere(building =>
+            ShouldRemoveUnresolvedPlantGrowerBuilding(
+                building == null,
+                building?.Destroyed ?? false
+            )
+        );
+    }
 
     /// <summary>
     /// Pure decision logic behind <see cref="ExposeData"/>'s one-time <see cref="HysteresisMode"/>
@@ -1274,16 +1290,7 @@ internal sealed class ManagerJob_FarmingHysteresis
             );
             HasMigratedHysteresisMode = true;
 
-            _ = SpecificGrowingZones.RemoveWhere(zone =>
-                ShouldRemoveUnresolvedGrowingZone(zone == null, zone?.Cells.Count ?? 0)
-            );
-            _ = SpecificPlantGrowerBuildings.RemoveWhere(building =>
-                ShouldRemoveUnresolvedPlantGrowerBuilding(
-                    building == null,
-                    building?.Destroyed ?? false,
-                    building?.Spawned ?? false
-                )
-            );
+            PruneUnresolvedSpecificGrowers();
 
             foreach (var entry in RotationEntries)
             {

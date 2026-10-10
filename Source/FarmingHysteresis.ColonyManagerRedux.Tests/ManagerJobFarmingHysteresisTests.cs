@@ -1,3 +1,4 @@
+using ColonyManagerRedux;
 using DevTools.Testing;
 using static FarmingHysteresis.ColonyManagerRedux.ManagerJob_FarmingHysteresis;
 
@@ -543,39 +544,41 @@ internal sealed class UnresolvedSpecificGrowerReferenceCleanupTests
 
     [Test]
     public static void UnresolvedPlantGrowerBuildingIsRemoved() =>
-        Expect.IsTrue(
-            ShouldRemoveUnresolvedPlantGrowerBuilding(isNull: true, destroyed: false, spawned: true)
-        );
+        Expect.IsTrue(ShouldRemoveUnresolvedPlantGrowerBuilding(isNull: true, destroyed: false));
 
     [Test]
     public static void DestroyedPlantGrowerBuildingIsRemoved() =>
-        Expect.IsTrue(
-            ShouldRemoveUnresolvedPlantGrowerBuilding(
-                isNull: false,
-                destroyed: true,
-                spawned: false
-            )
-        );
+        Expect.IsTrue(ShouldRemoveUnresolvedPlantGrowerBuilding(isNull: false, destroyed: true));
 
     [Test]
-    public static void UnspawnedPlantGrowerBuildingIsRemoved() =>
-        Expect.IsTrue(
-            ShouldRemoveUnresolvedPlantGrowerBuilding(
-                isNull: false,
-                destroyed: false,
-                spawned: false
-            )
-        );
+    public static void ResolvedPlantGrowerBuildingIsKept() =>
+        Expect.IsFalse(ShouldRemoveUnresolvedPlantGrowerBuilding(isNull: false, destroyed: false));
+}
 
+// Regression guard: specifically selected plant grower buildings must survive a save/load
+// round-trip. PostLoadInit runs before loaded things are spawned, so the cleanup must not treat
+// a not-yet-spawned building as gone.
+[TestFixture(TestType.Playing)]
+internal sealed class SpecificPlantGrowerBuildingSaveLoadTests
+{
     [Test]
-    public static void ResolvedSpawnedPlantGrowerBuildingIsKept() =>
-        Expect.IsFalse(
-            ShouldRemoveUnresolvedPlantGrowerBuilding(
-                isNull: false,
-                destroyed: false,
-                spawned: true
-            )
-        );
+    public static void SpecificPlantGrowerBuildingSurvivesPostLoadInit()
+    {
+        var map = Find.CurrentMap;
+        var manager = Manager.For(map);
+        var job = new ManagerJob_FarmingHysteresis(manager)
+        {
+            AssignmentMode = GrowerAssignmentMode.Specific,
+        };
+        var building = (Building_PlantGrower)ThingMaker.MakeThing(ThingDefOf.HydroponicsBasin);
+        _ = job.SpecificPlantGrowerBuildings.Add(building);
+
+        Expect.IsFalse(building.Spawned);
+
+        job.PruneUnresolvedSpecificGrowers();
+
+        Expect.IsTrue(job.SpecificPlantGrowerBuildings.Contains(building));
+    }
 }
 
 // Regression guard: a deleted Area used as GrowerArea must be cleared out via
