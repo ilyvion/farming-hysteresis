@@ -1,20 +1,12 @@
 runs:
     using: "composite"
     steps:
-        - name: Checkout ilyvion.Laboratory Repository
-          uses: actions/checkout@v4
-          with:
-              repository: "ilyvion/ilyvion-laboratory"
-              path: "ilyvion.Laboratory"
-
         - name: Checkout Colony Manager Redux Repository
-          uses: actions/checkout@v4
+          uses: actions/checkout@v7
           with:
               repository: "ilyvion/colony-manager-redux"
               path: "colony-manager-redux"
 
-        - name: Move dependencies to parent, where they're expected
+        - name: Move to parent, where it's expected
           shell: bash
-          run: |
-              mv ilyvion.Laboratory ..
-              mv colony-manager-redux ..
+          run: mv colony-manager-redux ..
