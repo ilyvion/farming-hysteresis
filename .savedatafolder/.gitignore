@@ -1,5 +1,3 @@
-*/Config
-*/Saves
-*/RimSaves
-*/Player*.log
-*/Test.log
+*
+!*/Config/ModsConfig.xml
+!*/Config/Prefs.xml

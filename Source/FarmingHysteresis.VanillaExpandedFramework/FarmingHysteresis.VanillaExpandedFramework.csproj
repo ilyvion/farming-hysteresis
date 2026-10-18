@@ -18,7 +18,7 @@
     <!-- Vanilla Expanded Framework's dual-crop assembly is named VFECore.dll through RimWorld 1.5
          and was renamed VEF.dll at 1.6, both under the same workshop id (2023507013). -->
     <Choose>
-        <When Condition="'$(RimWorldVersion)' == '1.6'">
+        <When Condition="$([MSBuild]::VersionGreaterThanOrEquals('$(RimWorldVersion)', '1.6'))">
             <ItemGroup>
                 <Reference Include="VEF">
                     <HintPath>$(RimWorldSteamWorkshopFolderPath)\2023507013\$(RimWorldVersion)\Assemblies\VEF.dll</HintPath>

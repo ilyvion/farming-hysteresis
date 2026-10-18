@@ -197,7 +197,7 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         float width
     )
     {
-        var modes = (HysteresisMode[])Enum.GetValues(typeof(HysteresisMode));
+        var modes = Enum.GetValues<HysteresisMode>();
         var cellWidth = width / modes.Length;
         var cellRect = new Rect(pos.x, pos.y, cellWidth, ListEntryHeight);
 
@@ -228,7 +228,7 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         float width
     )
     {
-        var modes = (RotationMode[])Enum.GetValues(typeof(RotationMode));
+        var modes = Enum.GetValues<RotationMode>();
         var cellWidth = width / modes.Length;
         var cellRect = new Rect(pos.x, pos.y, cellWidth, ListEntryHeight);
 
@@ -255,7 +255,7 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         float width
     )
     {
-        var modes = (RotationSwitchMode[])Enum.GetValues(typeof(RotationSwitchMode));
+        var modes = Enum.GetValues<RotationSwitchMode>();
         var cellWidth = width / modes.Length;
         var cellRect = new Rect(pos.x, pos.y, cellWidth, ListEntryHeight);
 
@@ -938,7 +938,7 @@ internal sealed class ManagerTab_FarmingHysteresis(Manager manager)
         float width
     )
     {
-        var modes = (GrowerAssignmentMode[])Enum.GetValues(typeof(GrowerAssignmentMode));
+        var modes = Enum.GetValues<GrowerAssignmentMode>();
         var cellWidth = width / modes.Length;
         var cellRect = new Rect(pos.x, pos.y, cellWidth, ListEntryHeight);
 

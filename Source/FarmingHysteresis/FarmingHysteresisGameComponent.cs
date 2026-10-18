@@ -73,10 +73,7 @@ public class FarmingHysteresisGameComponent(Game game) : GameComponent
     /// <param name="game">The game to get the component for.</param>
     public static FarmingHysteresisGameComponent For(Game game)
     {
-        if (game == null)
-        {
-            throw new ArgumentNullException(nameof(game));
-        }
+        ArgumentNullException.ThrowIfNull(game);
 
         var instance = game.GetComponent<FarmingHysteresisGameComponent>();
         if (instance != null)

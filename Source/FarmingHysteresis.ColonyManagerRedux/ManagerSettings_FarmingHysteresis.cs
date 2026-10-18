@@ -161,7 +161,7 @@ internal sealed class ManagerSettings_FarmingHysteresis : ManagerSettings
     /// </summary>
     private void DrawHysteresisModeSelector(Vector2 pos, float width)
     {
-        var modes = (HysteresisMode[])Enum.GetValues(typeof(HysteresisMode));
+        var modes = Enum.GetValues<HysteresisMode>();
         var cellWidth = width / modes.Length;
         var cellRect = new Rect(pos.x, pos.y, cellWidth, ListEntryHeight);
 
@@ -183,7 +183,7 @@ internal sealed class ManagerSettings_FarmingHysteresis : ManagerSettings
     /// <summary>Default-<see cref="RotationMode"/> icon row - see <see cref="DrawHysteresisModeSelector"/>.</summary>
     private void DrawRotationModeSelector(Vector2 pos, float width)
     {
-        var modes = (RotationMode[])Enum.GetValues(typeof(RotationMode));
+        var modes = Enum.GetValues<RotationMode>();
         var cellWidth = width / modes.Length;
         var cellRect = new Rect(pos.x, pos.y, cellWidth, ListEntryHeight);
 
@@ -205,7 +205,7 @@ internal sealed class ManagerSettings_FarmingHysteresis : ManagerSettings
     /// <summary>Default-<see cref="RotationSwitchMode"/> icon row - see <see cref="DrawHysteresisModeSelector"/>.</summary>
     private void DrawSwitchModeSelector(Vector2 pos, float width)
     {
-        var modes = (RotationSwitchMode[])Enum.GetValues(typeof(RotationSwitchMode));
+        var modes = Enum.GetValues<RotationSwitchMode>();
         var cellWidth = width / modes.Length;
         var cellRect = new Rect(pos.x, pos.y, cellWidth, ListEntryHeight);
 

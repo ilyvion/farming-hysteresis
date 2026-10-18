@@ -1,4 +1,4 @@
-[![RimWorld 1.3](https://img.shields.io/badge/RimWorld-1.3-brightgreen.svg)](http://rimworldgame.com/) [![RimWorld 1.4](https://img.shields.io/badge/RimWorld-1.4-brightgreen.svg)](http://rimworldgame.com/) [![RimWorld 1.5](https://img.shields.io/badge/RimWorld-1.5-brightgreen.svg)](http://rimworldgame.com/) [![RimWorld 1.6](https://img.shields.io/badge/RimWorld-1.6-brightgreen.svg)](http://rimworldgame.com/) [![Build](https://github.com/ilyvion/farming-hysteresis/actions/workflows/ci.yml/badge.svg)](https://github.com/ilyvion/farming-hysteresis/actions/workflows/ci.yml)
+[![RimWorld 1.3](https://img.shields.io/badge/RimWorld-1.3-brightgreen.svg)](http://rimworldgame.com/) [![RimWorld 1.4](https://img.shields.io/badge/RimWorld-1.4-brightgreen.svg)](http://rimworldgame.com/) [![RimWorld 1.5](https://img.shields.io/badge/RimWorld-1.5-brightgreen.svg)](http://rimworldgame.com/) [![RimWorld 1.6](https://img.shields.io/badge/RimWorld-1.6-brightgreen.svg)](http://rimworldgame.com/) [![RimWorld 1.7](https://img.shields.io/badge/RimWorld-1.7-brightgreen.svg)](http://rimworldgame.com/) [![Build](https://github.com/ilyvion/farming-hysteresis/actions/workflows/ci.yml/badge.svg)](https://github.com/ilyvion/farming-hysteresis/actions/workflows/ci.yml)
 
 Farming Hysteresis lets you automate enabling and disabling growing zones and hydroponics basins based on the amount of product already in storage.
 
@@ -33,9 +33,20 @@ CMR is not required, however — everything below continues to work exactly as i
 
 ## Legacy per-grower controls
 
-Without CMR (or with CMR-managed hysteresis turned off), the mod adds an "Enable hysteresis" gizmo to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported. When you enable this setting, the "Allow sowing" button is removed, and sowing and/or harvesting is instead controlled by the hysteresis bounds described above, editable per-grower. Hydroponics basins typically don't have this setting, but with this mod and hysteresis enabled, sowing and/or harvesting also stops on those when appropriate.
+Without CMR (or with CMR-managed hysteresis turned off), the mod adds an "Enable hysteresis" gizmo to all supported growing zones and hydroponics basins. Only plants that produce a harvestable product are supported. When you enable this setting, the "Allow sowing" button is removed, and sowing and/or harvesting is instead controlled by the hysteresis bounds described above. Hydroponics basins typically don't have this setting, but with this mod and hysteresis enabled, sowing and/or harvesting also stops on those when appropriate. Whether hysteresis controls sowing, harvesting, or both is chosen in the mod settings.
+
+Each grower's bounds can be its own ('Self'), shared with every other grower of the same product on the same map ('Map'), or shared across your whole save ('Game'). The Hysteresis tab lets you view and edit the shared bounds in one place.
 
 This mode still works and isn't going away, but it's no longer where new features are added — see the section above.
+
+## Compatibility
+
+Farming Hysteresis also supports the aquatic and sandy growing zones from Vanilla Plants Expanded - More Plants, and respects Smart Farming's 'No petty jobs' zone setting.
+
+## Requirements
+
+- [Harmony](https://github.com/pardeike/HarmonyRimWorld/releases/latest)
+- [ilyvion's Laboratory](https://github.com/ilyvion/ilyvion-laboratory/releases/latest)
 
 ## License
 

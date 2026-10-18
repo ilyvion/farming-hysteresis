@@ -82,10 +82,7 @@ internal sealed class CmrMigrationGameComponent(Game game) : GameComponent
 
     public static CmrMigrationGameComponent For(Game game)
     {
-        if (game == null)
-        {
-            throw new ArgumentNullException(nameof(game));
-        }
+        ArgumentNullException.ThrowIfNull(game);
 
         var instance = game.GetComponent<CmrMigrationGameComponent>();
         if (instance != null)

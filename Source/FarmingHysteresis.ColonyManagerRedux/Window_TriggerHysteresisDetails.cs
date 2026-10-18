@@ -124,7 +124,7 @@ internal sealed class WindowTriggerHysteresisDetails(CropRotationEntry entry, Ma
     /// </summary>
     private void DrawDualCropTrackingModeSelector(ref Vector2 pos, float width)
     {
-        foreach (var mode in (DualCropTrackingMode[])Enum.GetValues(typeof(DualCropTrackingMode)))
+        foreach (var mode in Enum.GetValues<DualCropTrackingMode>())
         {
             var rowRect = new Rect(pos.x, pos.y, width, ListEntryHeight);
             Utilities.DrawToggle(

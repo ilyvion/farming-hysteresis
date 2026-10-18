@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+
+- ilyvion's Laboratory: v0.26.0
+
+> [!IMPORTANT]  
+> This release requires an update to ilyvion's Laboratory!
+
+### Added
+
+- Support for RimWorld 1.7.
+
 ## [0.13.1] - 2026-10-10
 
 ### Fixed

@@ -1,6 +1,6 @@
 using DevTools.Testing;
 using FarmingHysteresis.VanillaExpandedFramework.Defs;
-#if v1_6
+#if v1_6_OR_GREATER
 using VEF.Plants;
 #else
 using VanillaPlantsExpanded;

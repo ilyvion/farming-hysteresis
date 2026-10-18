@@ -99,7 +99,9 @@ public class FarmingHysteresisControlDef : Def
         {
             if (field == null)
             {
-                field = (FarmingHysteresisControlWorker)Activator.CreateInstance(workerClass);
+                field = ActivatorUtility.CreateInstance<FarmingHysteresisControlWorker>(
+                    workerClass
+                );
                 field.def = this;
             }
             return field;
@@ -108,10 +110,7 @@ public class FarmingHysteresisControlDef : Def
 
     private void ValidatePlantGrowerType([NotNull] IPlantToGrowSettable? plantGrower, string method)
     {
-        if (plantGrower == null)
-        {
-            throw new ArgumentNullException(nameof(plantGrower));
-        }
+        ArgumentNullException.ThrowIfNull(plantGrower);
         if (!controlledClass.IsAssignableFrom(plantGrower.GetType()))
         {
             throw new InvalidOperationException(
@@ -280,10 +279,7 @@ public class FarmingHysteresisControlWorker_Zone_Growing : FarmingHysteresisCont
     /// <inheritdoc/>
     public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
     {
-        if (plantGrower == null)
-        {
-            throw new ArgumentNullException(nameof(plantGrower));
-        }
+        ArgumentNullException.ThrowIfNull(plantGrower);
 
         ((Zone_Growing)plantGrower).allowSow = value;
     }

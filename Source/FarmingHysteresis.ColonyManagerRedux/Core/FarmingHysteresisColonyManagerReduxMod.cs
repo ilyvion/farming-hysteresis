@@ -14,10 +14,7 @@ public class FarmingHysteresisColonyManagerReduxMod : Mod
     public FarmingHysteresisColonyManagerReduxMod(ModContentPack content)
         : base(content)
     {
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
+        ArgumentNullException.ThrowIfNull(content);
 
         new Harmony(content.PackageId).PatchAll(Assembly.GetExecutingAssembly());
 

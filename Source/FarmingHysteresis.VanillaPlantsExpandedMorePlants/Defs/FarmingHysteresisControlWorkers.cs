@@ -23,10 +23,7 @@ internal sealed class FarmingHysteresisControlWorker_Zone_GrowingAquatic
 
     public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
     {
-        if (plantGrower == null)
-        {
-            throw new ArgumentNullException(nameof(plantGrower));
-        }
+        ArgumentNullException.ThrowIfNull(plantGrower);
 
         ((Zone_GrowingAquatic)plantGrower).allowSow = value;
     }
@@ -52,10 +49,7 @@ internal sealed class FarmingHysteresisControlWorker_Zone_GrowingSandy
 
     public override void SetAllowSow(IPlantToGrowSettable plantGrower, bool value)
     {
-        if (plantGrower == null)
-        {
-            throw new ArgumentNullException(nameof(plantGrower));
-        }
+        ArgumentNullException.ThrowIfNull(plantGrower);
 
         ((Zone_GrowingSandy)plantGrower).allowSow = value;
     }

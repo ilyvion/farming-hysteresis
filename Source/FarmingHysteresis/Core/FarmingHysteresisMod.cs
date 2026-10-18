@@ -24,10 +24,7 @@ public class FarmingHysteresisMod : IlyvionMod
         : base(content)
     {
         // This is kind of stupid, but also kind of correct. Correct wins.
-        if (content == null)
-        {
-            throw new ArgumentNullException(nameof(content));
-        }
+        ArgumentNullException.ThrowIfNull(content);
 
         Instance = this;
 

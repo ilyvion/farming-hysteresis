@@ -19,7 +19,7 @@ public class SecondaryProductResolverDef : Def
 
     /// <summary>The lazily-instantiated worker for this def.</summary>
     public SecondaryProductResolverWorker Worker =>
-        field ??= (SecondaryProductResolverWorker)Activator.CreateInstance(resolverClass);
+        field ??= ActivatorUtility.CreateInstance<SecondaryProductResolverWorker>(resolverClass);
 }
 
 /// <summary>

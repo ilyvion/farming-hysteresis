@@ -14,10 +14,12 @@ internal sealed class ZoneGetInspectTabsComputeInspectTabsTests
         string[] values = ["existing"];
         Expect.AreEqual(
             1,
-            Zone_GetInspectTabs.ComputeInspectTabs(false, values, ExtraTabs).Count()
+            (Zone_GetInspectTabs.ComputeInspectTabs(false, values, ExtraTabs) ?? []).Count()
         );
         Expect.IsTrue(
-            Zone_GetInspectTabs.ComputeInspectTabs(false, values, ExtraTabs).Contains("existing")
+            (Zone_GetInspectTabs.ComputeInspectTabs(false, values, ExtraTabs) ?? []).Contains(
+                "existing"
+            )
         );
     }
 
@@ -28,14 +30,16 @@ internal sealed class ZoneGetInspectTabsComputeInspectTabsTests
     [Test]
     public static void ControlledZoneTypeWithNullValuesReturnsExtraTabs() =>
         Expect.IsTrue(
-            Zone_GetInspectTabs.ComputeInspectTabs(true, null, ExtraTabs).Contains("extra")
+            (Zone_GetInspectTabs.ComputeInspectTabs(true, null, ExtraTabs) ?? []).Contains("extra")
         );
 
     [Test]
     public static void ControlledZoneTypeConcatenatesExistingThenExtraTabs()
     {
         string[] values = ["existing"];
-        var result = Zone_GetInspectTabs.ComputeInspectTabs(true, values, ExtraTabs).ToList();
+        var result = (
+            Zone_GetInspectTabs.ComputeInspectTabs(true, values, ExtraTabs) ?? []
+        ).ToList();
 
         Expect.AreEqual(2, result.Count);
         Expect.AreEqual("existing", result[0]);

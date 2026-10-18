@@ -66,10 +66,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
     public FarmingHysteresisMapComponent(Map map)
         : base(map)
     {
-        if (map == null)
-        {
-            throw new ArgumentNullException(nameof(map));
-        }
+        ArgumentNullException.ThrowIfNull(map);
 
         // if not created in SavingLoading, give yourself the ID of the map you were constructed on.
         if (Scribe.mode == LoadSaveMode.Inactive)
@@ -111,10 +108,7 @@ public class FarmingHysteresisMapComponent : MapComponent, ILoadReferenceable
     /// <param name="map">The map to get the component for.</param>
     public static FarmingHysteresisMapComponent For(Map map)
     {
-        if (map == null)
-        {
-            throw new ArgumentNullException(nameof(map));
-        }
+        ArgumentNullException.ThrowIfNull(map);
 
         var instance = map.GetComponent<FarmingHysteresisMapComponent>();
         if (instance != null)
