@@ -48,6 +48,24 @@ Farming Hysteresis also supports the aquatic and sandy growing zones from Vanill
 - [Harmony](https://github.com/pardeike/HarmonyRimWorld/releases/latest)
 - [ilyvion's Laboratory](https://github.com/ilyvion/ilyvion-laboratory/releases/latest)
 
+## Building from source
+
+Farming Hysteresis is part of a family of mods that share build tooling. To build it, check out these sibling repositories alongside this one (i.e. `../colony-manager-redux`, `../ilyvion.Laboratory` and `../rimworld-utils` relative to this repo):
+
+- [`colony-manager-redux`](https://github.com/ilyvion/colony-manager-redux) — referenced by the Colony Manager Redux integration.
+- [`ilyvion.Laboratory`](https://github.com/ilyvion/ilyvion-laboratory) — shared library dependency.
+- [`rimworld-utils`](https://github.com/ilyvion/rimworld-utils) — shared MSBuild props/targets and build scripts.
+
+The test projects are only built in the Debug configuration, and additionally need [`SmashPhil-DevTools`](https://github.com/ilyvion/SmashPhil-DevTools) checked out at `../Third-Party/DevTools`.
+
+Then build with the .NET SDK (targets `net481` for RimWorld 1.3 through 1.6, `net10.0` for RimWorld 1.7):
+
+```sh
+dotnet build --configuration Release --property RimWorldVersion=1.7 FarmingHysteresis.sln
+```
+
+Or use `.vscode/build.sh`, which builds and copies the mod's files into your RimWorld `Mods` folder (see `.vscode/build_config.sh` for the target path).
+
 ## License
 
 Licensed under either of
