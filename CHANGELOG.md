@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Dependencies
+
+- ilyvion's Laboratory: v0.27.0
+
+> [!IMPORTANT]  
+> This release requires an update to ilyvion's Laboratory!
+
 ## [0.14.0] - 2026-10-20
 
 ### Dependencies

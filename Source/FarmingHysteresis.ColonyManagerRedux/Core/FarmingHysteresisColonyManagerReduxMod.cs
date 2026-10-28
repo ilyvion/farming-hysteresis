@@ -5,7 +5,7 @@ namespace FarmingHysteresis.ColonyManagerRedux;
 /// Only ever loads when Colony Manager Redux is active, via <c>LoadFolders.xml</c>'s
 /// <c>IfModActive</c> gating - this mod never needs to check for CMR's presence itself.
 /// </summary>
-public class FarmingHysteresisColonyManagerReduxMod : Mod
+public class FarmingHysteresisColonyManagerReduxMod : IlyvionMod
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FarmingHysteresisColonyManagerReduxMod"/> class.
@@ -14,9 +14,7 @@ public class FarmingHysteresisColonyManagerReduxMod : Mod
     public FarmingHysteresisColonyManagerReduxMod(ModContentPack content)
         : base(content)
     {
-        ArgumentNullException.ThrowIfNull(content);
-
-        new Harmony(content.PackageId).PatchAll(Assembly.GetExecutingAssembly());
+        _ = PatchAll();
 
         FarmingHysteresisMod.Instance.LogMessage(
             "Colony Manager Redux integration loaded successfully!"

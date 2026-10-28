@@ -4,7 +4,7 @@ namespace FarmingHysteresis.VanillaPlantsExpandedMorePlants;
 /// The interop mod class enabling Farming Hysteresis support for Vanilla Plants Expanded -
 /// More Plants.
 /// </summary>
-public class VanillaPlantsExpandedMorePlantsMod : Mod
+public class VanillaPlantsExpandedMorePlantsMod : IlyvionMod
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="VanillaPlantsExpandedMorePlantsMod"/> class.
@@ -13,7 +13,7 @@ public class VanillaPlantsExpandedMorePlantsMod : Mod
     public VanillaPlantsExpandedMorePlantsMod(ModContentPack content)
         : base(content)
     {
-        new Harmony(Constants.Id).PatchAll(Assembly.GetExecutingAssembly());
+        _ = PatchAll(Constants.Id);
 
         FarmingHysteresisMod.Instance.LogMessage(
             "\"Vanilla Plants Expanded - More Plants\" interop loaded successfully!"

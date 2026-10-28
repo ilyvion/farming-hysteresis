@@ -4,7 +4,7 @@ namespace FarmingHysteresis.SmartFarming;
 /// The interop mod class enabling Farming Hysteresis cooperation with Smart Farming's "No petty
 /// jobs" per-zone setting.
 /// </summary>
-public class SmartFarmingMod : Mod
+public class SmartFarmingMod : IlyvionMod
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="SmartFarmingMod"/> class.
@@ -13,7 +13,7 @@ public class SmartFarmingMod : Mod
     public SmartFarmingMod(ModContentPack content)
         : base(content)
     {
-        new Harmony(Constants.Id).PatchAll(Assembly.GetExecutingAssembly());
+        _ = PatchAll(Constants.Id);
 
         FarmingHysteresisMod.AllowSowVeto = SmartFarmingIntegration.AllowSow;
 

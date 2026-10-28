@@ -4,6 +4,6 @@
         <defName>FarminHysteresis_VersionCheck</defName>
         <modName>Farming Hysteresis</modName>
         <majorVersion>0</majorVersion>
-        <minorVersion>26</minorVersion>
+        <minorVersion>27</minorVersion>
     </ilyvion.Laboratory.VersionCheckDef>
 </Defs>
