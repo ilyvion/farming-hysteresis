@@ -1,4 +1,5 @@
 using DevTools.Testing;
+using SmartFarming;
 
 namespace FarmingHysteresis.SmartFarming.Tests;
 
@@ -28,4 +29,66 @@ internal sealed class SmartFarmingIntegrationTests
     [Test]
     public static void NonZoneGrowingGrowerIsNeverVetoed() =>
         Expect.IsTrue(SmartFarmingIntegration.AllowSow(new FakeGrower()));
+
+    // Regression guard: Smart Farming sets allow-sow from its sow mode on every recalculation,
+    // which turned sowing back on in a zone hysteresis had stopped until hysteresis next
+    // reasserted it.
+    [TestCase(ZoneData.SowMode.On)]
+    [TestCase(ZoneData.SowMode.Smart)]
+    [TestCase(ZoneData.SowMode.Force)]
+    public static void SmartFarmingDoesNotReenableSowingHysteresisDisallowed(
+        ZoneData.SowMode sowMode
+    ) =>
+        Expect.IsFalse(
+            SmartFarmingIntegration.ReconcileAllowSow(
+                sowMode,
+                allowSowBefore: false,
+                allowSowAfter: true,
+                noPettyJobs: false
+            )
+        );
+
+    [Test]
+    public static void HysteresisAllowedSowingStaysAllowed() =>
+        Expect.IsTrue(
+            SmartFarmingIntegration.ReconcileAllowSow(
+                ZoneData.SowMode.On,
+                allowSowBefore: true,
+                allowSowAfter: true,
+                noPettyJobs: false
+            )
+        );
+
+    [Test]
+    public static void PlayerChosenOffIsKept() =>
+        Expect.IsFalse(
+            SmartFarmingIntegration.ReconcileAllowSow(
+                ZoneData.SowMode.Off,
+                allowSowBefore: true,
+                allowSowAfter: false,
+                noPettyJobs: false
+            )
+        );
+
+    [Test]
+    public static void NoPettyJobsCanStillDisallowSowing() =>
+        Expect.IsFalse(
+            SmartFarmingIntegration.ReconcileAllowSow(
+                ZoneData.SowMode.On,
+                allowSowBefore: true,
+                allowSowAfter: false,
+                noPettyJobs: true
+            )
+        );
+
+    [Test]
+    public static void NoPettyJobsCannotReenableSowingHysteresisDisallowed() =>
+        Expect.IsFalse(
+            SmartFarmingIntegration.ReconcileAllowSow(
+                ZoneData.SowMode.On,
+                allowSowBefore: false,
+                allowSowAfter: true,
+                noPettyJobs: true
+            )
+        );
 }

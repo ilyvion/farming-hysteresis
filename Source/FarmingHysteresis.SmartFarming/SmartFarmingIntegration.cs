@@ -43,6 +43,24 @@ internal static class SmartFarmingIntegration
         || !cachedAllowSow.TryGetValue(zone, out var box)
         || box.Value;
 
+    /// <summary>
+    /// Pure decision logic behind <see cref="Patch.MapComponent_SmartFarming_CalculateAverages"/>
+    /// for a zone whose sowing Farming Hysteresis controls: given the zone's allow-sow flag before
+    /// and after Smart Farming's recalculation, returns the value the zone should be left with. A
+    /// zone the player set to <see cref="ZoneData.SowMode.Off"/> keeps Smart Farming's result.
+    /// Otherwise Farming Hysteresis's allow-sow flag stands, further restricted by the "No petty
+    /// jobs" decision when that is on.
+    /// </summary>
+    internal static bool ReconcileAllowSow(
+        ZoneData.SowMode sowMode,
+        bool allowSowBefore,
+        bool allowSowAfter,
+        bool noPettyJobs
+    ) =>
+        sowMode == ZoneData.SowMode.Off ? allowSowAfter
+        : noPettyJobs ? allowSowBefore && allowSowAfter
+        : allowSowBefore;
+
     private static bool HasNoPettyJobsEnabled(Zone_Growing zone) =>
         zone.Map?.GetComponent<MapComponent_SmartFarming>() is { } comp
         && comp.growZoneRegistry.TryGetValue(zone.ID, out var zoneData)

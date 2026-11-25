@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - When a growing zone or plant grower stops being managed by a Colony Manager Redux farming hysteresis job (because the job's grower selection changed or the job was deleted), sowing and harvesting are allowed on it again. It no longer stays stuck with whatever the job last set.
 - A Colony Manager Redux farming hysteresis job now actually stops sowing on hydroponics basins and other plant-grower buildings, and stops harvesting on all of its growers, when its stock is high. Before, this only happened if the grower's own 'Enable hysteresis' toggle was on and the mod settings' hysteresis mode covered sowing or harvesting.
 - With ReGrowth 2, a growing zone under hysteresis control no longer gets its Smart Farming sow mode switched to 'Off' when hysteresis stops sowing, which left the zone unsown even after hysteresis allowed sowing again. Smart Farming also no longer briefly turns sowing back on in such a zone while hysteresis has it off. If a zone in an existing save was already switched to 'Off' this way, click its Smart Farming sow button back to 'On' once.
+- With Smart Farming, a growing zone under hysteresis control no longer briefly gets sowing turned back on by Smart Farming while hysteresis has it off.
 
 ## [0.14.0] - 2026-10-20
 
