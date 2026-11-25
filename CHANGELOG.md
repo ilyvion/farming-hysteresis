@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A Colony Manager Redux farming hysteresis job no longer stops working, and stops rotating crops, when one of its growers can't grow the current crop (for example a hydroponics basin while the crop needs soil). That grower is now left alone and named in the job's log, and the job keeps managing every other grower.
 - When a growing zone or plant grower stops being managed by a Colony Manager Redux farming hysteresis job (because the job's grower selection changed or the job was deleted), sowing and harvesting are allowed on it again. It no longer stays stuck with whatever the job last set.
+- A Colony Manager Redux farming hysteresis job now actually stops sowing on hydroponics basins and other plant-grower buildings, and stops harvesting on all of its growers, when its stock is high. Before, this only happened if the grower's own 'Enable hysteresis' toggle was on and the mod settings' hysteresis mode covered sowing or harvesting.
 
 ## [0.14.0] - 2026-10-20
 

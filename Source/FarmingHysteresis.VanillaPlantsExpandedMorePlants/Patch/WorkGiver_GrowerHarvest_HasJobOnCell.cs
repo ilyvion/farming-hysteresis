@@ -1,4 +1,3 @@
-using FarmingHysteresis.Extensions;
 using FarmingHysteresis.Patch;
 using VanillaPlantsExpandedMorePlants;
 
@@ -12,20 +11,14 @@ internal static class WorkGiver_GrowerHarvestAquatic_HasJobOnCell
 {
     private static void Postfix(ref Pawn pawn, ref IntVec3 c, ref bool __result)
     {
-        if (__result && FarmingHysteresisMod.Settings.ControlHarvesting)
+        // We check that __result was true first so we don't mess up the game's
+        // other reasons for disallowing harvesting.
+        if (__result && c.GetZone(pawn.Map) is Zone_GrowingAquatic zoneGrowingAquatic)
         {
-            // We check that __result was true first so we don't mess up the game's
-            // other reasons for disallowing harvesting. But if harvesting normally is
-            // allowed, override it with what the hysteresis value is at any given time.
-            if (c.GetZone(pawn.Map) is Zone_GrowingAquatic zoneGrowingAquatic)
-            {
-                var data = zoneGrowingAquatic.GetFarmingHysteresisData();
-                __result = WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
-                    __result,
-                    data.Enabled,
-                    zoneGrowingAquatic.GetAllowHarvest()
-                );
-            }
+            __result = WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResultFor(
+                zoneGrowingAquatic,
+                __result
+            );
         }
     }
 }
@@ -38,20 +31,14 @@ internal static class WorkGiver_GrowerHarvestSandy_HasJobOnCell
 {
     private static void Postfix(ref Pawn pawn, ref IntVec3 c, ref bool __result)
     {
-        if (__result && FarmingHysteresisMod.Settings.ControlHarvesting)
+        // We check that __result was true first so we don't mess up the game's
+        // other reasons for disallowing harvesting.
+        if (__result && c.GetZone(pawn.Map) is Zone_GrowingSandy zoneGrowingSandy)
         {
-            // We check that __result was true first so we don't mess up the game's
-            // other reasons for disallowing harvesting. But if harvesting normally is
-            // allowed, override it with what the hysteresis value is at any given time.
-            if (c.GetZone(pawn.Map) is Zone_GrowingSandy zoneGrowingSandy)
-            {
-                var data = zoneGrowingSandy.GetFarmingHysteresisData();
-                __result = WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResult(
-                    __result,
-                    data.Enabled,
-                    zoneGrowingSandy.GetAllowHarvest()
-                );
-            }
+            __result = WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResultFor(
+                zoneGrowingSandy,
+                __result
+            );
         }
     }
 }

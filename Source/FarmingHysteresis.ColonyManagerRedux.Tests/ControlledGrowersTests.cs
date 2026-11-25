@@ -6,9 +6,18 @@ using ColonyManagerRedux;
 
 #if v1_7_OR_GREATER
 using FarmingHysteresis.Extensions;
+using FarmingHysteresis.Patch;
 #endif
 
 namespace FarmingHysteresis.ColonyManagerRedux.Tests;
+
+#if v1_7_OR_GREATER
+// Goes through vanilla's caller, since CoreCLR's JIT can inline Building_PlantGrower.CanAcceptSowNow.
+file sealed class SowRequirementsProbe : WorkGiver_GrowerSow
+{
+    public bool Check(IPlantToGrowSettable settable) => ExtraRequirements(settable, null);
+}
+#endif
 
 // A grower that drops out of a job's control must be handed back, unless it's gone or another job
 // now controls it.
@@ -110,21 +119,84 @@ internal sealed class ControlledGrowersTests
         );
     }
 
+    // The job's gating must reach growers without a native allow-sow toggle (and harvesting on
+    // every grower) whether or not the grower's own per-grower hysteresis toggle is on.
+    [Test]
+    public static void JobGatesBasinSowingAndHarvestingWithLegacyToggleOff()
+    {
+        var map = Find.CurrentMap;
+        WithJob(
+            map,
+            (job, zone) =>
+            {
+                var basin = SpawnHydroponicsBasin(map);
+                try
+                {
+                    basin.GetFarmingHysteresisData().Disable();
+                    basin.GetComp<CompPowerTrader>().PowerOn = true;
+                    _ = job.SpecificPlantGrowerBuildings.Add(basin);
+                    Expect.IsTrue(((IPlantToGrowSettable)basin).CanAcceptSowNow());
+
+                    job.ReassertControlledGrowers();
+
+                    Expect.IsTrue(job.ControlledGrowers.Contains(basin));
+                    Expect.IsFalse(new SowRequirementsProbe().Check(basin));
+                    Expect.IsFalse(
+                        WorkGiver_GrowerHarvest_HasJobOnCell.ComputeResultFor(basin, true)
+                    );
+                }
+                finally
+                {
+                    basin.Destroy();
+                }
+            },
+            plantDefName: "Plant_Rice",
+            mode: HysteresisMode.SowingAndHarvesting
+        );
+    }
+
+    [Test]
+    public static void UnspawnedGrowerIsNotControlled()
+    {
+        var previousController = FarmingHysteresisMod.HysteresisController;
+        try
+        {
+            FarmingHysteresisMod.HysteresisController = CmrHysteresisController.Instance;
+            var def = DefDatabase<ThingDef>.GetNamed("PlantPot");
+            var pot = (Building_PlantGrower)
+                ThingMaker.MakeThing(def, GenStuff.DefaultStuffFor(def));
+
+            Expect.IsFalse(CmrHysteresisController.Instance.ControlsSowingOf(pot));
+            Expect.IsFalse(CmrHysteresisController.Instance.ControlsHarvestingOf(pot));
+            Expect.IsTrue(((IPlantToGrowSettable)pot).CanAcceptSowNow());
+        }
+        finally
+        {
+            FarmingHysteresisMod.HysteresisController = previousController;
+        }
+    }
+
     /// <summary>
-    /// Runs <paramref name="test"/> against a CMR-controlled, sowing-only job in Specific mode
-    /// whose active crop is corn (soil only), latched above its upper bound, with one growing zone
-    /// selected. Restores the controller and removes the job and zone afterwards.
+    /// Runs <paramref name="test"/> against a CMR-controlled job in Specific mode whose active
+    /// crop is <paramref name="plantDefName"/> (corn, soil only, by default), latched above its
+    /// upper bound, with one growing zone selected. Restores the controller and removes the job
+    /// and zone afterwards.
     /// </summary>
-    private static void WithJob(Map map, Action<ManagerJob_FarmingHysteresis, Zone_Growing> test)
+    private static void WithJob(
+        Map map,
+        Action<ManagerJob_FarmingHysteresis, Zone_Growing> test,
+        string plantDefName = "Plant_Corn",
+        HysteresisMode mode = HysteresisMode.Sowing
+    )
     {
         var previousController = FarmingHysteresisMod.HysteresisController;
         var manager = Manager.For(map);
         var job = new ManagerJob_FarmingHysteresis(manager)
         {
             AssignmentMode = GrowerAssignmentMode.Specific,
-            HysteresisMode = HysteresisMode.Sowing,
+            HysteresisMode = mode,
         };
-        job.AddRotationEntry(DefDatabase<ThingDef>.GetNamed("Plant_Corn"));
+        job.AddRotationEntry(DefDatabase<ThingDef>.GetNamed(plantDefName));
         job.RotationEntries[0].LatchModeValue = LatchMode.AboveUpperBound;
 
         var zone = new Zone_Growing(map.zoneManager);

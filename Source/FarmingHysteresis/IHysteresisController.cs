@@ -48,6 +48,21 @@ public interface IHysteresisController
     ThingDef? GetCellSowPlantOverride(IPlantToGrowSettable grower, IntVec3 cell);
 
     /// <summary>
+    /// Whether this controller currently drives <paramref name="grower"/>'s sowing, so the
+    /// patches that gate sowing on growers without a native allow-sow toggle (e.g.
+    /// <see cref="Building_PlantGrower"/>) apply its allow-sow flag. When false, they leave
+    /// vanilla's own decision untouched. Queried live, like <see cref="IsCellSowAllowed"/>.
+    /// </summary>
+    bool ControlsSowingOf(IPlantToGrowSettable grower);
+
+    /// <summary>
+    /// Whether this controller currently drives <paramref name="grower"/>'s harvesting, so the
+    /// harvest work-giver patches apply its allow-harvest flag. When false, they leave vanilla's
+    /// own decision untouched. Queried live, like <see cref="IsCellSowAllowed"/>.
+    /// </summary>
+    bool ControlsHarvestingOf(IPlantToGrowSettable grower);
+
+    /// <summary>
     /// Whether the default per-grower hysteresis UI (the enable/disable gizmo and
     /// <c>ITab_Hysteresis</c>) should render.
     /// </summary>

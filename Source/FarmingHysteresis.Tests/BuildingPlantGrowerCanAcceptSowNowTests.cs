@@ -20,10 +20,12 @@ internal sealed class BuildingPlantGrowerCanAcceptSowNowTests
         var settings = FarmingHysteresisMod.Settings;
         var enabledByDefault = settings.EnabledByDefault;
         var hysteresisMode = settings.HysteresisMode;
+        var controller = FarmingHysteresisMod.HysteresisController;
         try
         {
             settings.EnabledByDefault = true;
             settings.HysteresisMode = HysteresisMode.Sowing;
+            FarmingHysteresisMod.HysteresisController = DefaultHysteresisController.Instance;
 
             var plantPotDef = DefDatabase<ThingDef>.GetNamed("PlantPot");
             var building = (Building_PlantGrower)
@@ -40,6 +42,33 @@ internal sealed class BuildingPlantGrowerCanAcceptSowNowTests
         {
             settings.EnabledByDefault = enabledByDefault;
             settings.HysteresisMode = hysteresisMode;
+            FarmingHysteresisMod.HysteresisController = controller;
+        }
+    }
+
+    [Test]
+    public static void DefaultControllerIgnoresAllowSowWhenHysteresisDisabled()
+    {
+        var settings = FarmingHysteresisMod.Settings;
+        var hysteresisMode = settings.HysteresisMode;
+        var controller = FarmingHysteresisMod.HysteresisController;
+        try
+        {
+            settings.HysteresisMode = HysteresisMode.Sowing;
+            FarmingHysteresisMod.HysteresisController = DefaultHysteresisController.Instance;
+
+            var plantPotDef = DefDatabase<ThingDef>.GetNamed("PlantPot");
+            var building = (Building_PlantGrower)
+                ThingMaker.MakeThing(plantPotDef, GenStuff.DefaultStuffFor(plantPotDef));
+            building.GetFarmingHysteresisData().Disable();
+
+            building.SetHysteresisControlState(HysteresisMode.Sowing, state: false);
+            Expect.IsTrue(((IPlantToGrowSettable)building).CanAcceptSowNow());
+        }
+        finally
+        {
+            settings.HysteresisMode = hysteresisMode;
+            FarmingHysteresisMod.HysteresisController = controller;
         }
     }
 }

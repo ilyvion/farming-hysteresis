@@ -7,12 +7,7 @@ internal static class Building_PlantGrower_CanAcceptSowNow
 {
     private static void Postfix(ref Building_PlantGrower __instance, ref bool __result)
     {
-        if (!__instance.GetFarmingHysteresisData().Enabled)
-        {
-            return;
-        }
-
-        if (__result && FarmingHysteresisMod.Settings.ControlSowing)
+        if (__result && FarmingHysteresisMod.HysteresisController.ControlsSowingOf(__instance))
         {
             // We check that __result was true first so we don't mess up the game's
             // other reasons for disallowing sowing. But if sowing normally is

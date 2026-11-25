@@ -81,6 +81,29 @@ internal sealed class CmrHysteresisController : IHysteresisController
             : null;
     }
 
+    /// <summary>
+    /// True whenever <paramref name="grower"/>'s owning job is active and can grow its active crop
+    /// - the growers that job sets sow/harvest state on. The job's own
+    /// <see cref="ManagerJob_FarmingHysteresis.HysteresisMode"/> is already baked into the flags
+    /// it sets, so it isn't consulted here.
+    /// </summary>
+    public bool ControlsSowingOf(IPlantToGrowSettable grower) => IsDrivenByJob(grower);
+
+    /// <inheritdoc cref="ControlsSowingOf"/>
+    public bool ControlsHarvestingOf(IPlantToGrowSettable grower) => IsDrivenByJob(grower);
+
+    private static bool IsDrivenByJob(IPlantToGrowSettable grower)
+    {
+        if (grower.Map is null)
+        {
+            return false;
+        }
+
+        var manager = Manager.For(grower.Map);
+        var job = ManagerJob_FarmingHysteresis.FindOwningJob(manager, grower);
+        return job is { IsManaged: true } && job.CanGrowActiveCropOn(grower);
+    }
+
     public bool ShowGrowerUi => false;
 
     public bool ShowMainTab => false;

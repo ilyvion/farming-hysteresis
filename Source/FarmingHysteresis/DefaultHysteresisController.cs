@@ -32,6 +32,13 @@ internal sealed class DefaultHysteresisController : IHysteresisController
 
     public ThingDef? GetCellSowPlantOverride(IPlantToGrowSettable grower, IntVec3 cell) => null;
 
+    public bool ControlsSowingOf(IPlantToGrowSettable grower) =>
+        FarmingHysteresisMod.Settings.ControlSowing && grower.GetFarmingHysteresisData().Enabled;
+
+    public bool ControlsHarvestingOf(IPlantToGrowSettable grower) =>
+        FarmingHysteresisMod.Settings.ControlHarvesting
+        && grower.GetFarmingHysteresisData().Enabled;
+
     public bool ShowGrowerUi => true;
 
     public bool ShowMainTab => true;
