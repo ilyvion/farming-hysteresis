@@ -6,7 +6,7 @@ namespace FarmingHysteresis.ReGrowth.Patch;
 /// Captures the "No petty jobs" sow decision ReGrowth's Smart Farming just computed, and, on
 /// zones whose sowing Farming Hysteresis controls, undoes the sow mode and allow-sow changes it
 /// made in reaction to Farming Hysteresis's own allow-sow flag - see <see
-/// cref="ReGrowthSmartFarmingIntegration"/>.
+/// cref="ReGrowthSmartFarmingIntegration"/> and <see cref="SmartFarmingCooperation"/>.
 /// </summary>
 [HarmonyPatch(
     typeof(MapComponent_SmartFarming),
@@ -28,7 +28,7 @@ internal static class MapComponent_SmartFarming_CalculateAverages
 
         if (zoneData.noPettyJobs && before.SowMode != ZoneData.SowMode.Off)
         {
-            ReGrowthSmartFarmingIntegration.CacheAllowSow(growing, growing.allowSow);
+            ReGrowthSmartFarmingIntegration.Cooperation.CacheAllowSow(growing, growing.allowSow);
         }
 
         if (!FarmingHysteresisMod.HysteresisController.ControlsSowingOf(growing))

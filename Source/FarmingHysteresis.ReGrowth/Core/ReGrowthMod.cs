@@ -15,7 +15,7 @@ public class ReGrowthMod : IlyvionMod
     {
         _ = PatchAll(Constants.Id);
 
-        FarmingHysteresisMod.AddAllowSowVeto(ReGrowthSmartFarmingIntegration.AllowSow);
+        FarmingHysteresisMod.AddAllowSowVeto(ReGrowthSmartFarmingIntegration.Cooperation.AllowSow);
 
         FarmingHysteresisMod.Instance.LogMessage("\"ReGrowth 2\" interop loaded successfully!");
     }
