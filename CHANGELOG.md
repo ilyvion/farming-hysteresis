@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > [!IMPORTANT]  
 > This release requires an update to ilyvion's Laboratory!
 
+### Changed
+
+- The mod now asks to be loaded after the RimWorld Core in the mod list.
+
 ## [0.14.0] - 2026-10-20
 
 ### Dependencies

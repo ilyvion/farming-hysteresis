@@ -6,7 +6,7 @@ namespace FarmingHysteresis.Tests;
 
 file sealed class SowRequirementsProbe : WorkGiver_GrowerSow
 {
-    public bool Check(IPlantToGrowSettable settable) => ExtraRequirements(settable, null!);
+    public bool Check(IPlantToGrowSettable settable) => ExtraRequirements(settable, null);
 }
 
 // Regression guard: CoreCLR's JIT can inline the small Building_PlantGrower.CanAcceptSowNow into

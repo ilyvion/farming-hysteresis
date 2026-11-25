@@ -52,6 +52,7 @@
         </li>
     </modDependencies>
     <loadAfter>
+        <li>ludeon.rimworld</li>
         <li>brrainz.harmony</li>
         <li>ilyvion.Laboratory</li>
         <!-- Sowing/harvesting control only works correctly if we're after Smart Farming -->
