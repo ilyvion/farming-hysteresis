@@ -261,7 +261,7 @@ internal sealed class ManagerJob_FarmingHysteresis
         ManagerSettings_FarmingHysteresis.Instance?.DefaultHysteresisMode ?? HysteresisMode.Sowing;
 
     /// <summary>
-    /// Whether this job caps how many of its <see cref="ManagedGrowers"/>' cells are actually
+    /// Whether this job caps how many of its <see cref="ControlledGrowers"/>' cells are actually
     /// sown at once, instead of sowing every eligible cell the moment the active entry's latch
     /// enables sowing - see <see cref="ComputeRequiredCellCount"/>/<see cref="ComputeCascadingSowPlan"/>
     /// for the cap itself. Off by default: the cap is only ever an estimate (it can't account for
@@ -504,7 +504,7 @@ internal sealed class ManagerJob_FarmingHysteresis
 
     /// <summary>
     /// Live glue behind <see cref="RecomputeSowBudget"/>'s <see cref="ComputeCascadingSowPlan"/>
-    /// call: every cell across <see cref="ManagedGrowers"/>, alongside its own fertility and
+    /// call: every cell across <see cref="ControlledGrowers"/>, alongside its own fertility and
     /// whatever plant currently stands on it (if any).
     /// </summary>
     private IEnumerable<(
@@ -512,7 +512,7 @@ internal sealed class ManagerJob_FarmingHysteresis
         float Fertility,
         ThingDef? StandingPlantDef
     )> GatherSowBudgetInputCells() =>
-        ManagedGrowers.SelectMany(grower =>
+        ControlledGrowers.SelectMany(grower =>
             grower.Cells.Select(cell =>
                 (cell, grower.Map.fertilityGrid.FertilityAt(cell), cell.GetPlant(grower.Map)?.def)
             )
@@ -932,9 +932,92 @@ internal sealed class ManagerJob_FarmingHysteresis
         Func<ThingDef, bool> isPlantAvailable
     ) => plantDef.plant.harvestedThingDef != null && isPlantAvailable(plantDef);
 
+    /// <summary>
+    /// Whether <paramref name="grower"/> can currently grow <see cref="TargetPlantDef"/>. A managed
+    /// grower that can't (e.g. a hydroponics basin while the active crop needs soil) is left alone
+    /// by this job rather than stopping it from working on every other grower.
+    /// </summary>
+    internal bool CanGrowActiveCropOn(IPlantToGrowSettable grower) =>
+        TargetPlantDef is { } targetPlantDef
+        && IsValidTargetPlantCandidate(
+            targetPlantDef,
+            def => Command_SetPlantToGrow.IsPlantAvailable(def, Manager.map)
+        )
+        && PlantUtility.CanSowOnGrower(targetPlantDef, grower);
+
+    /// <summary>
+    /// The growers this job actually drives right now: <see cref="ManagedGrowers"/> that can grow
+    /// the active crop (see <see cref="CanGrowActiveCropOn"/>).
+    /// </summary>
+    internal IReadOnlyList<IPlantToGrowSettable> ControlledGrowers =>
+        [.. ManagedGrowers.Where(CanGrowActiveCropOn)];
+
+    /// <summary>
+    /// The growers this job last set sow/harvest state on, so the ones that drop out of
+    /// <see cref="ControlledGrowers"/> can be handed back (see <see cref="SyncControlledGrowers"/>).
+    /// </summary>
+    private readonly HashSet<IPlantToGrowSettable> _lastControlledGrowers = [];
+
+    /// <summary>
+    /// Pure decision behind <see cref="SyncControlledGrowers"/>: every grower in
+    /// <paramref name="previouslyControlled"/> that isn't in <paramref name="nowControlled"/> and
+    /// that <paramref name="shouldLeaveAlone"/> doesn't exclude.
+    /// </summary>
+    internal static List<T> ComputeGrowersToRelease<T>(
+        IEnumerable<T> previouslyControlled,
+        IEnumerable<T> nowControlled,
+        Func<T, bool> shouldLeaveAlone
+    )
+    {
+        var now = nowControlled.ToHashSet();
+        return [.. previouslyControlled.Where(g => !now.Contains(g) && !shouldLeaveAlone(g))];
+    }
+
+    /// <summary>
+    /// Re-allows sowing/harvesting (see <see cref="PlantToGrowSettableExtensions.ReleaseHysteresisControl"/>)
+    /// on every grower this job controlled last time but no longer does, so a grower leaving this
+    /// job's scope isn't stuck with whatever sow/harvest state it was last given. Growers that are
+    /// gone, or that another active job now controls, are left alone.
+    /// </summary>
+    private void SyncControlledGrowers(IReadOnlyList<IPlantToGrowSettable> nowControlled)
+    {
+        foreach (
+            var grower in ComputeGrowersToRelease(
+                _lastControlledGrowers,
+                nowControlled,
+                g => IsGrowerGone(g) || IsControlledByAnotherJob(g)
+            )
+        )
+        {
+            grower.ReleaseHysteresisControl();
+        }
+
+        _lastControlledGrowers.Clear();
+        _lastControlledGrowers.UnionWith(nowControlled);
+    }
+
+    private static bool IsGrowerGone(IPlantToGrowSettable grower) =>
+        grower switch
+        {
+            Thing thing => thing.Destroyed,
+            Zone zone => zone.Cells.Count == 0,
+            _ => false,
+        };
+
+    private bool IsControlledByAnotherJob(IPlantToGrowSettable grower) =>
+        Manager
+            .JobTracker.JobsOfType<ManagerJob_FarmingHysteresis>()
+            .Any(job =>
+                job != this && job.IsManaged && job._lastControlledGrowers.Contains(grower)
+            );
+
     public override WorkTypeDef WorkTypeDef => WorkTypeDefOf.Growing;
 
-    public override void CleanUp(ManagerLog? jobLog = null) { }
+    /// <summary>
+    /// Hands every grower this job controls back to the player when the job is deleted (see
+    /// <see cref="SyncControlledGrowers"/>).
+    /// </summary>
+    public override void CleanUp(ManagerLog? jobLog = null) => SyncControlledGrowers([]);
 
     /// <summary>
     /// How often <see cref="Tick"/> reasserts sow/harvest state, in game ticks - matches
@@ -982,11 +1065,12 @@ internal sealed class ManagerJob_FarmingHysteresis
     }
 
     /// <summary>
-    /// Reasserts this job's current hysteresis latch state onto every managed grower every
-    /// <see cref="TickInterval"/> ticks (see <see cref="ReassertSowState"/>) - independent of this
+    /// Reasserts this job's current hysteresis latch state onto every controlled grower every
+    /// <see cref="TickInterval"/> ticks (see <see cref="ReassertSowState"/>), and hands back any
+    /// grower it no longer controls (see <see cref="SyncControlledGrowers"/>) - independent of this
     /// job's own work-cycle cadence, which can otherwise be far less frequent. A no-op while this
     /// job is dormant (<see cref="IsManaged"/> false, e.g. the legacy engine is the active
-    /// controller instead) or before a target plant has been chosen.
+    /// controller instead).
     /// </summary>
     public override void Tick()
     {
@@ -994,6 +1078,15 @@ internal sealed class ManagerJob_FarmingHysteresis
         {
             return;
         }
+
+        ReassertControlledGrowers();
+    }
+
+    /// <summary><see cref="Tick"/>'s per-interval work.</summary>
+    internal void ReassertControlledGrowers()
+    {
+        var controlledGrowers = ControlledGrowers;
+        SyncControlledGrowers(controlledGrowers);
 
         var targetPlantDef = TargetPlantDef;
         if (targetPlantDef == null)
@@ -1006,7 +1099,7 @@ internal sealed class ManagerJob_FarmingHysteresis
             .. RotationEntries.Select(e => e.PlantDef).OfType<ThingDef>(),
         ];
 
-        foreach (var grower in ManagedGrowers)
+        foreach (var grower in controlledGrowers)
         {
             ReassertSowState(grower, targetPlantDef, rotationPlantDefs, SwitchMode);
         }
@@ -1021,12 +1114,11 @@ internal sealed class ManagerJob_FarmingHysteresis
             yield break;
         }
 
-        var targetPlantDef = TargetPlantDef;
-        if (targetPlantDef == null || !ValidTargetPlants.Contains(targetPlantDef))
+        if (TargetPlantDef == null)
         {
-            // No target plant chosen yet, or the previously chosen one is no longer growable by
-            // every currently-managed grower (e.g. the scope changed) - nothing to push down or
-            // gate off of until the player (re-)picks one in the "Target plant" section.
+            // No crop chosen yet - nothing to push down or gate off of until the player picks one.
+            // Growers that can't grow the active crop don't stop the cycle; ExecuteJobDataCoroutine
+            // skips them, so the latches and the rotation keep moving.
             JobState = ManagerJobState.Completed;
             yield break;
         }
@@ -1129,9 +1221,21 @@ internal sealed class ManagerJob_FarmingHysteresis
             .. RotationEntries.Select(e => e.PlantDef).OfType<ThingDef>(),
         ];
 
+        var controlledGrowers = data.Growers.Where(CanGrowActiveCropOn).ToList();
+        foreach (var grower in data.Growers.Except(controlledGrowers))
+        {
+            jobLog.AddDetail(
+                "FarmingHysteresis.CMR.Logs.GrowerCannotGrow".Translate(
+                    GrowerLabel(grower),
+                    targetPlantDef.LabelCap
+                )
+            );
+        }
+
+        SyncControlledGrowers(controlledGrowers);
         RecomputeSowBudget();
 
-        foreach (var grower in data.Growers)
+        foreach (var grower in controlledGrowers)
         {
             if (grower.GetPlantDefToGrow() != targetPlantDef)
             {

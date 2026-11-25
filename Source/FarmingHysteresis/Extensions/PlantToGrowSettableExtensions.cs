@@ -145,6 +145,14 @@ internal static class PlantToGrowSettableExtensions
     }
 
     /// <summary>
+    /// Hands <paramref name="plantGrower"/> back from hysteresis control: sowing and harvesting
+    /// are both allowed again, except that a registered <see cref="FarmingHysteresisMod.AllowSowVeto"/>
+    /// can still keep sowing off.
+    /// </summary>
+    internal static void ReleaseHysteresisControl(this IPlantToGrowSettable plantGrower) =>
+        plantGrower.SetHysteresisControlState(HysteresisMode.SowingAndHarvesting, state: true);
+
+    /// <summary>
     /// Pure decision logic behind <see cref="SetHysteresisControlState"/>'s sow gating.
     /// <paramref name="vetoAllowsSow"/> is <see cref="FarmingHysteresisMod.AllowSowVeto"/>'s
     /// result for this grower (true when no veto is registered or it doesn't apply) - ANDed in

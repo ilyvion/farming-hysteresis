@@ -42,6 +42,7 @@ internal sealed class CmrHysteresisController : IHysteresisController
 
         var targetPlantDef = job.TargetPlantDef;
         return targetPlantDef != null
+            && job.CanGrowActiveCropOn(grower)
             && ManagerJob_FarmingHysteresis.IsLeftoverPlant(
                 plant.def,
                 targetPlantDef,
@@ -52,26 +53,32 @@ internal sealed class CmrHysteresisController : IHysteresisController
     /// <summary>
     /// Delegates to <paramref name="grower"/>'s owning job's own sow-cell budget (see
     /// <see cref="ManagerJob_FarmingHysteresis.IsCellWithinSowBudget"/>) - unrestricted whenever
-    /// there's no owning job, the job isn't actually active, or the job's "limit sowing to
-    /// computed need" option is off.
+    /// there's no owning job, the job isn't actually active, the grower can't grow the job's
+    /// active crop (see <see cref="ManagerJob_FarmingHysteresis.CanGrowActiveCropOn"/>), or the
+    /// job's "limit sowing to computed need" option is off.
     /// </summary>
     public bool IsCellSowAllowed(IPlantToGrowSettable grower, IntVec3 cell)
     {
         var manager = Manager.For(grower.Map);
         var job = ManagerJob_FarmingHysteresis.FindOwningJob(manager, grower);
-        return job is not { IsManaged: true } || job.IsCellWithinSowBudget(cell);
+        return job is not { IsManaged: true }
+            || !job.CanGrowActiveCropOn(grower)
+            || job.IsCellWithinSowBudget(cell);
     }
 
     /// <summary>
     /// Delegates to <paramref name="grower"/>'s owning job's own cascading sow plan (see
     /// <see cref="ManagerJob_FarmingHysteresis.GetCellSowPlantOverride"/>) - <see langword="null"/>
-    /// (no override) whenever there's no owning job or the job isn't actually active.
+    /// (no override) whenever there's no owning job, the job isn't actually active, or the grower
+    /// can't grow the job's active crop.
     /// </summary>
     public ThingDef? GetCellSowPlantOverride(IPlantToGrowSettable grower, IntVec3 cell)
     {
         var manager = Manager.For(grower.Map);
         var job = ManagerJob_FarmingHysteresis.FindOwningJob(manager, grower);
-        return job is { IsManaged: true } ? job.GetCellSowPlantOverride(cell) : null;
+        return job is { IsManaged: true } && job.CanGrowActiveCropOn(grower)
+            ? job.GetCellSowPlantOverride(cell)
+            : null;
     }
 
     public bool ShowGrowerUi => false;

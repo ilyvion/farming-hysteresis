@@ -90,6 +90,7 @@
     <FarmingHysteresis.CMR.Logs.LatchState>{0}</FarmingHysteresis.CMR.Logs.LatchState>
     <FarmingHysteresis.CMR.Logs.GrowerPlantSet>{0}: now set to grow {1}</FarmingHysteresis.CMR.Logs.GrowerPlantSet>
     <FarmingHysteresis.CMR.Logs.GrowerStateChanged>{0}: {1}</FarmingHysteresis.CMR.Logs.GrowerStateChanged>
+    <FarmingHysteresis.CMR.Logs.GrowerCannotGrow>{0}: can't grow {1}, left alone</FarmingHysteresis.CMR.Logs.GrowerCannotGrow>
     <FarmingHysteresis.CMR.Logs.Enabled>enabled</FarmingHysteresis.CMR.Logs.Enabled>
     <FarmingHysteresis.CMR.Logs.Disabled>disabled</FarmingHysteresis.CMR.Logs.Disabled>
 </LanguageData>
