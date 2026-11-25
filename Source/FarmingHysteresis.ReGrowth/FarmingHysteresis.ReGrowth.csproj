@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <RootNamespace>FarmingHysteresis.ReGrowth</RootNamespace>
+        <AssemblyName>FarmingHysteresis.ReGrowth</AssemblyName>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <OutputPath>../../Integrations/ReGrowth/$(RimWorldVersion)/Assemblies</OutputPath>
+        <!-- ReGrowth 2 only bundles Smart Farming from its 1.6 build onwards. -->
+        <SupportedRimWorldVersions>1.6;1.7</SupportedRimWorldVersions>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <!-- CalculateAverages is private; publicizing it lets the Harmony patch target it via
+             nameof instead of a bare string literal. -->
+        <Publicize Include="ReGrowthCore:ReGrowthCore.MapComponent_SmartFarming.CalculateAverages" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FarmingHysteresis\FarmingHysteresis.csproj">
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
+        <Reference Include="ReGrowthCore">
+            <HintPath>$(RimWorldSteamWorkshopFolderPath)\2260097569\$(RimWorldVersion)\Assemblies\ReGrowthCore.dll</HintPath>
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+</Project>

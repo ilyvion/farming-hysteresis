@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <UseLaboratory>true</UseLaboratory>
+        <RootNamespace>FarmingHysteresis.ReGrowth.Tests</RootNamespace>
+        <AssemblyName>FarmingHysteresis.ReGrowth.Tests</AssemblyName>
+        <OutputPath>../../Integrations/ReGrowth/$(RimWorldVersion)/Assemblies</OutputPath>
+        <SupportedRimWorldVersions>1.6;1.7</SupportedRimWorldVersions>
+    </PropertyGroup>
+    <!--
+        Dev-only test assembly for the ReGrowth 2 integration, built and run in-game via DevTools.
+        Its output is deployed alongside FarmingHysteresis.ReGrowth.dll into
+        Integrations/ReGrowth/<version>/Assemblies, which LoadFolders.xml only loads when
+        ReGrowth 2 (ReGrowth.BOTR.Core) is active, so these tests are only discovered when there's
+        a ReGrowth 2 install for them to actually exercise, and launching FarmingHysteresis
+        without it never touches this assembly.
+
+        It's listed in FarmingHysteresis.sln so it always builds locally (default Configuration
+        is Debug, see .vscode/build_config.sh), but FarmingHysteresis.sln deliberately omits a
+        Release|Any CPU.Build.0 line for this project's GUID, so a Release-configuration build
+        (what CI/release always use, per rimworld-utils' build_mod.yml) skips building it
+        entirely; its output never lands in a shipped release.
+    -->
+    <ItemGroup>
+        <ProjectReference Include="..\FarmingHysteresis\FarmingHysteresis.csproj">
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
+        <ProjectReference Include="..\FarmingHysteresis.ReGrowth\FarmingHysteresis.ReGrowth.csproj">
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
+        <Reference Include="ReGrowthCore">
+            <HintPath>$(RimWorldSteamWorkshopFolderPath)\2260097569\$(RimWorldVersion)\Assemblies\ReGrowthCore.dll</HintPath>
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
+    <ItemGroup Condition="'$(RimWorldVersion)' == '1.6' Or '$(RimWorldVersion)' == '1.7'">
+        <ProjectReference
+            Include="$(ProjectDependenciesBasePath)\Third-Party\DevTools\DevTools\DevTools.csproj"
+            AdditionalProperties="RimWorldVersion=$(RimWorldVersion);OutDir=$(MSBuildThisFileDirectory)..\..\$(RimWorldVersion)\Assemblies\"
+        >
+            <CopyLocal>False</CopyLocal>
+            <Private>false</Private>
+        </ProjectReference>
+    </ItemGroup>
+</Project>

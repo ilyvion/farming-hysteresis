@@ -41,7 +41,7 @@ This mode still works and isn't going away, but it's no longer where new feature
 
 ## Compatibility
 
-Farming Hysteresis also supports the aquatic and sandy growing zones from Vanilla Plants Expanded - More Plants, and respects Smart Farming's 'No petty jobs' zone setting.
+Farming Hysteresis also supports the aquatic and sandy growing zones from Vanilla Plants Expanded - More Plants, and works alongside Smart Farming, including the copy bundled into ReGrowth 2, respecting its 'No petty jobs' zone setting.
 
 ## Requirements
 

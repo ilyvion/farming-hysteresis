@@ -27,7 +27,7 @@
 
         &lt;size=24&gt;Compatibility&lt;/size&gt;
 
-        Farming Hysteresis also supports the aquatic and sandy growing zones from Vanilla Plants Expanded - More Plants, and respects Smart Farming's 'No petty jobs' zone setting.
+        Farming Hysteresis also supports the aquatic and sandy growing zones from Vanilla Plants Expanded - More Plants, and works alongside Smart Farming, including the copy bundled into ReGrowth 2, respecting its 'No petty jobs' zone setting.
     </description>
     <supportedVersions>
         <li>1.3</li>
@@ -57,6 +57,9 @@
         <li>ilyvion.Laboratory</li>
         <!-- Sowing/harvesting control only works correctly if we're after Smart Farming -->
         <li>Owlchemist.SmartFarming</li>
+        <!-- ReGrowth 2 bundles its own copy of Smart Farming, which the ReGrowth integration
+             patches -->
+        <li>ReGrowth.BOTR.Core</li>
         <!-- The Colony Manager Redux integration subclasses its ManagerJob/ManagerSettings/
              ManagerTab, so its assembly must load after CMR's -->
         <li>ilyvion.colonymanagerredux</li>

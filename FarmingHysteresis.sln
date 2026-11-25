@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmingHysteresis.SmartFarm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmingHysteresis.SmartFarming.Tests", "Source\FarmingHysteresis.SmartFarming.Tests\FarmingHysteresis.SmartFarming.Tests.csproj", "{24176CA0-EB0A-4B45-8400-571B2E9EE37B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmingHysteresis.ReGrowth", "Source\FarmingHysteresis.ReGrowth\FarmingHysteresis.ReGrowth.csproj", "{D8B2D91B-A289-42FA-BFD4-627950ADE5E1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FarmingHysteresis.ReGrowth.Tests", "Source\FarmingHysteresis.ReGrowth.Tests\FarmingHysteresis.ReGrowth.Tests.csproj", "{B3463E50-B8F4-428A-8316-7E0CF40E9F25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +68,13 @@ Global
 		{24176CA0-EB0A-4B45-8400-571B2E9EE37B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{24176CA0-EB0A-4B45-8400-571B2E9EE37B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24176CA0-EB0A-4B45-8400-571B2E9EE37B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8B2D91B-A289-42FA-BFD4-627950ADE5E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8B2D91B-A289-42FA-BFD4-627950ADE5E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8B2D91B-A289-42FA-BFD4-627950ADE5E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8B2D91B-A289-42FA-BFD4-627950ADE5E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3463E50-B8F4-428A-8316-7E0CF40E9F25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3463E50-B8F4-428A-8316-7E0CF40E9F25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3463E50-B8F4-428A-8316-7E0CF40E9F25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
