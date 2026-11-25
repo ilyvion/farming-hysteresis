@@ -15,7 +15,7 @@ public class SmartFarmingMod : IlyvionMod
     {
         _ = PatchAll(Constants.Id);
 
-        FarmingHysteresisMod.AllowSowVeto = SmartFarmingIntegration.AllowSow;
+        FarmingHysteresisMod.AddAllowSowVeto(SmartFarmingIntegration.AllowSow);
 
         FarmingHysteresisMod.Instance.LogMessage("\"Smart Farming\" interop loaded successfully!");
     }

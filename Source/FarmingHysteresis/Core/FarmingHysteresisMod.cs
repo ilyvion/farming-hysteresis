@@ -33,4 +33,14 @@ public partial class FarmingHysteresisMod
     /// veto) when nothing is registered.
     /// </summary>
     public static Func<IPlantToGrowSettable, bool>? AllowSowVeto { get; internal set; }
+
+    /// <summary>
+    /// Registers <paramref name="veto"/> in <see cref="AllowSowVeto"/> alongside any veto already
+    /// registered: sowing is allowed only when every registered veto allows it.
+    /// </summary>
+    internal static void AddAllowSowVeto(Func<IPlantToGrowSettable, bool> veto)
+    {
+        var previousVeto = AllowSowVeto;
+        AllowSowVeto = previousVeto == null ? veto : grower => previousVeto(grower) && veto(grower);
+    }
 }

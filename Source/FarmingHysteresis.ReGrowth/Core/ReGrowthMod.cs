@@ -15,10 +15,7 @@ public class ReGrowthMod : IlyvionMod
     {
         _ = PatchAll(Constants.Id);
 
-        var previousVeto = FarmingHysteresisMod.AllowSowVeto;
-        FarmingHysteresisMod.AllowSowVeto = grower =>
-            (previousVeto?.Invoke(grower) ?? true)
-            && ReGrowthSmartFarmingIntegration.AllowSow(grower);
+        FarmingHysteresisMod.AddAllowSowVeto(ReGrowthSmartFarmingIntegration.AllowSow);
 
         FarmingHysteresisMod.Instance.LogMessage("\"ReGrowth 2\" interop loaded successfully!");
     }
